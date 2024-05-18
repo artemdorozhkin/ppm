@@ -207,32 +207,15 @@ Public Function SaveModules(ByRef Modules As Object, ByVal Encoding As String, B
 End Function
 
 Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
-    Dim Stream As Object: Set Stream = NewFileSystemObject().GetFile(Path).OpenAsTextStream()
-    Dim Content As String: Content = Stream.ReadAll()
-    Stream.Close
+    Dim SourceStream As Object
+    Set SourceStream = NewFileSystemObject().OpenTextFile(Path)
+    Dim Content As String
+    If Not SourceStream.AtEndOfStream Then
+        Content = SourceStream.ReadAll()
+    End If
+    SourceStream.Close
 
-    Dim UTFStream As Object
-    Set UTFStream = CreateObject("adodb.stream")
-    UTFStream.Type = 2 'adTypeText
-    UTFStream.Mode = 3 'adModeReadWrite
-    UTFStream.Charset = Encoding
-    UTFStream.Open
-    UTFStream.WriteText Content
-    UTFStream.Position = 3 'skip BOM
-
-    Dim BinaryStream As Object
-    Set BinaryStream = CreateObject("adodb.stream")
-    BinaryStream.Type = 1 'adTypeBinary
-    BinaryStream.Mode = 3 'adModeReadWrite
-    BinaryStream.Open
-
-    UTFStream.CopyTo BinaryStream
-    UTFStream.Flush
-    UTFStream.Close
-
-    BinaryStream.SaveToFile Path, 2 'adSaveCreateOverWrite
-    BinaryStream.Flush
-    BinaryStream.Close
+    SaveToFile Path, Content, Encoding
 End Sub
 
 Private Property Get ICommand_CommandInfo() As CommandInfo
@@ -240,10 +223,11 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Run()
+    Dim Ms As Double: Ms = DateTime.Timer
     Dim LastExport As Variant: LastExport = Me.GetLastExport()
     If UBound(LastExport) > -1 Then Me.DeleteFiles LastExport
 
-    Dim Modules As Object: Set Modules = NewDictionary()
+    Dim Modules As Dictionary: Set Modules = NewDictionary()
     Dim SaveStruct As Boolean: SaveStruct = ArrayIncludes(this.Args, "-s", "--save-struct")
     If SaveStruct Then
         Set Modules = Me.ParseModulesWithDirectory()
@@ -254,4 +238,10 @@ Private Sub ICommand_Run()
     Dim Encoding As String: Encoding = Me.GetEncoding()
     LastExport = Me.SaveModules(Modules, Encoding, SaveStruct)
     SaveLastExport LastExport
+
+    Ms = DateTime.Timer - Ms
+    Debug.Print FString( _
+        "exported {0} module{1} in {2}\\nroot folder: {3}\\n", _
+        Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(Ms), SelectedProject.Folder _
+    )
 End Sub

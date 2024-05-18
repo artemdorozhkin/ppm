@@ -93,22 +93,20 @@ Private Function ReadLines() As Variant
     If Strings.Len(this.ConfigPath) = 0 Then Err.Raise 76, TypeName(Me)
 
     With NewFileSystemObject()
-        If Not .FileExists(this.ConfigPath) Then .CreateTextFile this.ConfigPath
-        With .GetFile(this.ConfigPath).OpenAsTextStream(ConfigIOMode.ForReading)
-            If Not .AtEndOfLine Then ReadLines = Strings.Split(.ReadAll(), vbNewLine)
-            .Close
-        End With
+        If Not .FileExists(this.ConfigPath) Then
+            .CreateTextFile this.ConfigPath
+        End If
+    End With
+
+    With NewStream()
+        .Charset = "UTF-8"
+        .Open
+        .LoadFromFile this.ConfigPath
+        ReadLines = Strings.Split(.ReadText(), vbNewLine)
     End With
 End Function
 
 Private Sub WriteLines(ByRef Lines As Variant)
     If Strings.Len(this.ConfigPath) = 0 Then Err.Raise 76, TypeName(Me)
-
-    With NewFileSystemObject()
-        If Not .FileExists(this.ConfigPath) Then .CreateTextFile this.ConfigPath
-        With .GetFile(this.ConfigPath).OpenAsTextStream(ConfigIOMode.ForWriting)
-            .Write Strings.Join(Lines, vbNewLine)
-            .Close
-        End With
-    End With
+    SaveToFile this.ConfigPath, Strings.Join(Lines, vbNewLine), "UTF-8"
 End Sub

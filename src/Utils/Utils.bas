@@ -2,6 +2,48 @@ Attribute VB_Name = "Utils"
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
+Public Function ConvertTime(ByVal Value As Double) As String
+    Dim s As Double: s = 1000
+    Dim m As Double: m = s * 60
+    Dim h As Double: h = m * 60
+    Dim d As Double: d = h * 24
+    Dim w As Double: w = d * 7
+    Dim y As Double: y = d * 365.25
+
+    Value = Math.Round(Math.Abs(Value * s))
+    If Value >= d Then
+        ConvertTime = FString("{0}d", Math.Round(Value / d))
+    ElseIf Value >= h Then
+        ConvertTime = FString("{0}h", Math.Round(Value / h))
+    ElseIf Value >= m Then
+        ConvertTime = FString("{0}m", Math.Round(Value / m))
+    ElseIf Value >= s Then
+        ConvertTime = FString("{0}s", Math.Round(Value / s))
+    Else
+        ConvertTime = FString("{0}ms", Value)
+    End If
+End Function
+
+Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, ByVal Encoding As String)
+    Dim EncodingStream As Stream: Set EncodingStream = NewStream()
+    EncodingStream.Mode = 3 'adModeReadWrite
+    EncodingStream.Charset = Encoding
+    EncodingStream.Open
+    EncodingStream.WriteText Content
+    EncodingStream.Position = 3 'skip BOM
+
+    Dim BinaryStream As Object: Set BinaryStream = NewStream()
+    BinaryStream.Mode = 3 'adModeReadWrite
+    BinaryStream.Type = 1 'adTypeBinary
+    BinaryStream.Open
+
+    EncodingStream.CopyTo BinaryStream
+    EncodingStream.Close
+
+    BinaryStream.SaveToFile Path, 2 'adSaveCreateOverWrite
+    BinaryStream.Close
+End Sub
+
 Public Sub CreateFoldersRecoursive(ByVal Path As String)
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
     Dim Parts As Variant: Parts = Strings.Split(Path, Application.PathSeparator)
@@ -241,7 +283,11 @@ Public Function GetFileExt(ByVal Path As String) As String
     GetFileExt = Strings.Mid(FileName, DotPosition)
 End Function
 
-Public Function NewDictionary(Optional ByVal Compare As VbCompareMethod = VbCompareMethod.vbBinaryCompare) As Object
+Public Function NewStream() As Stream
+    Set NewStream = CreateObject("ADODB.Stream")
+End Function
+
+Public Function NewDictionary(Optional ByVal Compare As VbCompareMethod = VbCompareMethod.vbBinaryCompare) As Dictionary
     Set NewDictionary = CreateObject("Scripting.Dictionary")
     NewDictionary.CompareMode = Compare
 End Function

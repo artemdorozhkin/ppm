@@ -35,6 +35,10 @@ Public Property Get Path() As String
     Path = this.Project.FileName
 End Property
 
+Public Property Get Folder() As String
+    Folder = NewFolder(this.Project.FileName).Path
+End Property
+
 Public Property Set Project(ByVal RHS As VBProject)
     Set this.Project = RHS
 End Property

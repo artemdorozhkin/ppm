@@ -30,33 +30,6 @@ Public Property Let Args(ByVal RHS As Variant)
     this.Args = RHS
 End Property
 
-Public Sub PrintHelp(ByRef Info As CommandInfo)
-    Debug.Print FString(Info.Description & "\\n")
-    Debug.Print FString("Usage:\\nppm ""{0} {1}""\\n", Info.Name, Strings.Join(Info.Usage, "\\n  "))
-
-    If Info.Params.Count > 0 Then
-        Debug.Print "Options:"
-        Dim Param As Variant
-        For Each Param In Info.Params
-            Dim Description As String: Description = Info.Params(Param)
-            Debug.Print FString("--{0}{1}", Param, Description)
-        Next
-    End If
-
-    Dim CommandAliases As Collection: Set CommandAliases = New Collection
-    Dim CLIAliases As Object: Set CLIAliases = CLI.Aliases
-    Dim Alias As Variant
-    For Each Alias In CLIAliases
-        If IsEqual(CLIAliases(Alias), Info.Name) Then
-            CommandAliases.Add Alias
-        End If
-    Next
-
-    If CommandAliases.Count > 0 Then
-        Debug.Print FString("Aliases:\\n{0}", Strings.Join(ToArray(CommandAliases), ", "))
-    End If
-End Sub
-
 Public Function GetCommandName() As String
     If Information.IsEmpty(this.Args) Then Exit Function
 
@@ -82,9 +55,7 @@ Private Sub ICommand_Run()
 
     On Error GoTo Catch
     Dim Command As ICommand: Set Command = Application.Run(FString("New{0}Command", Arg), this.Args)
-    On Error GoTo 0
-
-    PrintHelp Command.CommandInfo
+    Debug.Print Command.CommandInfo.GetUsage()
 Exit Sub
 
 Catch:
