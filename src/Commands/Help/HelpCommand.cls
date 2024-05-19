@@ -45,13 +45,44 @@ Continue:
     GetCommandName = Arg
 End Function
 
+Public Function ShowPPMInfo()
+    Immediate.WriteLine FString("Pear Package Manager, v{0}\\n", App.Version)
+    Immediate.WriteLine "Usage:"
+    Immediate.WriteLine FString( _
+        "ppm ""install""\\nppm ""install <package>""\\nppm ""init""\\nppm ""init <project name>""\\n" _
+    )
+    Immediate.WriteLine "Commands:"
+
+    Dim List As Collection: Set List = New Collection
+    Dim Command As Variant
+    For Each Command In CLI.Commands
+        Dim Line As String
+        If Strings.Len(Line) = 0 Then
+            Line = Command
+        Else
+            Line = FString("{0}, {1}", Line, Command)
+        End If
+
+        If Strings.Len(Line) > 45 Then
+            List.Add Line
+            Line = ""
+        End If
+    Next
+    If Strings.Len(Line) > 0 Then List.Add Line
+
+    Immediate.WriteLine Strings.Join(PCollection.ToArray(List), vbNewLine)
+End Function
+
 Private Property Get ICommand_CommandInfo() As CommandInfo
     Set ICommand_CommandInfo = this.CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
     Dim Arg As String: Arg = CLI.FindCommand(Me.GetCommandName())
-    If Strings.Len(Arg) = 0 Then Arg = "help"
+    If Strings.Len(Arg) = 0 Then
+        ShowPPMInfo
+        Exit Sub
+    End If
 
     On Error GoTo Catch
     Dim Command As ICommand: Set Command = Application.Run(FString("New{0}Command", Arg), this.Args)
@@ -61,4 +92,3 @@ Exit Sub
 Catch:
     Immediate.WriteLine "Unknown command " & Arg
 End Sub
-

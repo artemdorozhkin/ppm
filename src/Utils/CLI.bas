@@ -34,6 +34,9 @@ Public Function ParseCommand(ByRef Args As Variant) As ICommand
     If Not IsArray(Args) Then
         Set ParseCommand = NewHelpCommand(Empty)
         Exit Function
+    ElseIf UBound(Args) = -1 Then
+        Set ParseCommand = NewHelpCommand(Empty)
+        Exit Function
     ElseIf PArray.IncludesAny(Args, "-h") Or PArray.IncludesAny(Args, "--help") Then
         Set ParseCommand = NewHelpCommand(Args)
         Exit Function
