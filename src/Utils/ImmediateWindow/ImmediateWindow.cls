@@ -46,12 +46,8 @@ Public Sub WriteLine(ParamArray Args() As Variant)
 End Sub
 
 Public Sub ReadLine(ByVal Text As String, Optional ByVal NextFunction As String)
-    If Strings.Len(NextFunction) = 0 Then NextFunction = "Immediate.Echo"
-    Debug.Print Text & vbNewLine & Space(100) & NextFunction & " _"
-End Sub
-
-Public Sub Echo(ByVal Args As String)
-    Debug.Print Args
+    If Strings.Len(NextFunction) > 0 Then NextFunction = NextFunction & " _"
+    Debug.Print Text & vbNewLine & Space(100) & NextFunction
 End Sub
 
 Public Function ParseArgs(ByVal StringArgs As String) As Variant
