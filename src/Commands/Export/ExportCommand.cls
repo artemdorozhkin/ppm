@@ -90,9 +90,15 @@ Exit Sub
 
 Catch:
     If FSO.FolderExists(Item) Then
-        Immediate.WriteLine FString("ERR: Cannot delete folder '{0}'. #{1} {2}", FSO.GetFolder(Item).Name, Err.Number, Err.Description)
+        Immediate.WriteLine FString( _
+            "ERR: Cannot delete folder '{0}'. #{1} {2}", _
+            FSO.GetFolder(Item).Name, Err.Number, Err.Description _
+        )
     ElseIf FSO.FileExists(Item) Then
-        Immediate.WriteLine FString("ERR: Cannot delete file '{0}'. #{1} {2}", FSO.GetFile(Item).Name, Err.Number, Err.Description)
+        Immediate.WriteLine FString( _
+            "ERR: Cannot delete file '{0}'. #{1} {2}", _
+            FSO.GetFolder(Item).Name, Err.Number, Err.Description _
+        )
     End If
 End Sub
 
