@@ -35,6 +35,6 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
     Set ICommand_CommandInfo = this.CommandInfo
 End Property
 
-Private Sub ICommand_Run()
+Private Sub ICommand_Exec()
     Debug.Print "ppm install command"
 End Sub

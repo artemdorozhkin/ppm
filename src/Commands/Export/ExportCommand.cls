@@ -222,7 +222,7 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
     Set ICommand_CommandInfo = this.CommandInfo
 End Property
 
-Private Sub ICommand_Run()
+Private Sub ICommand_Exec()
     Dim Ms As Double: Ms = DateTime.Timer
     Dim LastExport As Variant: LastExport = Me.GetLastExport()
     If UBound(LastExport) > -1 Then Me.DeleteFiles LastExport
@@ -245,3 +245,4 @@ Private Sub ICommand_Run()
         Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(Ms), SelectedProject.Folder _
     )
 End Sub
+

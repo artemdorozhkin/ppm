@@ -26,10 +26,18 @@ Public Property Let ConfigPath(ByVal RHS As String)
     this.ConfigPath = RHS
 End Property
 
-Public Function ReadSection(ByVal Name As String) As Object
+#If DEV Then
+  Public Function ReadSection(ByVal Name As String) As Dictionary
+#Else
+  Public Function ReadSection(ByVal Name As String) As Object
+#End If
     Dim Lines As Variant: Lines = ReadLines()
     If Information.IsEmpty(Lines) Then Lines = Array()
+  #If DEV Then
+    Dim Section As Dictionary: Set Section = NewDictionary(vbTextCompare)
+  #Else
     Dim Section As Object: Set Section = NewDictionary(vbTextCompare)
+  #End If
 
     Dim i As Long
     For i = 0 To UBound(Lines)
@@ -108,5 +116,5 @@ End Function
 
 Private Sub WriteLines(ByRef Lines As Variant)
     If Strings.Len(this.ConfigPath) = 0 Then Err.Raise 76, TypeName(Me)
-    SaveToFile this.ConfigPath, Strings.Join(Lines, vbNewLine), "UTF-8"
+    SaveToFile this.ConfigPath, Strings.Join(Lines, vbNewLine)
 End Sub

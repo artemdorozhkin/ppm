@@ -18,12 +18,20 @@ Public Enum ModuleType
 End Enum
 
 Private Type TProject
+  #If DEV Then
     Project As VBProject
+  #Else
+    Project As Object
+  #End If
 End Type
 
 Private this As TProject
 
-Public Property Get Modules() As VBComponents
+#If DEV Then
+  Public Property Get Modules() As VBComponents
+#Else
+  Public Property Get Modules() As Object
+#End If
     Set Modules = this.Project.VBComponents
 End Property
 
@@ -43,12 +51,20 @@ Public Property Set Project(ByVal RHS As VBProject)
     Set this.Project = RHS
 End Property
 
-Public Function GetModule(ByVal Name As String) As Object
+#If DEV Then
+  Public Function GetModule(ByVal Name As String) As VBComponents
+#Else
+  Public Function GetModule(ByVal Name As String) As Object
+#End If
     If Not Me.IsModuleExists(Name) Then Exit Function
     Set GetModule = this.Project.VBComponents(Name)
 End Function
 
-Public Function AddModule(ByVal Name As String) As Object
+#If DEV Then
+  Public Function AddModule(ByVal Name As String) As VBComponents
+#Else
+  Public Function AddModule(ByVal Name As String) As Object
+#End If
     Set AddModule = this.Project.VBComponents.Add(ModuleType.StdModule)
     AddModule.Name = Name
 End Function
@@ -59,7 +75,11 @@ Public Function ImportModule(ByVal Path As String)
     Set ImportModule = this.Project.VBComponents.Import(Path)
 End Function
 
-Public Function ExportModule(ByVal Folder As String, ByRef Module As VBComponent) As String
+#If DEV Then
+  Public Function ExportModule(ByVal Folder As String, ByRef Module As VBComponent) As String
+#Else
+  Public Function ExportModule(ByVal Folder As String, ByRef Module As Object) As String
+#End If
     Dim Ext As String: Ext = GetModuleExt(Module)
     Dim Path As String: Path = NewFileSystemObject().BuildPath(Folder, Module.Name & Ext)
     Module.Export Path
@@ -85,7 +105,11 @@ Private Function IsValidType(ByVal Path As String) As Boolean
     IsValidType = Ext = ".bas" Or Ext = ".cls"
 End Function
 
-Private Function GetModuleExt(ByRef Module As VBComponent) As String
+#If DEV Then
+  Private Function GetModuleExt(ByRef Module As VBComponent) As String
+#Else
+  Private Function GetModuleExt(ByRef Module As Object) As String
+#End If
     Select Case Module.Type
     Case ModuleType.StdModule: GetModuleExt = ".bas"
     Case ModuleType.ClassModule: GetModuleExt = ".cls"
@@ -94,4 +118,3 @@ Private Function GetModuleExt(ByRef Module As VBComponent) As String
     Case Else: GetModuleExt = ".txt"
     End Select
 End Function
-

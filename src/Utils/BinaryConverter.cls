@@ -17,17 +17,17 @@ End Type
 Private this As TBinaryConverter
 
 Private Sub Class_Initialize()
-    Set this.Stream = CreateObject("ADODB.Stream")
+    Set this.Stream = NewStream()
 End Sub
 
 Public Function FromFile(ByVal Path As String) As String
-    Dim fileNum As Integer: fileNum = FreeFile
+    Dim FileNum As Integer: FileNum = FreeFile
 
-    Open Path For Binary Access Read As #fileNum
+    Open Path For Binary Access Read As #FileNum
     Dim FileData() As Byte
-    ReDim FileData(1 To LOF(fileNum))
-    Get #fileNum, , FileData
-    Close #fileNum
+    ReDim FileData(1 To LOF(FileNum))
+    Get #FileNum, , FileData
+    Close #FileNum
 
     FromFile = Strings.StrConv(FileData, vbUnicode)
 End Function

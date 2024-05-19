@@ -10,7 +10,7 @@ Public Sub ppm(Optional ByVal StringArgs As String)
     Set SelectedProject = NewProject(Application.VBE.ActiveVBProject)
     Dim Args As Variant: Args = ArgsParser.Parse(StringArgs)
     Dim Command As ICommand: Set Command = CLI.Parse(Args)
-    Command.Run
+    Command.Exec
 Exit Sub
 
 Catch:

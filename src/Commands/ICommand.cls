@@ -14,5 +14,5 @@ Option Explicit
 Public Property Get CommandInfo() As CommandInfo
 End Property
 
-Public Sub Run()
+Public Sub Exec()
 End Sub

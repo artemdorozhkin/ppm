@@ -10,8 +10,16 @@ Public Property Get Commands() As Variant
     )
 End Property
 
-Public Property Get Aliases() As Object
+#If DEV Then
+  Public Property Get Aliases() As Dictionary
+#Else
+  Public Property Get Aliases() As Object
+#End If
+  #If DEV Then
+    Dim Buffer As Dictionary: Set Buffer = NewDictionary(vbTextCompare)
+  #Else
     Dim Buffer As Object: Set Buffer = NewDictionary(vbTextCompare)
+  #End If
 
     Buffer("i") = "install"
     Buffer("add") = "install"
@@ -51,3 +59,4 @@ Public Function FindCommand(ByVal Name As String) As String
         Exit Function
     End If
 End Function
+

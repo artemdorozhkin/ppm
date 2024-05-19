@@ -24,15 +24,23 @@ Public Function ConvertTime(ByVal Value As Double) As String
     End If
 End Function
 
-Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, ByVal Encoding As String)
+Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional ByVal Encoding As String = "UTF-8")
+  #If DEV Then
     Dim EncodingStream As Stream: Set EncodingStream = NewStream()
+  #Else
+    Dim EncodingStream As Object: Set EncodingStream = NewStream()
+  #End If
     EncodingStream.Mode = 3 'adModeReadWrite
     EncodingStream.Charset = Encoding
     EncodingStream.Open
     EncodingStream.WriteText Content
     EncodingStream.Position = 3 'skip BOM
 
+  #If DEV Then
+    Dim BinaryStream As Stream: Set BinaryStream = NewStream()
+  #Else
     Dim BinaryStream As Object: Set BinaryStream = NewStream()
+  #End If
     BinaryStream.Mode = 3 'adModeReadWrite
     BinaryStream.Type = 1 'adTypeBinary
     BinaryStream.Open
@@ -45,7 +53,11 @@ Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, ByVal Encod
 End Sub
 
 Public Sub CreateFoldersRecoursive(ByVal Path As String)
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
     Dim Parts As Variant: Parts = Strings.Split(Path, Application.PathSeparator)
     Dim Part As Variant
     For Each Part In Parts
@@ -183,7 +195,11 @@ Public Function ArrayIncludes(ByRef Data As Variant, ParamArray OneOfValue() As 
 End Function
 
 Public Function ArgsToOptions(ByRef Args As Variant) As Variant
+  #If DEV Then
+    Dim Options As Dictionary: Set Options = NewDictionary(VbCompareMethod.vbTextCompare)
+  #Else
     Dim Options As Object: Set Options = NewDictionary(VbCompareMethod.vbTextCompare)
+  #End If
 
     Dim i As Long
     For i = 1 To UBound(Args)
@@ -287,16 +303,28 @@ Public Function NewStream() As Stream
     Set NewStream = CreateObject("ADODB.Stream")
 End Function
 
-Public Function NewDictionary(Optional ByVal Compare As VbCompareMethod = VbCompareMethod.vbBinaryCompare) As Dictionary
+#If DEV Then
+  Public Function NewDictionary(Optional ByVal Compare As VbCompareMethod = VbCompareMethod.vbBinaryCompare) As Dictionary
+#Else
+  Public Function NewDictionary(Optional ByVal Compare As VbCompareMethod = VbCompareMethod.vbBinaryCompare) As Object
+#End If
     Set NewDictionary = CreateObject("Scripting.Dictionary")
     NewDictionary.CompareMode = Compare
 End Function
 
-Public Function NewFileSystemObject() As FileSystemObject
+#If DEV Then
+  Public Function NewFileSystemObject() As FileSystemObject
+#Else
+  Public Function NewFileSystemObject() As Object
+#End If
     Set NewFileSystemObject = CreateObject("Scripting.FileSystemObject")
 End Function
 
-Public Function NewFolder(ByVal Path As String) As Folder
+#If DEV Then
+  Public Function NewFolder(ByVal Path As String) As Folder
+#Else
+  Public Function NewFolder(ByVal Path As String) As Object
+#End If
     With NewFileSystemObject()
         If (FileSystem.GetAttr(Path) And vbDirectory) = vbDirectory Then
             Set NewFolder = .GetFolder(Path)
@@ -305,3 +333,4 @@ Public Function NewFolder(ByVal Path As String) As Folder
         End If
     End With
 End Function
+

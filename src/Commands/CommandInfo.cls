@@ -12,7 +12,11 @@ Option Explicit
 
 Public Name As String
 Public Description As String
-Public Params As Variant
+#If DEV Then
+  Public Params As Dictionary
+#Else
+  Public Params As Object
+#End If
 Public Usage As Variant
 
 Private Sub Class_Initialize()

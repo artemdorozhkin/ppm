@@ -49,7 +49,7 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
     Set ICommand_CommandInfo = this.CommandInfo
 End Property
 
-Private Sub ICommand_Run()
+Private Sub ICommand_Exec()
     Dim Arg As String: Arg = CLI.FindCommand(Me.GetCommandName())
     If Strings.Len(Arg) = 0 Then Arg = "help"
 
@@ -61,3 +61,4 @@ Exit Sub
 Catch:
     Debug.Print "Unknown command " & Arg
 End Sub
+
