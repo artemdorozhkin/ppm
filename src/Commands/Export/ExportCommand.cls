@@ -23,8 +23,8 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "export"
     this.CommandInfo.Description = "Exports the selected project."
-    this.CommandInfo.Params("save-struct") = "\\tSave the RubberDuck structure when exporting a project."
-    this.CommandInfo.Params("encoding") = "\\t\\tExport files with set encoding. Default UTF-8."
+    this.CommandInfo.Params.Add "save-struct", "\\tSave the RubberDuck structure when exporting a project."
+    this.CommandInfo.Params.Add "encoding", "\\t\\tExport files with set encoding. Default UTF-8."
     this.CommandInfo.Usage = Array("[<options>]")
 End Sub
 
@@ -228,7 +228,7 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
-    Dim Ms As Double: Ms = DateTime.Timer
+    Dim ms As Double: ms = DateTime.Timer
     Dim LastExport As Variant: LastExport = Me.GetLastExport()
     If UBound(LastExport) > -1 Then Me.DeleteFiles LastExport
 
@@ -244,9 +244,9 @@ Private Sub ICommand_Exec()
     LastExport = Me.SaveModules(Modules, Encoding, SaveStruct)
     SaveLastExport LastExport
 
-    Ms = DateTime.Timer - Ms
+    ms = DateTime.Timer - ms
     Immediate.WriteLine FString( _
         "exported {0} module{1} in {2}\\nroot folder: {3}\\n", _
-        Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(Ms), SelectedProject.Folder _
+        Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(ms), SelectedProject.Folder _
     )
 End Sub
