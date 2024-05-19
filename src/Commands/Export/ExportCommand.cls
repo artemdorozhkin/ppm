@@ -25,7 +25,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Description = "Exports the selected project."
     this.CommandInfo.Params("save-struct") = "\\tSave the RubberDuck structure when exporting a project."
     this.CommandInfo.Params("encoding") = "\\t\\tExport files with set encoding. Default UTF-8."
-    this.CommandInfo.Params("yes") = "\\t\\t\\tSkip warnings."
     this.CommandInfo.Usage = Array("[<options>]")
 End Sub
 
@@ -49,7 +48,7 @@ Exit Function
 
 Catch:
     If Err.Number = 76 Then
-        Debug.Print "ERR: It is required to save the project before exporting."
+        Immediate.WriteLine "ERR: It is required to save the project before exporting."
         End
     Else
         Err.Raise Err.Number, TypeName(Me)
@@ -68,7 +67,7 @@ Exit Sub
 
 Catch:
     If Err.Number = 76 Then
-        Debug.Print "ERR: It is required to save the project before exporting."
+        Immediate.WriteLine "ERR: It is required to save the project before exporting."
         End
     Else
         Err.Raise Err.Number, TypeName(Me)
@@ -91,9 +90,9 @@ Exit Sub
 
 Catch:
     If FSO.FolderExists(Item) Then
-        Debug.Print FString("ERR: Cannot delete folder '{0}'. #{1} {2}", FSO.GetFolder(Item).Name, Err.Number, Err.Description)
+        Immediate.WriteLine FString("ERR: Cannot delete folder '{0}'. #{1} {2}", FSO.GetFolder(Item).Name, Err.Number, Err.Description)
     ElseIf FSO.FileExists(Item) Then
-        Debug.Print FString("ERR: Cannot delete file '{0}'. #{1} {2}", FSO.GetFile(Item).Name, Err.Number, Err.Description)
+        Immediate.WriteLine FString("ERR: Cannot delete file '{0}'. #{1} {2}", FSO.GetFile(Item).Name, Err.Number, Err.Description)
     End If
 End Sub
 
@@ -240,7 +239,7 @@ Private Sub ICommand_Exec()
     SaveLastExport LastExport
 
     Ms = DateTime.Timer - Ms
-    Debug.Print FString( _
+    Immediate.WriteLine FString( _
         "exported {0} module{1} in {2}\\nroot folder: {3}\\n", _
         Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(Ms), SelectedProject.Folder _
     )

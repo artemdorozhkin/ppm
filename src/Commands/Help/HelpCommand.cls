@@ -55,10 +55,10 @@ Private Sub ICommand_Exec()
 
     On Error GoTo Catch
     Dim Command As ICommand: Set Command = Application.Run(FString("New{0}Command", Arg), this.Args)
-    Debug.Print Command.CommandInfo.GetUsage()
+    Immediate.WriteLine Command.CommandInfo.GetUsage()
 Exit Sub
 
 Catch:
-    Debug.Print "Unknown command " & Arg
+    Immediate.WriteLine "Unknown command " & Arg
 End Sub
 

@@ -232,31 +232,9 @@ Public Function FString(ByVal Text As String, ParamArray Variables() As Variant)
 
     FormatedText = Strings.Replace(FormatedText, "\\n", vbNewLine)
     FormatedText = Strings.Replace(FormatedText, "\\r", vbNewLine)
+    FormatedText = Strings.Replace(FormatedText, "\\t", vbTab)
 
-    If InStr(1, FormatedText, "\\t", vbTextCompare) = 0 Then
-        FString = FormatedText
-        Exit Function
-    End If
-
-    Dim Lines As Variant: Lines = Strings.Split(FormatedText, vbNewLine)
-    Dim Index As Long
-    For Index = 0 To UBound(Lines)
-        Dim Line As String: Line = Lines(Index)
-        i = 1
-        Do While i <= Strings.Len(Line)
-            If Strings.Mid(Line, i, 1) = "\" And _
-               Strings.Mid(Line, i + 1, 1) = "\" And _
-               Strings.Mid(Line, i + 2, 1) = "t" Then
-                Line = Strings.Replace(Line, "\\t", Strings.Space(4 - ((i - 1) Mod 4)), Count:=1)
-            End If
-
-            Lines(Index) = Line
-            i = i + 1
-            If i > Strings.Len(Line) Then Exit Do
-        Loop
-    Next
-
-    FString = Strings.Join(Lines, vbNewLine)
+    FString = FormatedText
 End Function
 
 Public Function IsWhiteSpace(ByVal Char As String) As Boolean

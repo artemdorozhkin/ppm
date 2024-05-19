@@ -30,22 +30,22 @@ End Property
     Set Aliases = Buffer
 End Property
 
-Public Function Parse(ByRef Args As Variant) As ICommand
+Public Function ParseCommand(ByRef Args As Variant) As ICommand
     If Not IsArray(Args) Then
-        Set Parse = NewHelpCommand(Empty)
+        Set ParseCommand = NewHelpCommand(Empty)
         Exit Function
     ElseIf ArrayIncludes(Args, "-h") Or ArrayIncludes(Args, "--help") Then
-        Set Parse = NewHelpCommand(Args)
+        Set ParseCommand = NewHelpCommand(Args)
         Exit Function
     End If
 
     Dim Command As String: Command = CLI.FindCommand(Args(0))
     If Strings.Len(Command) = 0 Then
-        Debug.Print "Unknown command " & Args(0)
+        Immediate.WriteLine "Unknown command " & Args(0)
         End
     End If
 
-    Set Parse = Application.Run(FString("New{0}Command", Command), Args)
+    Set ParseCommand = Application.Run(FString("New{0}Command", Command), Args)
 End Function
 
 Public Function FindCommand(ByVal Name As String) As String
@@ -59,4 +59,3 @@ Public Function FindCommand(ByVal Name As String) As String
         Exit Function
     End If
 End Function
-
