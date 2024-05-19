@@ -6,6 +6,7 @@ Public Property Get Commands() As Variant
     Commands = Array( _
         "export", _
         "help", _
+        "init", _
         "install" _
     )
 End Property
@@ -26,6 +27,9 @@ End Property
 
     Buffer("exp") = "export"
     Buffer("save") = "export"
+
+    Buffer("create") = "init"
+    Buffer("new") = "init"
 
     Set Aliases = Buffer
 End Property
@@ -61,6 +65,18 @@ Public Function FindCommand(ByVal Name As String) As String
         FindCommand = Aliases(Name)
         Exit Function
     End If
+End Function
+
+Public Function GetGlobalConfigPath() As String
+    With NewFileSystemObject()
+        Dim PPMPath As String
+        PPMPath = .BuildPath(Interaction.Environ("APPDATA"), "ppm")
+        If Not .FolderExists(PPMPath) Then CreateFoldersRecoursive PPMPath
+        Dim ConfigPath As String
+        ConfigPath = .BuildPath(PPMPath, "config.cfg")
+        If Not .FileExists(ConfigPath) Then .CreateTextFile(ConfigPath).Close
+        GetGlobalConfigPath = ConfigPath
+    End With
 End Function
 
 Public Function GetPPMProjectsPath() As String

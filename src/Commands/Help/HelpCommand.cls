@@ -49,7 +49,7 @@ Public Function ShowPPMInfo()
     Immediate.WriteLine FString("Pear Package Manager, v{0}\\n", App.Version)
     Immediate.WriteLine "Usage:"
     Immediate.WriteLine FString( _
-        "ppm ""install""\\nppm ""install <package>""\\nppm ""init""\\nppm ""init <project name>""\\n" _
+        "ppm ""install""\\nppm ""install <package>""\\nppm ""init""\\nppm ""init <package name>""\\n" _
     )
     Immediate.WriteLine "Commands:"
 
