@@ -23,7 +23,7 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "install"
     this.CommandInfo.Description = "Installs the selected package."
-    this.CommandInfo.Params("yes") = "\\tSets the default package information."
+    this.CommandInfo.Params.Add "yes", "\\tSets the default package information."
     this.CommandInfo.Usage = Array("[<some package>@<some version>] [<options>]")
 End Sub
 

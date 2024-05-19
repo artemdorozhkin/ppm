@@ -46,11 +46,14 @@ End Property
         i = i + 1
         Line = Lines(i)
         Do While Not StartsWith(Line, "[")
-            Dim KeyValuePair As Variant
-            KeyValuePair = Strings.Split(Line, "=")
-            Section(Strings.Trim(KeyValuePair(0))) = Strings.Trim(KeyValuePair(1))
+            If Strings.Len(Strings.Replace(Line, " ", "")) > 0 Then
+                Dim KeyValuePair As Variant
+                KeyValuePair = Strings.Split(Line, "=")
+                Section(Strings.Trim(KeyValuePair(0))) = Strings.Trim(KeyValuePair(1))
+            End If
             i = i + 1
-            If i >= UBound(Lines) Then Exit Do
+            If i > UBound(Lines) Then Exit Do
+            Line = Lines(i)
         Loop
         Exit For
 Continue:
@@ -80,7 +83,7 @@ Public Sub WriteData(ByVal SectionName As String, ByVal Key As String, ByVal Val
                 End If
             End If
             i = i + 1
-            If i >= UBound(Lines) Then Exit Do
+            If i > UBound(Lines) Then Exit Do
             Line = Lines(i)
         Loop
         If i > UBound(Lines) Then ReDim Preserve Lines(UBound(Lines) + 1)

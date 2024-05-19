@@ -52,7 +52,7 @@ Public Property Set Project(ByVal RHS As VBProject)
 End Property
 
 #If DEV Then
-  Public Function GetModule(ByVal Name As String) As VBComponents
+  Public Function GetModule(ByVal Name As String) As VBComponent
 #Else
   Public Function GetModule(ByVal Name As String) As Object
 #End If
@@ -61,7 +61,7 @@ End Property
 End Function
 
 #If DEV Then
-  Public Function AddModule(ByVal Name As String) As VBComponents
+  Public Function AddModule(ByVal Name As String) As VBComponent
 #Else
   Public Function AddModule(ByVal Name As String) As Object
 #End If
