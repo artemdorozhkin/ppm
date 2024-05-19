@@ -6,7 +6,7 @@
 
 Currently, `ppm` supports a few commands:
 
-- `export`: Exports modules to project folder.
+- `export`: Exports modules to the project root folder.
 - `help`: Provides usage assistance and descriptions for commands.
 
 ## Contribution
