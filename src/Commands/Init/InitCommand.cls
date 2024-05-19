@@ -72,9 +72,8 @@ Private Sub ICommand_Exec()
     Dim SkipByDefault As Boolean
     SkipByDefault = PArray.IncludesAny(this.Args, "-y", "--yes")
 
-    If UBound(this.Args) > 0 And Not SkipByDefault Then
-        InitDialog.SetNameAndDefault Me.FindProjectName()
-    ElseIf UBound(this.Args) > 1 And SkipByDefault Then
+    If (UBound(this.Args) > 0 And Not SkipByDefault) Or _
+       (UBound(this.Args) > 1 And SkipByDefault) Then
         InitDialog.SetNameAndDefault Me.FindProjectName()
     ElseIf Not SkipByDefault Then
         InitDialog.SetDefault
