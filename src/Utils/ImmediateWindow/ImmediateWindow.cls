@@ -79,5 +79,5 @@ Public Function ParseArgs(ByVal StringArgs As String) As Variant
         Args.Add Arg
     Loop
 
-    ParseArgs = ToArray(Args)
+    ParseArgs = PCollection.ToArray(Args)
 End Function

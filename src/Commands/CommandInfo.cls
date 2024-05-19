@@ -47,7 +47,7 @@ Public Function GetUsage() As String
     Next
 
     If CommandAliases.Count > 0 Then
-        Usage = Usage & FString("\\nAliases:\\n{0}\\n", Strings.Join(ToArray(CommandAliases), ", "))
+        Usage = Usage & FString("\\nAliases:\\n{0}\\n", Strings.Join(PCollection.ToArray(CommandAliases), ", "))
     End If
 
     GetUsage = FString(Usage)

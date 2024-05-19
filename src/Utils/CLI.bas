@@ -34,7 +34,7 @@ Public Function ParseCommand(ByRef Args As Variant) As ICommand
     If Not IsArray(Args) Then
         Set ParseCommand = NewHelpCommand(Empty)
         Exit Function
-    ElseIf ArrayIncludes(Args, "-h") Or ArrayIncludes(Args, "--help") Then
+    ElseIf PArray.IncludesAny(Args, "-h") Or PArray.IncludesAny(Args, "--help") Then
         Set ParseCommand = NewHelpCommand(Args)
         Exit Function
     End If
@@ -49,7 +49,7 @@ Public Function ParseCommand(ByRef Args As Variant) As ICommand
 End Function
 
 Public Function FindCommand(ByVal Name As String) As String
-    If ArrayIncludes(Commands, Name) Then
+    If PArray.IncludesAny(Commands, Name) Then
         FindCommand = Name
         Exit Function
     End If
@@ -58,4 +58,37 @@ Public Function FindCommand(ByVal Name As String) As String
         FindCommand = Aliases(Name)
         Exit Function
     End If
+End Function
+
+Public Function GetPPMProjectsPath() As String
+    With NewFileSystemObject()
+        Dim PPMPath As String
+        PPMPath = .BuildPath(Interaction.Environ("LOCALAPPDATA"), "ppm")
+        Dim PPMProjectsPath As String
+        PPMProjectsPath = .BuildPath(PPMPath, "projects")
+        If Not .FolderExists(PPMProjectsPath) Then CreateFoldersRecoursive PPMProjectsPath
+        GetPPMProjectsPath = PPMProjectsPath
+    End With
+End Function
+
+Public Function GetProjectPath() As String
+    Dim PPMProjectsPath As String: PPMProjectsPath = GetPPMProjectsPath()
+    With NewFileSystemObject()
+        Dim ProjectName As String
+        ProjectName = .GetFileName(SelectedProject.Path)
+
+        Dim ProjectTimeStamp As String
+        ProjectTimeStamp = Strings.Format( _
+            .GetFile(SelectedProject.Path).DateCreated, "ddmmyyyy_hhnnss" _
+        )
+
+        Dim FolderName As String
+        FolderName = FString("{0}_{1}", ProjectName, ProjectTimeStamp)
+
+        Dim ThisProjectPath As String
+        ThisProjectPath = .BuildPath(PPMProjectsPath, FolderName)
+        If Not .FolderExists(ThisProjectPath) Then FileSystem.MkDir ThisProjectPath
+    End With
+
+    GetProjectPath = ThisProjectPath
 End Function

@@ -208,7 +208,7 @@ Public Function SaveModules(ByRef Modules As Object, ByVal Encoding As String, B
         FileList.Add FileName
     Next
 
-    SaveModules = ToArray(FileList)
+    SaveModules = PCollection.ToArray(FileList)
 End Function
 
 Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
@@ -233,7 +233,7 @@ Private Sub ICommand_Exec()
     If UBound(LastExport) > -1 Then Me.DeleteFiles LastExport
 
     Dim Modules As Dictionary: Set Modules = NewDictionary()
-    Dim SaveStruct As Boolean: SaveStruct = ArrayIncludes(this.Args, "-s", "--save-struct")
+    Dim SaveStruct As Boolean: SaveStruct = PArray.IncludesAny(this.Args, "-s", "--save-struct")
     If SaveStruct Then
         Set Modules = Me.ParseModulesWithDirectory()
     Else
@@ -250,4 +250,3 @@ Private Sub ICommand_Exec()
         Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(Ms), SelectedProject.Folder _
     )
 End Sub
-
