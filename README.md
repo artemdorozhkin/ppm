@@ -6,6 +6,7 @@
 
 Currently, `ppm` supports a few commands:
 
+- `init`: Initialises the package.
 - `export`: Exports modules to the project root folder.
 - `help`: Provides usage assistance and descriptions for commands.
 
