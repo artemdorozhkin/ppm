@@ -1,5 +1,5 @@
 Attribute VB_Name = "HelpCommandCstr"
-'@Folder "PearPMProject.src.Commands.Help"
+'@Folder "PearPMProject.src.CLI.Commands.Help"
 Option Explicit
 
 Public Function NewHelpCommand(Optional ByRef Tokens As Tokens) As HelpCommand

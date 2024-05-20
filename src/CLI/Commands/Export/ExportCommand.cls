@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.Commands.Export"
+'@Folder "PearPMProject.src.CLI.Commands.Export"
 Option Explicit
 
 Implements ICommand
@@ -23,8 +23,10 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "export"
     this.CommandInfo.Description = "Exports the selected project."
-    this.CommandInfo.Params.Add "save-struct", "\\tSave the RubberDuck structure when exporting a project."
-    this.CommandInfo.Params.Add "encoding", "\\t\\tExport files with set encoding. Default UTF-8."
+    this.CommandInfo.Params = Array( _
+        "encoding", _
+        "save-struct" _
+    )
     this.CommandInfo.Usage = Array("[<options>]")
 End Sub
 
@@ -255,3 +257,5 @@ Private Sub ICommand_Exec()
         Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(ms), SelectedProject.Folder _
     )
 End Sub
+
+

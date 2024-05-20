@@ -1,5 +1,5 @@
 Attribute VB_Name = "SyntaxTokenCstr"
-'@Folder "PearPMProject.src.Lexer"
+'@Folder "PearPMProject.src.CLI.Lexer"
 Option Explicit
 
 Public Function NewSyntaxToken(ByVal Kind As TokenKind, ByVal Text As String) As SyntaxToken

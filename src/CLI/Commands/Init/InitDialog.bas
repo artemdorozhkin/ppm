@@ -1,5 +1,5 @@
 Attribute VB_Name = "InitDialog"
-'@Folder("PearPMProject.src.Commands.Init")
+'@Folder "PearPMProject.src.CLI.Commands.Init"
 Option Explicit
 
 Public Type TPackageInfo
@@ -64,7 +64,7 @@ Public Sub Step7(Optional ByVal Confirm As String)
     If IsEqual(Confirm, "n") Then
         Immediate.WriteLine "Aborted"
     Else
-        ppm "init -y --after-dialog"
+        ppm "init -y --_after-dialog"
     End If
 End Sub
 
@@ -100,3 +100,4 @@ Public Function SetDefault() As TPackageInfo
 
     SetDefault = PackInfo
 End Function
+

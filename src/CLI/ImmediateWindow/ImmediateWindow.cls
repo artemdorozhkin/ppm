@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.Utils.ImmediateWindow"
+'@Folder "PearPMProject.src.CLI.ImmediateWindow"
 Option Explicit
 
 Private Type TImmediateWindow
@@ -49,3 +49,4 @@ Public Sub ReadLine(ByVal Text As String, Optional ByVal NextFunction As String)
     If Strings.Len(NextFunction) > 0 Then NextFunction = NextFunction & " _"
     Debug.Print Text & vbNewLine & Space(100) & NextFunction
 End Sub
+

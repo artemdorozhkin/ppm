@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.Commands.Install"
+'@Folder "PearPMProject.src.CLI.Commands.Install"
 Option Explicit
 
 Implements ICommand
@@ -23,7 +23,6 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "install"
     this.CommandInfo.Description = "Installs the selected package."
-    this.CommandInfo.Params.Add "yes", "\\tSets the default package information."
     this.CommandInfo.Usage = Array("[<some package>@<some version>] [<options>]")
 End Sub
 

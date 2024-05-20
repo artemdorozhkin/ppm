@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.Lexer"
+'@Folder "PearPMProject.src.CLI.Lexer"
 Option Explicit
 
 Private Type TLexer
@@ -36,6 +36,10 @@ Public Function Lex() As Tokens
 
             Case " "
                 ReadWhiteSpace
+                GoTo Continue
+
+            Case "="
+                this.Position = this.Position + 1
                 GoTo Continue
 
             Case Else
@@ -81,14 +85,14 @@ Private Sub ReadOptionItem()
         this.Kind = OptionItem
     End If
 
-    Do While Current Like "[A-Za-zА-Яа-яЁё0-9-]"
+    Do While Current Like "[A-Za-zА-Яа-яЁё0-9-_]"
         this.Position = this.Position + 1
         If Information.IsNull(Current) Then Exit Do
     Loop
 End Sub
 
 Private Sub ReadIdentifier()
-    Do While Current Like "[A-Za-zА-Яа-яЁё0-9-]"
+    Do While Current Like "[A-Za-zА-Яа-яЁё0-9-_@.]"
         this.Position = this.Position + 1
         If Information.IsNull(Current) Then Exit Do
     Loop

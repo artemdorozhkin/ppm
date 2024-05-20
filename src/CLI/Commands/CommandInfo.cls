@@ -7,33 +7,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.Commands"
+'@Folder "PearPMProject.src.CLI.Commands"
 Option Explicit
 
 Public Name As String
 Public Description As String
-#If DEV Then
-  Public Params As Dictionary
-#Else
-  Public Params As Object
-#End If
+Public Params As Variant
 Public Usage As Variant
-
-Private Sub Class_Initialize()
-    Set Me.Params = NewDictionary()
-End Sub
 
 Public Function GetUsage() As String
     Dim Usage As String
     Usage = FString(Me.Description & "\\n")
     Usage = Usage & FString("\\nUsage:\\nppm ""{0} {1}""\\n", Me.Name, Strings.Join(Me.Usage, "\\n  "))
 
-    If Me.Params.Count > 0 Then
+    If Information.IsArray(Me.Params) Then
         Usage = Usage & "\\nOptions:\\n"
         Dim Param As Variant
         For Each Param In Me.Params
-            Dim About As String: About = Me.Params(Param)
-            Usage = Usage & FString("--{0}{1}\\n", Param, About)
+            Dim Definition As Definition: Set Definition = CLI.Definitions(Param)
+            Usage = Usage & FString( _
+                "-{0}|--{1}{2}\\n", Definition.Short, Definition.Key, Definition.Description _
+            )
         Next
     End If
 
@@ -52,3 +46,4 @@ Public Function GetUsage() As String
 
     GetUsage = FString(Usage)
 End Function
+

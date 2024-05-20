@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.Commands.Init"
+'@Folder "PearPMProject.src.CLI.Commands.Init"
 Option Explicit
 
 Implements ICommand
@@ -23,10 +23,8 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "init"
     this.CommandInfo.Description = "Create a package module."
-    this.CommandInfo.Params.Add "yes", "\\tSkip dialog and sets package by default."
-    this.CommandInfo.Usage = Array( _
-        "<package name>" _
-    )
+    this.CommandInfo.Params = Array("name", "yes")
+    this.CommandInfo.Usage = Array("<package name>")
 End Sub
 
 Public Property Set Tokens(ByVal RHS As Tokens)
@@ -60,11 +58,14 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    Dim AfterDialogDef As Definition: Set AfterDialogDef = CLI.Definitions("_after-dialog")
     Dim AfterDialog As Boolean
-    AfterDialog = this.Tokens.IncludeToken("after-dialog", OptionItem)
+    AfterDialog = this.Tokens.IncludeToken(AfterDialogDef.Key, OptionItem)
+
+    Dim YesDef As Definition: Set YesDef = CLI.Definitions("yes")
     Dim SkipByDefault As Boolean
-    SkipByDefault = this.Tokens.IncludeToken("y", ShortOptionItem) Or _
-                    this.Tokens.IncludeToken("yes", OptionItem)
+    SkipByDefault = this.Tokens.IncludeToken(YesDef.Short, ShortOptionItem) Or _
+                    this.Tokens.IncludeToken(YesDef.Key, OptionItem)
 
     If Not AfterDialog Then InitDialog.SetDefault
     If this.Tokens.IncludeTokenKind(Identifier) Then
@@ -82,3 +83,4 @@ Private Sub ICommand_Exec()
         InitDialog.Start
     End If
 End Sub
+

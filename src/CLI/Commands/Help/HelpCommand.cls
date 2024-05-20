@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.Commands.Help"
+'@Folder "PearPMProject.src.CLI.Commands.Help"
 Option Explicit
 
 Implements ICommand
@@ -114,3 +114,4 @@ Exit Sub
 Catch:
     Immediate.WriteLine "Unknown command " & CommandName
 End Sub
+

@@ -1,5 +1,5 @@
 Attribute VB_Name = "TokenKindEnum"
-'@Folder "PearPMProject.src.Lexer"
+'@Folder "PearPMProject.src.CLI.Lexer"
 Option Explicit
 
 Public Enum TokenKind
