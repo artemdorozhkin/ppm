@@ -13,7 +13,7 @@ Option Explicit
 Implements ICommand
 
 Private Type TInstallCommand
-    Args As Variant
+    Tokens As Tokens
     CommandInfo As CommandInfo
 End Type
 
@@ -27,8 +27,8 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = Array("[<some package>@<some version>] [<options>]")
 End Sub
 
-Public Property Let Args(ByVal RHS As Variant)
-    this.Args = RHS
+Public Property Set Tokens(ByVal RHS As Tokens)
+    Set this.Tokens = RHS
 End Property
 
 Private Property Get ICommand_CommandInfo() As CommandInfo

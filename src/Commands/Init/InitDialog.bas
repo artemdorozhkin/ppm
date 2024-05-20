@@ -18,7 +18,11 @@ Public Sub Start()
 End Sub
 
 Public Sub Step2(Optional ByVal ProjectName As String)
-    PackInfo.Name = GetOrDefault(ProjectName, "ProjectName")
+    Dim Name As String
+    If Strings.Len(PackInfo.Name) = 0 Then
+        PackInfo.Name = GetOrDefault(ProjectName, "ProjectName")
+    End If
+
     Dim Default As String: Default = GetOrDefault("", "Version")
     Immediate.ReadLine FString("version ({0}):", Default), "InitDialog.Step3"
 End Sub
@@ -60,7 +64,7 @@ Public Sub Step7(Optional ByVal Confirm As String)
     If IsEqual(Confirm, "n") Then
         Immediate.WriteLine "Aborted"
     Else
-        ppm "init -y"
+        ppm "init -y --after-dialog"
     End If
 End Sub
 

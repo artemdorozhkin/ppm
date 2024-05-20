@@ -2,7 +2,7 @@ Attribute VB_Name = "InitCommandCstr"
 '@Folder("PearPMProject.src.Commands.Init")
 Option Explicit
 
-Public Function NewInitCommand(ByRef Args As Variant) As InitCommand
+Public Function NewInitCommand(ByRef Tokens As Tokens) As InitCommand
     Set NewInitCommand = New InitCommand
-    NewInitCommand.Args = Args
+    Set NewInitCommand.Tokens = Tokens
 End Function

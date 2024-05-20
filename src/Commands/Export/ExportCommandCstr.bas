@@ -2,7 +2,7 @@ Attribute VB_Name = "ExportCommandCstr"
 '@Folder("PearPMProject.src.Commands.Export")
 Option Explicit
 
-Public Function NewExportCommand(ByRef Args As Variant) As ExportCommand
+Public Function NewExportCommand(ByRef Tokens As Tokens) As ExportCommand
     Set NewExportCommand = New ExportCommand
-    NewExportCommand.Args = Args
+    Set NewExportCommand.Tokens = Tokens
 End Function

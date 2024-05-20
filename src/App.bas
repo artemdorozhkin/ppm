@@ -8,8 +8,7 @@ Public SelectedProject As Project
 Public Sub ppm(Optional ByVal StringArgs As String)
     On Error GoTo Catch
     Set SelectedProject = NewProject(Application.VBE.ActiveVBProject)
-    Dim Args As Variant: Args = Immediate.ParseArgs(StringArgs)
-    Dim Command As ICommand: Set Command = CLI.ParseCommand(Args)
+    Dim Command As ICommand: Set Command = CLI.ParseCommand(NewLexer(StringArgs).Lex())
     Command.Exec
 Exit Sub
 

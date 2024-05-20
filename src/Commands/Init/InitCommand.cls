@@ -13,7 +13,7 @@ Option Explicit
 Implements ICommand
 
 Private Type TInitCommand
-    Args As Variant
+    Tokens As Tokens
     CommandInfo As CommandInfo
 End Type
 
@@ -29,18 +29,9 @@ Private Sub Class_Initialize()
     )
 End Sub
 
-Public Property Let Args(ByVal RHS As Variant)
-    this.Args = RHS
+Public Property Set Tokens(ByVal RHS As Tokens)
+    Set this.Tokens = RHS
 End Property
-
-Public Function FindProjectName() As String
-    this.Args = Strings.Filter(this.Args, "init", include:=False, Compare:=vbTextCompare)
-    this.Args = Strings.Filter(this.Args, "--yes", include:=False, Compare:=vbTextCompare)
-    this.Args = Strings.Filter(this.Args, "-y", include:=False, Compare:=vbTextCompare)
-    If UBound(this.Args) > 0 Then Err.Raise 9, TypeName(Me), "Invalid count of options."
-    If UBound(this.Args) = -1 Then Exit Function
-    FindProjectName = this.Args(0)
-End Function
 
 Public Sub CreatePack()
     If SelectedProject.IsModuleExists("package") Then
@@ -69,12 +60,15 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    Dim AfterDialog As Boolean
+    AfterDialog = this.Tokens.IncludeToken("after-dialog", OptionItem)
     Dim SkipByDefault As Boolean
-    SkipByDefault = PArray.IncludesAny(this.Args, "-y", "--yes")
+    SkipByDefault = this.Tokens.IncludeToken("y", ShortOptionItem) Or _
+                    this.Tokens.IncludeToken("yes", OptionItem)
 
-    If (UBound(this.Args) > 0 And Not SkipByDefault) Or _
-       (UBound(this.Args) > 1 And SkipByDefault) Then
-        InitDialog.SetNameAndDefault Me.FindProjectName()
+    If Not AfterDialog Then InitDialog.SetDefault
+    If this.Tokens.IncludeTokenKind(Identifier) Then
+        InitDialog.SetNameAndDefault this.Tokens.GetFirstTokenKind(Identifier).Text
     ElseIf Not SkipByDefault Then
         InitDialog.SetDefault
     End If

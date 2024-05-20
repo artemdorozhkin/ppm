@@ -13,7 +13,7 @@ Option Explicit
 Implements ICommand
 
 Private Type TExportCommand
-    Args As Variant
+    Tokens As Tokens
     CommandInfo As CommandInfo
 End Type
 
@@ -28,8 +28,8 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = Array("[<options>]")
 End Sub
 
-Public Property Let Args(ByVal RHS As Variant)
-    this.Args = RHS
+Public Property Set Tokens(ByVal RHS As Tokens)
+    Set this.Tokens = RHS
 End Property
 
 Public Function GetLastExport() As Variant
@@ -171,14 +171,17 @@ End Function
 Public Function GetEncoding() As Variant
     Dim Encoding As String: Encoding = "UTF-8"
 
-    Dim i As Long
-    For i = 0 To UBound(this.Args) - 1
-        Dim Arg As Variant: Arg = this.Args(i)
-        If IsEqual(Arg, "-e") Or IsEqual(Arg, "--encoding") Then
-            Encoding = this.Args(i + 1)
-            Exit For
-        End If
-    Next
+    Dim EncodingTokenIndex As Long
+    EncodingTokenIndex = this.Tokens.GetTokenIndex("encoding", OptionItem)
+    If EncodingTokenIndex = -1 Then EncodingTokenIndex = this.Tokens.GetTokenIndex("e", ShortOptionItem)
+
+    If EncodingTokenIndex = -1 Then
+        GetEncoding = Encoding
+    Else
+        GetEncoding = this.Tokens.MatchToken( _
+            EncodingTokenIndex + 1, Identifier, "Expected encoding type after ""-e|--encoding"" option." _
+        ).Text
+    End If
 
     GetEncoding = Encoding
 End Function
@@ -229,18 +232,20 @@ End Property
 
 Private Sub ICommand_Exec()
     Dim ms As Double: ms = DateTime.Timer
+    Dim Encoding As String: Encoding = Me.GetEncoding()
+
     Dim LastExport As Variant: LastExport = Me.GetLastExport()
     If UBound(LastExport) > -1 Then Me.DeleteFiles LastExport
 
     Dim Modules As Dictionary: Set Modules = NewDictionary()
-    Dim SaveStruct As Boolean: SaveStruct = PArray.IncludesAny(this.Args, "-s", "--save-struct")
+    Dim SaveStruct As Boolean: SaveStruct = this.Tokens.IncludeToken("s", ShortOptionItem) Or _
+                                            this.Tokens.IncludeToken("save-struct", OptionItem)
     If SaveStruct Then
         Set Modules = Me.ParseModulesWithDirectory()
     Else
         Set Modules = Me.ParseModules()
     End If
 
-    Dim Encoding As String: Encoding = Me.GetEncoding()
     LastExport = Me.SaveModules(Modules, Encoding, SaveStruct)
     SaveLastExport LastExport
 

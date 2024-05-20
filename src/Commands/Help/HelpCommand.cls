@@ -13,7 +13,7 @@ Option Explicit
 Implements ICommand
 
 Private Type THelpCommand
-    Args As Variant
+    Tokens As Tokens
     CommandInfo As CommandInfo
 End Type
 
@@ -26,23 +26,30 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = Array("[<command>]")
 End Sub
 
-Public Property Let Args(ByVal RHS As Variant)
-    this.Args = RHS
+Public Property Set Tokens(ByVal RHS As Tokens)
+    Set this.Tokens = RHS
 End Property
 
 Public Function GetCommandName() As String
-    If Information.IsEmpty(this.Args) Then Exit Function
+    Dim Commands As Variant: Commands = this.Tokens.GetTokensKind(TokenKind.Command)
+    If UBound(Commands) = -1 Then
+        GetCommandName = this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text
+        Exit Function
+    End If
 
-    Dim Arg As Variant
-    For Each Arg In this.Args
-        If IsEqual(Arg, "help", vbTextCompare) Or _
-           IsEqual(Arg, "-h", vbTextCompare) Or _
-           IsEqual(Arg, "--help", vbTextCompare) Then GoTo Continue
-        Exit For
-Continue:
-    Next
+    Dim HelpOptionIndex As Long: HelpOptionIndex = this.Tokens.GetTokenIndex("h", ShortOptionItem)
+    If HelpOptionIndex = -1 Then HelpOptionIndex = this.Tokens.GetTokenIndex("help", OptionItem)
+    Dim CommandIndex As Long
+    CommandIndex = IIf(HelpOptionIndex = -1, 1, 0)
 
-    GetCommandName = Arg
+    Dim Command As SyntaxToken: Set Command = Commands(CommandIndex)
+    Dim Name As String: Name = CLI.FindCommand(Command.Text)
+
+    If Strings.Len(Name) = 0 Then
+        GetCommandName = Command.Text
+    Else
+        GetCommandName = Name
+    End If
 End Function
 
 Public Function ShowPPMInfo()
@@ -78,17 +85,32 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
-    Dim Arg As String: Arg = CLI.FindCommand(Me.GetCommandName())
-    If Strings.Len(Arg) = 0 Then
+    If IsFalse(this.Tokens) Then
         ShowPPMInfo
         Exit Sub
     End If
 
+    If this.Tokens.Count = 0 Then
+        ShowPPMInfo
+        Exit Sub
+    End If
+
+    If this.Tokens.Count = 1 Then
+        If IsEqual(this.Tokens(1).Text, this.CommandInfo.Name) Then
+            ppm "help -h"
+            Exit Sub
+        End If
+    End If
+
     On Error GoTo Catch
-    Dim Command As ICommand: Set Command = Application.Run(FString("New{0}Command", Arg), this.Args)
+    Dim CommandName As String: CommandName = Me.GetCommandName()
+    If Strings.Len(CommandName) = 0 Then Err.Raise 0
+
+    Dim Command As ICommand
+    Set Command = Application.Run(FString("New{0}Command", CommandName), this.Tokens)
     Immediate.WriteLine Command.CommandInfo.GetUsage()
 Exit Sub
 
 Catch:
-    Immediate.WriteLine "Unknown command " & Arg
+    Immediate.WriteLine "Unknown command " & CommandName
 End Sub

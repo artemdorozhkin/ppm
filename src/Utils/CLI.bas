@@ -34,25 +34,24 @@ End Property
     Set Aliases = Buffer
 End Property
 
-Public Function ParseCommand(ByRef Args As Variant) As ICommand
-    If Not IsArray(Args) Then
-        Set ParseCommand = NewHelpCommand(Empty)
+Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
+    If Tokens.Count = 0 Then
+        Set ParseCommand = NewHelpCommand()
         Exit Function
-    ElseIf UBound(Args) = -1 Then
-        Set ParseCommand = NewHelpCommand(Empty)
-        Exit Function
-    ElseIf PArray.IncludesAny(Args, "-h") Or PArray.IncludesAny(Args, "--help") Then
-        Set ParseCommand = NewHelpCommand(Args)
+    ElseIf Tokens.IncludeToken("h", ShortOptionItem) Or _
+           Tokens.IncludeToken("help", OptionItem) Then
+        Set ParseCommand = NewHelpCommand(Tokens)
         Exit Function
     End If
 
-    Dim Command As String: Command = CLI.FindCommand(Args(0))
-    If Strings.Len(Command) = 0 Then
-        Immediate.WriteLine "Unknown command " & Args(0)
+    Dim CommandToken As SyntaxToken: Set CommandToken = Tokens(1) ' collection starts from 0
+    If CommandToken.Kind <> TokenKind.Command Then
+        Immediate.WriteLine "Unknown command " & CommandToken.Text
         End
     End If
 
-    Set ParseCommand = Application.Run(FString("New{0}Command", Command), Args)
+    Dim Command As String: Command = CLI.FindCommand(CommandToken.Text)
+    Set ParseCommand = Application.Run(FString("New{0}Command", Command), Tokens)
 End Function
 
 Public Function FindCommand(ByVal Name As String) As String

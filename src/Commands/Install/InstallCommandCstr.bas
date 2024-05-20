@@ -4,5 +4,5 @@ Option Explicit
 
 Public Function NewInstallCommand(ByRef Args As Variant) As InstallCommand
     Set NewInstallCommand = New InstallCommand
-    NewInstallCommand.Args = Args
+    NewInstallCommand.Tokens = Args
 End Function
