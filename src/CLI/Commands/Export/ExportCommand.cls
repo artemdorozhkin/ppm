@@ -35,45 +35,14 @@ Public Property Set Tokens(ByVal RHS As Tokens)
 End Property
 
 Public Function GetLastExport() As Variant
-    On Error GoTo Catch
-    Dim ProjectPath As String: ProjectPath = GetProjectPath()
-    On Error GoTo 0
-    With NewFileSystemObject()
-        Dim ProjectConfig As String
-        ProjectConfig = .BuildPath(ProjectPath, "config.cfg")
-    End With
-
-    Dim ConfigIO As ConfigIO: Set ConfigIO = NewConfigIO(ProjectConfig)
+    Dim ConfigIO As ConfigIO: Set ConfigIO = Configs.GetCurrentProjectConfig()
     Dim LastExport As Object: Set LastExport = ConfigIO.ReadSection("LastExport")
     GetLastExport = Strings.Split(LastExport("List"), ";")
-Exit Function
-
-Catch:
-    If Err.Number = 76 Then
-        Immediate.WriteLine "ERR: It is required to save the project before exporting."
-        End
-    Else
-        Err.Raise Err.Number, TypeName(Me)
-    End If
 End Function
 
 Public Sub SaveLastExport(ByRef LastExport As Variant)
-    With NewFileSystemObject()
-        Dim ProjectConfig As String
-        ProjectConfig = .BuildPath(GetProjectPath(), "config.cfg")
-    End With
-
-    Dim ConfigIO As ConfigIO: Set ConfigIO = NewConfigIO(ProjectConfig)
+    Dim ConfigIO As ConfigIO: Set ConfigIO = Configs.GetCurrentProjectConfig()
     ConfigIO.WriteData "LastExport", "List", Strings.Join(LastExport, ";")
-Exit Sub
-
-Catch:
-    If Err.Number = 76 Then
-        Immediate.WriteLine "ERR: It is required to save the project before exporting."
-        End
-    Else
-        Err.Raise Err.Number, TypeName(Me)
-    End If
 End Sub
 
 Public Sub DeleteFiles(ByRef List As Variant)
