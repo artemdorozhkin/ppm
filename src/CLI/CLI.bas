@@ -12,6 +12,15 @@ Public Property Get Commands() As Variant
     )
 End Property
 
+Public Property Get SubCommands() As Variant
+    SubCommands = Array( _
+        "get", _
+        "set", _
+        "delete", _
+        "list" _
+    )
+End Property
+
 Public Property Get Definitions()
   #If DEV Then
     Dim Buffer As Dictionary: Set Buffer = NewDictionary(vbTextCompare)
@@ -34,6 +43,15 @@ Public Property Get Definitions()
         Short:="e", _
         Default:="UTF-8", _
         Description:="\\t\\tExport files with set encoding." _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
+        Key:="global", _
+        KeyType:=vbBoolean, _
+        Short:="g", _
+        Default:=True, _
+        Description:="\\tExecutes command at the global level." _
     )
     Set Buffer(Definition.Key) = Definition
 
@@ -106,8 +124,8 @@ Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
     If Tokens.Count = 0 Then
         Set ParseCommand = NewHelpCommand()
         Exit Function
-    ElseIf Tokens.IncludeToken("h", ShortOptionItem) Or _
-           Tokens.IncludeToken("help", OptionItem) Then
+    ElseIf Tokens.IncludeToken("h", TokenKind.ShortOptionItem) Or _
+           Tokens.IncludeToken("help", TokenKind.OptionItem) Then
         Set ParseCommand = NewHelpCommand(Tokens)
         Exit Function
     End If

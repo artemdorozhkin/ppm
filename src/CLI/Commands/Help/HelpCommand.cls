@@ -37,8 +37,8 @@ Public Function GetCommandName() As String
         Exit Function
     End If
 
-    Dim HelpOptionIndex As Long: HelpOptionIndex = this.Tokens.GetTokenIndex("h", ShortOptionItem)
-    If HelpOptionIndex = -1 Then HelpOptionIndex = this.Tokens.GetTokenIndex("help", OptionItem)
+    Dim HelpOptionIndex As Long: HelpOptionIndex = this.Tokens.GetTokenIndex("h", TokenKind.ShortOptionItem)
+    If HelpOptionIndex = -1 Then HelpOptionIndex = this.Tokens.GetTokenIndex("help", TokenKind.OptionItem)
     Dim CommandIndex As Long
     CommandIndex = IIf(HelpOptionIndex = -1, 1, 0)
 

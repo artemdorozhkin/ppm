@@ -4,6 +4,7 @@ Option Explicit
 
 Public Enum TokenKind
     Command
+    SubCommand
     Identifier
     OptionItem
     ShortOptionItem

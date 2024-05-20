@@ -143,14 +143,14 @@ Public Function GetEncoding() As Variant
     Dim Encoding As String: Encoding = "UTF-8"
 
     Dim EncodingTokenIndex As Long
-    EncodingTokenIndex = this.Tokens.GetTokenIndex("encoding", OptionItem)
-    If EncodingTokenIndex = -1 Then EncodingTokenIndex = this.Tokens.GetTokenIndex("e", ShortOptionItem)
+    EncodingTokenIndex = this.Tokens.GetTokenIndex("encoding", TokenKind.OptionItem)
+    If EncodingTokenIndex = -1 Then EncodingTokenIndex = this.Tokens.GetTokenIndex("e", TokenKind.ShortOptionItem)
 
     If EncodingTokenIndex = -1 Then
         GetEncoding = Encoding
     Else
         GetEncoding = this.Tokens.MatchToken( _
-            EncodingTokenIndex + 1, Identifier, "Expected encoding type after ""-e|--encoding"" option." _
+            EncodingTokenIndex + 1, TokenKind.Identifier, "Expected encoding type after ""-e|--encoding"" option." _
         ).Text
     End If
 
@@ -209,8 +209,8 @@ Private Sub ICommand_Exec()
     If UBound(LastExport) > -1 Then Me.DeleteFiles LastExport
 
     Dim Modules As Dictionary: Set Modules = NewDictionary()
-    Dim SaveStruct As Boolean: SaveStruct = this.Tokens.IncludeToken("s", ShortOptionItem) Or _
-                                            this.Tokens.IncludeToken("save-struct", OptionItem)
+    Dim SaveStruct As Boolean: SaveStruct = this.Tokens.IncludeToken("s", TokenKind.ShortOptionItem) Or _
+                                            this.Tokens.IncludeToken("save-struct", TokenKind.OptionItem)
     If SaveStruct Then
         Set Modules = Me.ParseModulesWithDirectory()
     Else

@@ -60,16 +60,16 @@ End Property
 Private Sub ICommand_Exec()
     Dim AfterDialogDef As Definition: Set AfterDialogDef = CLI.Definitions("_after-dialog")
     Dim AfterDialog As Boolean
-    AfterDialog = this.Tokens.IncludeToken(AfterDialogDef.Key, OptionItem)
+    AfterDialog = this.Tokens.IncludeToken(AfterDialogDef.Key, TokenKind.OptionItem)
 
     Dim YesDef As Definition: Set YesDef = CLI.Definitions("yes")
     Dim SkipByDefault As Boolean
-    SkipByDefault = this.Tokens.IncludeToken(YesDef.Short, ShortOptionItem) Or _
-                    this.Tokens.IncludeToken(YesDef.Key, OptionItem)
+    SkipByDefault = this.Tokens.IncludeToken(YesDef.Short, TokenKind.ShortOptionItem) Or _
+                    this.Tokens.IncludeToken(YesDef.Key, TokenKind.OptionItem)
 
     If Not AfterDialog Then InitDialog.SetDefault
-    If this.Tokens.IncludeTokenKind(Identifier) Then
-        InitDialog.SetNameAndDefault this.Tokens.GetFirstTokenKind(Identifier).Text
+    If this.Tokens.IncludeTokenKind(TokenKind.Identifier) Then
+        InitDialog.SetNameAndDefault this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text
     ElseIf Not SkipByDefault Then
         InitDialog.SetDefault
     End If

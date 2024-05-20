@@ -78,11 +78,11 @@ End Sub
 Private Sub ReadOptionItem()
     this.Position = this.Position + 1
     this.Start = this.Position
-    this.Kind = ShortOptionItem
+    this.Kind = TokenKind.ShortOptionItem
     If Current = "-" Then
         this.Position = this.Position + 1
         this.Start = this.Position
-        this.Kind = OptionItem
+        this.Kind = TokenKind.OptionItem
     End If
 
     Do While Current Like "[A-Za-zА-Яа-яЁё0-9-_]"
@@ -101,9 +101,11 @@ Private Sub ReadIdentifier()
     Dim Text As String: Text = Strings.Mid(this.Text, this.Start, Length)
     If PArray.IncludesAny(CLI.Commands, Text) Or _
        CLI.Aliases.Exists(Text) Then
-        this.Kind = Command
+        this.Kind = TokenKind.Command
+    ElseIf PArray.IncludesAny(CLI.SubCommands, Text) Then
+        this.Kind = TokenKind.SubCommand
     Else
-        this.Kind = Identifier
+        this.Kind = TokenKind.Identifier
     End If
 End Sub
 

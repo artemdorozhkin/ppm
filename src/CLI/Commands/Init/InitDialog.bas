@@ -76,8 +76,7 @@ Public Function GetOrDefault(ByVal Value As String, ByVal ConfigKey As String) A
 
     Static Section As Dictionary
     If IsFalse(Section) Then
-        Dim Config As ConfigIO
-        Set Config = NewConfigIO(CLI.GetGlobalConfigPath())
+        Dim Config As ConfigIO: Set Config = Configs.GetGlobalConfig()
         Set Section = Config.ReadSection("Init")
     End If
     GetOrDefault = Section(ConfigKey)

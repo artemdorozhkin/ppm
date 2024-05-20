@@ -97,9 +97,39 @@ Continue:
     If i > 0 Then i = i + 1
     Lines(i) = FString("[{0}]", SectionName)
     Lines(i + 1) = FString("{0}={1}", Key, Value)
+    RemoveEmpty Lines
     WriteLines Lines
 End Sub
-    
+
+Public Sub DeleteKey(ByVal SectionName As String, ByVal Key As String)
+    Dim Lines As Variant: Lines = ReadLines()
+    If Information.IsEmpty(Lines) Then Lines = Array()
+
+    Dim i As Long
+    For i = 0 To UBound(Lines)
+        Dim Line As Variant: Line = Lines(i)
+        If Not IsEqual(Line, FString("[{0}]", SectionName)) Then GoTo Continue
+        i = i + 1
+        Line = Lines(i)
+        Do While Not StartsWith(Line, "[")
+            If Strings.Len(Strings.Replace(Line, " ", "")) > 0 Then
+                Dim KeyValuePair As Variant
+                KeyValuePair = Strings.Split(Line, "=")
+                If IsEqual(KeyValuePair(0), Key) Then
+                    Lines(i) = Empty
+                    RemoveEmpty Lines
+                    WriteLines Lines
+                    Exit Sub
+                End If
+            End If
+            i = i + 1
+            If i > UBound(Lines) Then Exit Do
+            Line = Lines(i)
+        Loop
+Continue:
+    Next
+End Sub
+
 Private Function ReadLines() As Variant
     If Strings.Len(this.ConfigPath) = 0 Then Err.Raise 76, TypeName(Me)
 
@@ -120,4 +150,20 @@ End Function
 Private Sub WriteLines(ByRef Lines As Variant)
     If Strings.Len(this.ConfigPath) = 0 Then Err.Raise 76, TypeName(Me)
     SaveToFile this.ConfigPath, Strings.Join(Lines, vbNewLine)
+End Sub
+
+Private Sub RemoveEmpty(ByRef Lines As Variant)
+    Dim Buffer() As Variant: ReDim Buffer(UBound(Lines))
+
+    Dim i As Long
+    For i = 0 To UBound(Lines)
+        If Strings.Len(Lines(i)) = 0 Then GoTo Continue
+        Dim j As Long
+        Buffer(j) = Lines(i)
+        j = j + 1
+Continue:
+    Next
+
+    ReDim Preserve Buffer(j - 1)
+    Lines = Buffer
 End Sub
