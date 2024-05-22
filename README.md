@@ -8,6 +8,7 @@ Currently, `ppm` supports a few commands:
 
 - `init`: Initialises the package.
 - `export`: Exports modules to the project root folder.
+- `config`: Manages configurations.
 - `help`: Provides usage assistance and descriptions for commands.
 
 ## Contribution
@@ -16,4 +17,4 @@ Contributions to `ppm` are welcomed. To contribute, please submit a pull request
 
 ## License
 
-The `ppm` VBA package manager is open-source software, and it is available under the [MIT License](LICENSE).
+The `ppm` VBA package manager is open-source software, and it is available under the MIT License.
