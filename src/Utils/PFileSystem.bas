@@ -43,7 +43,7 @@ Public Sub CreateFoldersRecoursive(ByVal Path As String)
         If Strings.Len(Current) = 0 Then
             Current = Part
         Else
-            Current = FString("{0}{1}{2}", Current, Application.PathSeparator, Part)
+            Current = PStrings.FString("{0}{1}{2}", Current, Application.PathSeparator, Part)
         End If
 
         If Not FSO.FolderExists(Current) Then

@@ -7,11 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.CLI.Definition"
+'@Folder "PearPMProject.src.Config.Definition"
 Option Explicit
 
 Public Key As String
-Public KeyType As VbVarType
 Public Short As String
+Public DataType As VbVarType
 Public Default As Variant
 Public Description As String

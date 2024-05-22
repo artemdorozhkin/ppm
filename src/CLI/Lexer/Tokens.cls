@@ -95,6 +95,19 @@ Public Function GetTokensKind(ByVal Kind As TokenKind) As Variant
     GetTokensKind = PCollection.ToArray(Buffer)
 End Function
 
+Public Function IncludeDefinition(ByRef Definition As Definition) As Boolean
+    IncludeDefinition = Me.IncludeToken(Definition.Key, TokenKind.OptionItem) Or _
+                        Me.IncludeToken(Definition.Short, TokenKind.ShortOptionItem)
+End Function
+
+Public Function GetTokenByDefinition(ByRef Definition As Definition) As SyntaxToken
+    If Me.IncludeToken(Definition.Key, TokenKind.OptionItem) Then
+        Set GetTokenByDefinition = Me.GetNextTokenAfter(Definition.Key, TokenKind.OptionItem)
+    ElseIf Me.IncludeToken(Definition.Short, TokenKind.ShortOptionItem) Then
+        Set GetTokenByDefinition = Me.GetNextTokenAfter(Definition.Short, TokenKind.ShortOptionItem)
+    End If
+End Function
+
 Public Function IncludeToken(ByVal Text As String, ByVal Kind As TokenKind) As Boolean
     Dim Token As SyntaxToken
     For Each Token In this.Tokens
@@ -127,10 +140,10 @@ End Function
 
 Public Function MatchToken(ByVal Index As Long, ByVal Kind As TokenKind, ByVal ErrMessage As String) As SyntaxToken
     If this.Tokens.Count < Index Then
-        Err.Raise 1, TypeName(Me), ErrMessage
+        Information.Err.Raise 1, Information.TypeName(Me), ErrMessage
     ElseIf this.Tokens(Index).Kind = Kind Then
         Set MatchToken = this.Tokens(Index)
     Else
-        Err.Raise 1, TypeName(Me), ErrMessage
+        Information.Err.Raise 1, Information.TypeName(Me), ErrMessage
     End If
 End Function

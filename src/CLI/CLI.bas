@@ -17,81 +17,9 @@ Public Property Get SubCommands() As Variant
         "get", _
         "set", _
         "delete", _
-        "list" _
+        "list", _
+        "edit" _
     )
-End Property
-
-Public Property Get Definitions()
-  #If DEV Then
-    Dim Buffer As Dictionary: Set Buffer = NewDictionary(vbTextCompare)
-  #Else
-    Dim Buffer As Object: Set Buffer = NewDictionary(vbTextCompare)
-  #End If
-    Dim Definition As Definition
-
-    Set Definition = NewDefinition( _
-        Key:="_after-dialog", _
-        KeyType:=vbBoolean, _
-        Short:="", _
-        Default:=True _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
-        Key:="encoding", _
-        KeyType:=vbString, _
-        Short:="e", _
-        Default:="UTF-8", _
-        Description:="\\t\\tExport files with set encoding." _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
-        Key:="global", _
-        KeyType:=vbBoolean, _
-        Short:="g", _
-        Default:=True, _
-        Description:="\\tExecutes command at the global level." _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
-        Key:="help", _
-        KeyType:=vbBoolean, _
-        Short:="h", _
-        Default:=True, _
-        Description:="\\t\\tShow help about command." _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
-        Key:="name", _
-        KeyType:=vbString, _
-        Short:="n", _
-        Default:="", _
-        Description:="\\tSets name." _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
-        Key:="save-struct", _
-        KeyType:=vbBoolean, _
-        Short:="s", _
-        Default:=False, _
-        Description:="\\tSave the RubberDuck structure when exporting a project." _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
-        Key:="yes", _
-        KeyType:=vbBoolean, _
-        Short:="y", _
-        Default:=True, _
-        Description:="\\tSkips dialog and sets default values." _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definitions = Buffer
 End Property
 
 #If DEV Then
@@ -100,9 +28,9 @@ End Property
   Public Property Get Aliases() As Object
 #End If
   #If DEV Then
-    Dim Buffer As Dictionary: Set Buffer = NewDictionary(vbTextCompare)
+    Dim Buffer As Dictionary: Set Buffer = NewDictionary(VbCompareMethod.vbTextCompare)
   #Else
-    Dim Buffer As Object: Set Buffer = NewDictionary(vbTextCompare)
+    Dim Buffer As Object: Set Buffer = NewDictionary(VbCompareMethod.vbTextCompare)
   #End If
 
     Buffer("i") = "install"
@@ -117,27 +45,32 @@ End Property
     Buffer("c") = "config"
     Buffer("cfg") = "config"
 
+    Buffer("ls") = "list"
+    Buffer("rm") = "delete"
+
     Set Aliases = Buffer
 End Property
 
 Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
+    Dim Config As Config: Set Config = NewConfig(Definitions.Items, Tokens)
     If Tokens.Count = 0 Then
         Set ParseCommand = NewHelpCommand()
         Exit Function
-    ElseIf Tokens.IncludeToken("h", TokenKind.ShortOptionItem) Or _
-           Tokens.IncludeToken("help", TokenKind.OptionItem) Then
-        Set ParseCommand = NewHelpCommand(Tokens)
+    ElseIf Config.GetValue("help") Then
+        Set ParseCommand = NewHelpCommand(Config, Tokens)
         Exit Function
     End If
 
-    Dim CommandToken As SyntaxToken: Set CommandToken = Tokens(1) ' collection starts from 0
+    Dim CommandToken As SyntaxToken: Set CommandToken = Tokens(1) ' collection starts from 1
     If CommandToken.Kind <> TokenKind.Command Then
         Immediate.WriteLine "Unknown command " & CommandToken.Text
         End
     End If
 
     Dim Command As String: Command = CLI.FindCommand(CommandToken.Text)
-    Set ParseCommand = Application.Run(FString("New{0}Command", Command), Tokens)
+    Set ParseCommand = Application.Run( _
+        PStrings.FString("New{0}Command", Command), Config, Tokens _
+    )
 End Function
 
 Public Function FindCommand(ByVal Name As String) As String

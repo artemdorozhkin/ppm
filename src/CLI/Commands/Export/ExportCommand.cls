@@ -13,8 +13,9 @@ Option Explicit
 Implements ICommand
 
 Private Type TExportCommand
-    Tokens As Tokens
     CommandInfo As CommandInfo
+    Config As Config
+    Tokens As Tokens
 End Type
 
 Private this As TExportCommand
@@ -23,30 +24,75 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "export"
     this.CommandInfo.Description = "Exports the selected project."
-    this.CommandInfo.Params = Array( _
-        "encoding", _
-        "save-struct" _
-    )
+    this.CommandInfo.Params.Item("encoding") = "\\t\\tExport files with set encoding."
+    this.CommandInfo.Params.Item("save-struct") = "\\tSave the RubberDuck structure when exporting a project."
     this.CommandInfo.Usage = Array("[<options>]")
 End Sub
+
+Public Property Set Config(ByVal RHS As Config)
+    Set this.Config = RHS
+End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
 End Property
 
+Private Property Get ICommand_CommandInfo() As CommandInfo
+    Set ICommand_CommandInfo = this.CommandInfo
+End Property
+
+Private Sub ICommand_Exec()
+    Dim ms As Double: ms = DateTime.Timer
+    Dim Encoding As String: Encoding = Me.GetEncoding()
+
+    Dim LastExport As Variant: LastExport = Me.GetLastExport()
+    If UBound(LastExport) > -1 Then Me.DeleteFiles LastExport
+
+  #If DEV Then
+    Dim Modules As Dictionary: Set Modules = NewDictionary()
+  #Else
+    Dim Modules As Object: Set Modules = NewDictionary()
+  #End If
+    Dim SaveStruct As Boolean
+    SaveStruct = this.Config.GetValue("save-struct")
+
+    If SaveStruct Then
+        Set Modules = Me.ParseModulesWithDirectory()
+    Else
+        Set Modules = Me.ParseModules()
+    End If
+
+    LastExport = Me.SaveModules(Modules, Encoding, SaveStruct)
+    SaveLastExport LastExport
+
+    ms = DateTime.Timer - ms
+    Immediate.WriteLine PStrings.FString( _
+        "exported {0} module{1} in {2}\\nroot folder: {3}\\n", _
+        Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(ms), SelectedProject.Folder _
+    )
+End Sub
+
 Public Function GetLastExport() As Variant
-    Dim ConfigIO As ConfigIO: Set ConfigIO = Configs.GetCurrentProjectConfig()
-    Dim LastExport As Object: Set LastExport = ConfigIO.ReadSection("LastExport")
-    GetLastExport = Strings.Split(LastExport("List"), ";")
+    Dim LastExportPath As String
+    LastExportPath = NewFileSystemObject().BuildPath(Constants.ProjectPath, ".lel")
+    Dim ConfigIO As ConfigIO: Set ConfigIO = NewConfigIO(LastExportPath)
+    Dim LastExportList As String: LastExportList = ConfigIO.Read()("LastExportList")
+    GetLastExport = Strings.Split(LastExportList, ";")
 End Function
 
 Public Sub SaveLastExport(ByRef LastExport As Variant)
-    Dim ConfigIO As ConfigIO: Set ConfigIO = Configs.GetCurrentProjectConfig()
-    ConfigIO.WriteData "LastExport", "List", Strings.Join(LastExport, ";")
+    Dim LastExportPath As String
+    LastExportPath = NewFileSystemObject().BuildPath(Constants.ProjectPath, ".lel")
+    Dim ConfigIO As ConfigIO: Set ConfigIO = NewConfigIO(LastExportPath)
+    ConfigIO.CreateOrWrite "LastExportList", Strings.Join(LastExport, ";")
 End Sub
 
 Public Sub DeleteFiles(ByRef List As Variant)
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
 
     Dim Item As Variant
     For Each Item In List
@@ -61,21 +107,32 @@ Exit Sub
 
 Catch:
     If FSO.FolderExists(Item) Then
-        Immediate.WriteLine FString( _
+        Immediate.WriteLine PStrings.FString( _
             "ERR: Cannot delete folder '{0}'. #{1} {2}", _
-            FSO.GetFolder(Item).Name, Err.Number, Err.Description _
+            FSO.GetFolder(Item).Name, Information.Err.Number, Information.Err.Description _
         )
     ElseIf FSO.FileExists(Item) Then
-        Immediate.WriteLine FString( _
+        Immediate.WriteLine PStrings.FString( _
             "ERR: Cannot delete file '{0}'. #{1} {2}", _
-            FSO.GetFolder(Item).Name, Err.Number, Err.Description _
+            FSO.GetFolder(Item).Name, _
+            Information.Err.Number, _
+            Information.Err.Description _
         )
     End If
 End Sub
 
-Public Function ParseModules() As Object
-    Dim Modules As Object: Set Modules = NewDictionary()
+#If DEV Then
+  Public Function ParseModules() As Dictionary
+#Else
+  Public Function ParseModules() As Object
+#End If
+  #If DEV Then
+    Dim Modules As Dictionary: Set Modules = NewDictionary()
     Dim Module As VBComponent
+  #Else
+    Dim Modules As Object: Set Modules = NewDictionary()
+    Dim Module As Object
+  #End If
     For Each Module In SelectedProject.Modules
         Set Modules(Module.Name) = Module
     Next
@@ -83,19 +140,32 @@ Public Function ParseModules() As Object
     Set ParseModules = Modules
 End Function
 
-Public Function ParseModulesWithDirectory() As Object
-    Dim Modules As Object: Set Modules = NewDictionary()
+#If DEV Then
+  Public Function ParseModulesWithDirectory() As Dictionary
+#Else
+  Public Function ParseModulesWithDirectory() As Object
+#End If
+  #If DEV Then
+    Dim Modules As Dictionary: Set Modules = NewDictionary()
     Dim Module As VBComponent
+  #Else
+    Dim Modules As Object: Set Modules = NewDictionary()
+    Dim Module As Object
+  #End If
     For Each Module In SelectedProject.Modules
         Dim DirectoryPath As String
-        DirectoryPath = FString("{0}:{1}", Module.Name, Me.GetDirectory(Module.CodeModule))
+        DirectoryPath = PStrings.FString("{0}:{1}", Module.Name, Me.GetDirectory(Module.CodeModule))
         Set Modules(DirectoryPath) = Module
     Next
 
     Set ParseModulesWithDirectory = Modules
 End Function
 
-Public Function GetDirectory(ByRef Code As CodeModule) As String
+#If DEV Then
+  Public Function GetDirectory(ByRef Code As CodeModule) As String
+#Else
+  Public Function GetDirectory(ByRef Code As Object) As String
+#End If
     Dim Lines As Variant: Lines = Strings.Split(Code.Lines(1, Code.CountOfLines), vbNewLine)
     Dim Line As Variant
     For Each Line In Lines
@@ -140,31 +210,34 @@ Public Function GetIndexOfChar(ByVal Text As String, ByVal Char As String, Optio
 End Function
 
 Public Function GetEncoding() As Variant
-    Dim Encoding As String: Encoding = "UTF-8"
-
-    Dim EncodingTokenIndex As Long
-    EncodingTokenIndex = this.Tokens.GetTokenIndex("encoding", TokenKind.OptionItem)
-    If EncodingTokenIndex = -1 Then EncodingTokenIndex = this.Tokens.GetTokenIndex("e", TokenKind.ShortOptionItem)
-
-    If EncodingTokenIndex = -1 Then
-        GetEncoding = Encoding
+    Dim EncodingDef As Definition: Set EncodingDef = Definitions("encoding")
+    If this.Tokens.IncludeDefinition(EncodingDef) Then
+        GetEncoding = this.Tokens.GetTokenByDefinition(EncodingDef).Text
     Else
-        GetEncoding = this.Tokens.MatchToken( _
-            EncodingTokenIndex + 1, TokenKind.Identifier, "Expected encoding type after ""-e|--encoding"" option." _
-        ).Text
+        GetEncoding = EncodingDef.Default
     End If
-
-    GetEncoding = Encoding
 End Function
 
-Public Function SaveModules(ByRef Modules As Object, ByVal Encoding As String, ByVal SaveStruct As Boolean) As Variant
+#If DEV Then
+  Public Function SaveModules(ByRef Modules As Dictionary, ByVal Encoding As String, ByVal SaveStruct As Boolean) As Variant
+#Else
+  Public Function SaveModules(ByRef Modules As Object, ByVal Encoding As String, ByVal SaveStruct As Boolean) As Variant
+#End If
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
     Dim RootPath As String: RootPath = FSO.GetParentFolderName(SelectedProject.Path)
     Dim FileList As Collection: Set FileList = New Collection
 
     Dim DirectoryPath As Variant
     For Each DirectoryPath In Modules
+      #If DEV Then
         Dim Module As VBComponent: Set Module = Modules(DirectoryPath)
+      #Else
+        Dim Module As Object: Set Module = Modules(DirectoryPath)
+      #End If
         Dim SaveFolderPath As String
         If Not SaveStruct Then
             SaveFolderPath = RootPath
@@ -186,7 +259,11 @@ Public Function SaveModules(ByRef Modules As Object, ByVal Encoding As String, B
 End Function
 
 Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
+  #If DEV Then
+      Dim SourceStream As TextStream
+  #Else
     Dim SourceStream As Object
+  #End If
     Set SourceStream = NewFileSystemObject().OpenTextFile(Path)
     Dim Content As String
     If Not SourceStream.AtEndOfStream Then
@@ -196,35 +273,3 @@ Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
 
     SaveToFile Path, Content, Encoding
 End Sub
-
-Private Property Get ICommand_CommandInfo() As CommandInfo
-    Set ICommand_CommandInfo = this.CommandInfo
-End Property
-
-Private Sub ICommand_Exec()
-    Dim ms As Double: ms = DateTime.Timer
-    Dim Encoding As String: Encoding = Me.GetEncoding()
-
-    Dim LastExport As Variant: LastExport = Me.GetLastExport()
-    If UBound(LastExport) > -1 Then Me.DeleteFiles LastExport
-
-    Dim Modules As Dictionary: Set Modules = NewDictionary()
-    Dim SaveStruct As Boolean: SaveStruct = this.Tokens.IncludeToken("s", TokenKind.ShortOptionItem) Or _
-                                            this.Tokens.IncludeToken("save-struct", TokenKind.OptionItem)
-    If SaveStruct Then
-        Set Modules = Me.ParseModulesWithDirectory()
-    Else
-        Set Modules = Me.ParseModules()
-    End If
-
-    LastExport = Me.SaveModules(Modules, Encoding, SaveStruct)
-    SaveLastExport LastExport
-
-    ms = DateTime.Timer - ms
-    Immediate.WriteLine FString( _
-        "exported {0} module{1} in {2}\\nroot folder: {3}\\n", _
-        Modules.Count, IIf(Modules.Count > 1, "s", ""), ConvertTime(ms), SelectedProject.Folder _
-    )
-End Sub
-
-

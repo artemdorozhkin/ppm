@@ -47,7 +47,11 @@ Public Property Get Folder() As String
     Folder = NewFolder(this.Project.FileName).Path
 End Property
 
-Public Property Set Project(ByVal RHS As VBProject)
+#If DEV Then
+  Public Property Set Project(ByVal RHS As VBProject)
+#Else
+  Public Property Set Project(ByVal RHS As Object)
+#End If
     Set this.Project = RHS
 End Property
 
@@ -70,8 +74,8 @@ End Function
 End Function
 
 Public Function ImportModule(ByVal Path As String)
-    If Not IsValidType(Path) Then Err.Raise 13, TypeName(Me), "unsupproted type: '" & GetFileExt(Path) & "'"
-    If IsModuleExists(Path) Then Err.Raise 58, TypeName(Me), "this module already exists: '" & GetFileName(Path) & "'"
+    If Not IsValidType(Path) Then Information.Err.Raise 13, Information.TypeName(Me), "unsupproted type: '" & GetFileExt(Path) & "'"
+    If IsModuleExists(Path) Then Information.Err.Raise 58, Information.TypeName(Me), "this module already exists: '" & GetFileName(Path) & "'"
     Set ImportModule = this.Project.VBComponents.Import(Path)
 End Function
 
@@ -93,10 +97,10 @@ Public Function IsModuleExists(ByVal NameOrPath As String) As Boolean
 Exit Function
 
 Catch:
-    If Err.Number = 9 Then
+    If Information.Err.Number = 9 Then
         IsModuleExists = False
     Else
-        Err.Raise Err.Number, TypeName(Me)
+        Information.Err.Raise Information.Err.Number, Information.TypeName(Me)
     End If
 End Function
 

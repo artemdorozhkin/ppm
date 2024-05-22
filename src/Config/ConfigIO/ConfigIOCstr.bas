@@ -1,5 +1,5 @@
 Attribute VB_Name = "ConfigIOCstr"
-'@Folder "PearPMProject.src.ConfigIO"
+'@Folder "PearPMProject.src.Config.ConfigIO"
 Option Explicit
 
 Public Function NewConfigIO(ByVal Path As String) As ConfigIO

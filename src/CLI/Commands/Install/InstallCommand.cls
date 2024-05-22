@@ -13,8 +13,9 @@ Option Explicit
 Implements ICommand
 
 Private Type TInstallCommand
-    Tokens As Tokens
     CommandInfo As CommandInfo
+    Config As Config
+    Tokens As Tokens
 End Type
 
 Private this As TInstallCommand
@@ -25,6 +26,10 @@ Private Sub Class_Initialize()
     this.CommandInfo.Description = "Installs the selected package."
     this.CommandInfo.Usage = Array("[<some package>@<some version>] [<options>]")
 End Sub
+
+Public Property Set Config(ByVal RHS As Config)
+    Set this.Config = RHS
+End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS

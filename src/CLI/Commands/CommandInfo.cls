@@ -12,21 +12,34 @@ Option Explicit
 
 Public Name As String
 Public Description As String
-Public Params As Variant
+#If DEV Then
+  Public Params As Dictionary
+#Else
+  Public Params As Object
+#End If
 Public Usage As Variant
+
+Private Sub Class_Initialize()
+    Set Me.Params = NewDictionary(VbCompareMethod.vbTextCompare)
+End Sub
 
 Public Function GetUsage() As String
     Dim Usage As String
-    Usage = FString(Me.Description & "\\n")
-    Usage = Usage & FString("\\nUsage:\\nppm ""{0} {1}""\\n", Me.Name, Strings.Join(Me.Usage, "\\n  "))
+    Usage = PStrings.FString(Me.Description & "\\n")
+    Usage = Usage & PStrings.FString("\\nUsage:\\nppm ""{0} {1}""\\n", Me.Name, Strings.Join(Me.Usage, "\\n  "))
 
-    If Information.IsArray(Me.Params) Then
+    If Me.Params.Count > 0 Then
         Usage = Usage & "\\nOptions:\\n"
         Dim Param As Variant
         For Each Param In Me.Params
-            Dim Definition As Definition: Set Definition = CLI.Definitions(Param)
-            Usage = Usage & FString( _
-                "-{0}|--{1}{2}\\n", Definition.Short, Definition.Key, Definition.Description _
+            Dim Definition As Definition: Set Definition = Definitions(Param)
+            Dim Value As String: Value = Empty
+            If Strings.Len(Definition.Short) > 0 Then
+                Value = PStrings.FString("-{0}|", Definition.Short)
+            End If
+            Value = Value & FString("--{0}", Definition.Key)
+            Usage = Usage & PStrings.FString( _
+                "{0}{1}\\n", Value, Params(Param) _
             )
         Next
     End If
@@ -41,9 +54,8 @@ Public Function GetUsage() As String
     Next
 
     If CommandAliases.Count > 0 Then
-        Usage = Usage & FString("\\nAliases:\\n{0}\\n", Strings.Join(PCollection.ToArray(CommandAliases), ", "))
+        Usage = Usage & PStrings.FString("\\nAliases:\\n{0}\\n", Strings.Join(PCollection.ToArray(CommandAliases), ", "))
     End If
 
-    GetUsage = FString(Usage)
+    GetUsage = PStrings.FString(Usage)
 End Function
-

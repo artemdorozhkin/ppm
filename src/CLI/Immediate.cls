@@ -2,19 +2,14 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "ImmediateWindow"
+Attribute VB_Name = "Immediate"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
+Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.CLI.ImmediateWindow"
+'@PredeclaredId
+'@Folder "PearPMProject.src.CLI"
 Option Explicit
-
-Private Type TImmediateWindow
-    Func As String
-End Type
-
-Private this As TImmediateWindow
 
 Public Sub WriteLine(ParamArray Args() As Variant)
     Dim Text As String: Text = Strings.Join(Args, " ")
@@ -49,4 +44,3 @@ Public Sub ReadLine(ByVal Text As String, Optional ByVal NextFunction As String)
     If Strings.Len(NextFunction) > 0 Then NextFunction = NextFunction & " _"
     Debug.Print Text & vbNewLine & Space(100) & NextFunction
 End Sub
-

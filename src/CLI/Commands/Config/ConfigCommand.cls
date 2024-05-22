@@ -13,8 +13,9 @@ Option Explicit
 Implements ICommand
 
 Private Type TConfigCommand
-    Tokens As Tokens
     CommandInfo As CommandInfo
+    Config As Config
+    Tokens As Tokens
 End Type
 
 Private this As TConfigCommand
@@ -23,12 +24,19 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "config"
     this.CommandInfo.Description = "Manage the ppm configuration file."
+    this.CommandInfo.Params.Item("global") = "\\tUse global config."
+    this.CommandInfo.Params.Item("location") = "\\tUse config from specify location <global|user|project>."
     this.CommandInfo.Usage = Array( _
         "set <key>=<value>", _
         "get <key>=<value>", _
+        "edit", _
         "delete <key>" _
     )
 End Sub
+
+Public Property Set Config(ByVal RHS As Config)
+    Set this.Config = RHS
+End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -39,9 +47,22 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
-    Dim Config As ConfigIO: Set Config = Configs.GetGlobalConfig()
+    Dim Config As ConfigIO: Set Config = GetConfig()
 
-    Select Case this.Tokens.GetFirstTokenKind(TokenKind.SubCommand).Text
+    Dim SubCommand As SyntaxToken
+    Set SubCommand = this.Tokens.GetFirstTokenKind(TokenKind.SubCommand)
+    Dim SubCommandName As String
+    If IsTrue(SubCommand) Then
+        SubCommandName = SubCommand.Text
+    Else
+        ppm "config --help"
+    End If
+
+    If CLI.Aliases.Exists(SubCommandName) Then
+        SubCommandName = CLI.Aliases(SubCommandName)
+    End If
+
+    Select Case SubCommandName
         Case "get"
             ConfigGet Config
 
@@ -51,63 +72,88 @@ Private Sub ICommand_Exec()
         Case "delete"
             ConfigDelete Config
 
+        Case "edit"
+            ConfigEdit Config
+
+        Case "list"
+            ConfigList Config
+
     End Select
 End Sub
 
-Private Sub ConfigSet(ByVal Config As ConfigIO)
+Public Function GetConfig() As ConfigIO
+    If this.Config.GetValue("global") Then
+        Set GetConfig = Configs.GetGlobalConfig()
+        Exit Function
+    End If
+
+    Dim Location As String: Location = this.Config.GetValue("location")
+    If IsFalse(Location) Then
+        Set GetConfig = Configs.GetProjectConfig()
+    Else
+        Select Case Location
+            Case "project"
+                Set GetConfig = Configs.GetProjectConfig()
+
+            Case "user"
+                Set GetConfig = Configs.GetUserConfig()
+
+            Case "global"
+                Set GetConfig = Configs.GetGlobalConfig()
+
+            Case Else
+                Information.Err.Raise 9, Information.TypeName(Me), "Unknown config type: " & Location
+        End Select
+    End If
+End Function
+
+Public Sub ConfigSet(ByVal Config As ConfigIO)
     Dim i As Long
     For i = 1 To this.Tokens.Count
         Dim KeyToken As SyntaxToken: Set KeyToken = this.Tokens(i)
-        Dim Section As String: Section = "Global"
+        If KeyToken.Kind <> TokenKind.Identifier Then GoTo Continue
+        i = i + 1
+        If i > this.Tokens.Count Then Exit For
+        
+        Dim ValueToken As SyntaxToken
+        Set ValueToken = this.Tokens.MatchToken( _
+            i, TokenKind.Identifier, "Expected Value token after Key token " & KeyToken.Text _
+        )
+        Config.CreateOrWrite KeyToken.Text, ValueToken.Text
+Continue:
+    Next
+End Sub
+
+Public Sub ConfigGet(ByVal Config As ConfigIO)
+  #If DEV Then
+    Dim Data As Dictionary: Set Data = Config.Read()
+  #Else
+    Dim Data As Object: Set Data = Config.Read()
+  #End If
+
+    Dim i As Long
+    For i = 1 To this.Tokens.Count
+        Dim KeyToken As SyntaxToken: Set KeyToken = this.Tokens(i)
         Dim Key As String: Key = KeyToken.Text
-        If PStrings.Contains(Key, ".") Then
-            Dim Parts As Variant: Parts = Strings.Split(Key, ".")
-            Section = Parts(0)
-            Key = Parts(1)
-        End If
         If KeyToken.Kind = TokenKind.Identifier Then
-            i = i + 1
-            Dim ValueToken As SyntaxToken
-            Set ValueToken = this.Tokens.MatchToken( _
-                             i, TokenKind.Identifier, "Expected Value token after Key token" _
-                                                     )
-            Config.WriteData Section, Key, ValueToken.Text
+            Immediate.WriteLine PStrings.FString("{0}={1}", Key, Data(Key))
         End If
     Next
 End Sub
 
-Private Sub ConfigGet(ByVal Config As ConfigIO)
-    Dim GlobalSection As Dictionary
-    Set GlobalSection = Config.ReadSection("Global")
-
+Public Sub ConfigDelete(ByVal Config As ConfigIO)
     Dim i As Long
     For i = 1 To this.Tokens.Count
         Dim KeyToken As SyntaxToken: Set KeyToken = this.Tokens(i)
-        Dim Key As String: Key = KeyToken.Text
-        Dim Section As Dictionary: Set Section = GlobalSection
-        If PStrings.Contains(Key, ".") Then
-            Dim Parts As Variant: Parts = Strings.Split(Key, ".")
-            Dim CustomSection As String: CustomSection = Parts(0)
-            Key = Parts(1)
-            Set Section = Config.ReadSection(CustomSection)
-        End If
-        If KeyToken.Kind = TokenKind.Identifier Then
-            Immediate.WriteLine FString("{0}={1}", Key, Section(Key))
-        End If
+        Config.DeleteKey KeyToken.Text
     Next
 End Sub
 
-Private Sub ConfigDelete(ByVal Config As ConfigIO)
-    Dim i As Long
-    For i = 1 To this.Tokens.Count
-        Dim KeyToken As SyntaxToken: Set KeyToken = this.Tokens(i)
-        Dim Key As String: Key = KeyToken.Text
-        Dim Section As String: Section = "Global"
-        If PStrings.Contains(Key, ".") Then
-            Dim Parts As Variant: Parts = Strings.Split(Key, ".")
-            Section = Parts(0)
-            Key = Parts(1)
-        End If
-        Config.DeleteKey Section, Key
-    Next
+Public Sub ConfigEdit(ByVal Config As ConfigIO)
+    Config.AddDataWithoutReplace Definitions.Items
+    Interaction.Shell "notepad.exe " & Config.ConfigPath, vbNormalFocus
+End Sub
+
+Public Sub ConfigList(ByVal Config As ConfigIO)
+    Immediate.WriteLine Config.Text
 End Sub

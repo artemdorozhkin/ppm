@@ -13,44 +13,44 @@ End Type
 Public PackInfo As TPackageInfo
 
 Public Sub Start()
-    Dim Default As String: Default = GetOrDefault(PackInfo.Name, "ProjectName")
-    Immediate.ReadLine FString("project name ({0}):", Default), "InitDialog.Step2"
+    Dim Default As String: Default = GetOrDefault(PackInfo.Name, "name")
+    Immediate.ReadLine PStrings.FString("project name ({0}):", Default), "InitDialog.Step2"
 End Sub
 
 Public Sub Step2(Optional ByVal ProjectName As String)
     Dim Name As String
     If Strings.Len(PackInfo.Name) = 0 Then
-        PackInfo.Name = GetOrDefault(ProjectName, "ProjectName")
+        PackInfo.Name = GetOrDefault(ProjectName, "name")
     End If
 
-    Dim Default As String: Default = GetOrDefault("", "Version")
-    Immediate.ReadLine FString("version ({0}):", Default), "InitDialog.Step3"
+    Dim Default As String: Default = GetOrDefault("", "version")
+    Immediate.ReadLine PStrings.FString("version ({0}):", Default), "InitDialog.Step3"
 End Sub
 
 Public Sub Step3(Optional ByVal Version As String)
-    PackInfo.Version = GetOrDefault(Version, "Version")
+    PackInfo.Version = GetOrDefault(Version, "version")
     Immediate.ReadLine "description:", "InitDialog.Step4"
 End Sub
 
 Public Sub Step4(Optional ByVal Description As String)
-    PackInfo.Description = GetOrDefault(Description, "Description")
-
-    Dim Default As String: Default = GetOrDefault("", "ProjectName")
-    Immediate.ReadLine "author:", "InitDialog.Step5"
+    PackInfo.Description = Description
+    Dim Default As String: Default = GetOrDefault("", "author-name")
+    Immediate.ReadLine PStrings.FString("author ({0}):", Default), "InitDialog.Step5"
 End Sub
 
 Public Sub Step5(Optional ByVal Author As String)
-    PackInfo.Author = GetOrDefault(Author, "Author")
-    Immediate.ReadLine "git repository:", "InitDialog.Step6"
+    PackInfo.Author = GetOrDefault(Author, "author-name")
+    Dim Default As String: Default = GetOrDefault("", "author-url")
+    Immediate.ReadLine PStrings.FString("git repository ({0}):", Default), "InitDialog.Step6"
 End Sub
 
 Public Sub Step6(Optional ByVal GitURL As String)
-    PackInfo.GitURL = GetOrDefault(GitURL, "GitURL")
+    PackInfo.GitURL = GetOrDefault(GitURL, "author-url")
 
     Immediate.WriteLine
     With PackInfo
         Dim Info As String
-        Info = FString( _
+        Info = PStrings.FString( _
             "name: {0}\\nversion: {1}\\ndescription: {2}\\nauthor: {3}\\ngit: {4}\\n", _
             .Name, .Version, .Description, .Author, .GitURL _
         )
@@ -60,11 +60,11 @@ Public Sub Step6(Optional ByVal GitURL As String)
     Immediate.ReadLine "is this ok? (Y/n):", "InitDialog.Step7"
 End Sub
 
-Public Sub Step7(Optional ByVal Confirm As String)
-    If IsEqual(Confirm, "n") Then
-        Immediate.WriteLine "Aborted"
-    Else
+Public Sub Step7(Optional ByVal Confirm As String = "y")
+    If IsEqual(Confirm, "y") Then
         ppm "init -y --_after-dialog"
+    Else
+        Immediate.WriteLine "Aborted"
     End If
 End Sub
 
@@ -74,27 +74,24 @@ Public Function GetOrDefault(ByVal Value As String, ByVal ConfigKey As String) A
         Exit Function
     End If
 
-    Static Section As Dictionary
-    If IsFalse(Section) Then
-        Dim Config As ConfigIO: Set Config = Configs.GetGlobalConfig()
-        Set Section = Config.ReadSection("Init")
-    End If
-    GetOrDefault = Section(ConfigKey)
+    Dim Config As Config
+    Set Config = NewConfig(Definitions.Items)
+    GetOrDefault = Config.GetValue(ConfigKey)
 End Function
 
 Public Function SetNameAndDefault(ByVal Name As String) As TPackageInfo
     PackInfo = SetDefault()
-    PackInfo.Name = GetOrDefault(Name, "ProjectName")
+    PackInfo.Name = GetOrDefault(Name, "name")
     SetNameAndDefault = PackInfo
 End Function
 
 Public Function SetDefault() As TPackageInfo
     With PackInfo
-        .Name = GetOrDefault("", "ProjectName")
-        .Version = GetOrDefault("", "Version")
+        .Name = GetOrDefault("", "name")
+        .Version = GetOrDefault("", "version")
         .Description = ""
-        .Author = ""
-        .GitURL = ""
+        .Author = GetOrDefault("", "author-name")
+        .GitURL = GetOrDefault("", "author-url")
     End With
 
     SetDefault = PackInfo

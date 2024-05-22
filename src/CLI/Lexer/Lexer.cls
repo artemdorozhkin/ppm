@@ -92,15 +92,19 @@ Private Sub ReadOptionItem()
 End Sub
 
 Private Sub ReadIdentifier()
-    Do While Current Like "[A-Za-zА-Яа-яЁё0-9-_@.]"
+    Do While Not PStrings.IsWhiteSpace(Current) And _
+             Not Current = "-" And _
+             Not Current = "="
         this.Position = this.Position + 1
         If Information.IsNull(Current) Then Exit Do
     Loop
 
     Dim Length As Long: Length = this.Position - this.Start
     Dim Text As String: Text = Strings.Mid(this.Text, this.Start, Length)
-    If PArray.IncludesAny(CLI.Commands, Text) Or _
-       CLI.Aliases.Exists(Text) Then
+    If CLI.Aliases.Exists(Text) Then
+        Text = CLI.Aliases(Text)
+    End If
+    If PArray.IncludesAny(CLI.Commands, Text) Then
         this.Kind = TokenKind.Command
     ElseIf PArray.IncludesAny(CLI.SubCommands, Text) Then
         this.Kind = TokenKind.SubCommand

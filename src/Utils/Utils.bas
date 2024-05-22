@@ -2,6 +2,36 @@ Attribute VB_Name = "Utils"
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
+Public Function ConvertToType(ByVal Value As Variant, ByVal DataType As VbVarType) As Variant
+    If Information.VarType(Value) = DataType Then
+        ConvertToType = Value
+    Else
+        Select Case DataType
+            Case VbVarType.vbString: ConvertToType = Conversion.CStr(Value)
+            Case VbVarType.vbBoolean: ConvertToType = Conversion.CBool(Value)
+            Case Else: Information.Err.Raise 9, "ConvertToType", "Type not defined: " & DataType
+        End Select
+    End If
+End Function
+
+Public Sub CreateCstr(ByVal Name As String)
+    Dim Project As Project: Set Project = NewProject(Application.VBE.ActiveVBProject)
+    If Project.IsModuleExists(Name) Then
+        Name = Project.GetModule(Name).Name
+    End If
+
+    Dim CstrCode As String
+    CstrCode = PStrings.FString( _
+        "Public Function New{0}() As {0}\\n" & _
+        "\\tSet New{0} = New {0}\\n" & _
+        "End Function", _
+        Name _
+    )
+    With Project.AddModule(PStrings.FString("{0}Cstr", Name)).CodeModule
+        .AddFromString CstrCode
+    End With
+End Sub
+
 Public Function ConvertTime(ByVal Value As Double) As String
     Dim s As Double: s = 1000
     Dim m As Double: m = s * 60
@@ -12,15 +42,15 @@ Public Function ConvertTime(ByVal Value As Double) As String
 
     Value = Math.Round(Math.Abs(Value * s))
     If Value >= d Then
-        ConvertTime = FString("{0}d", Math.Round(Value / d))
+        ConvertTime = PStrings.FString("{0}d", Math.Round(Value / d))
     ElseIf Value >= h Then
-        ConvertTime = FString("{0}h", Math.Round(Value / h))
+        ConvertTime = PStrings.FString("{0}h", Math.Round(Value / h))
     ElseIf Value >= m Then
-        ConvertTime = FString("{0}m", Math.Round(Value / m))
+        ConvertTime = PStrings.FString("{0}m", Math.Round(Value / m))
     ElseIf Value >= s Then
-        ConvertTime = FString("{0}s", Math.Round(Value / s))
+        ConvertTime = PStrings.FString("{0}s", Math.Round(Value / s))
     Else
-        ConvertTime = FString("{0}ms", Value)
+        ConvertTime = PStrings.FString("{0}ms", Value)
     End If
 End Function
 
@@ -38,7 +68,7 @@ Public Function IsFalse(ByVal Value As Variant) As Boolean
             On Error Resume Next
             Dim IsEmptyArray As Boolean
             IsEmptyArray = UBound(Value) = -1
-            IsFalse = IsEmptyArray Or Err.Number > 0
+            IsFalse = IsEmptyArray Or Information.Err.Number > 0
         End If
     ElseIf (ValueType And vbObject) = vbObject Then
         IsFalse = Value Is Nothing
@@ -58,6 +88,6 @@ Public Function IsFalse(ByVal Value As Variant) As Boolean
     ElseIf (ValueType And vbNull) = vbNull Then
         IsFalse = True
     Else
-        Err.Raise 13, "IsFalse", "Cannot detect the type of Value"
+        Information.Err.Raise 13, "IsFalse", "Cannot detect the type of Value"
     End If
 End Function

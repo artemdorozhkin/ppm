@@ -2,6 +2,17 @@ Attribute VB_Name = "PStrings"
 '@Folder("PearPMProject.src.Utils")
 Option Explicit
 
+Public Function FirstNonEmptyChar(ByVal Text As String) As String
+    Dim i As Long
+    For i = 1 To Strings.Len(Text)
+        Dim Char As String: Char = Strings.Mid(Text, i, 1)
+        If PStrings.IsWhiteSpace(Char) Then GoTo Continue
+        FirstNonEmptyChar = Char
+        Exit For
+Continue:
+    Next
+End Function
+
 Public Function Contains( _
     ByVal Text As String, _
     ByVal Value As String, _
@@ -53,5 +64,10 @@ Public Function FString(ByVal Text As String, ParamArray Variables() As Variant)
 End Function
 
 Public Function IsWhiteSpace(ByVal Char As String) As Boolean
-    IsWhiteSpace = Char = " "
+    Select Case Strings.Asc(Char)
+        Case Strings.Asc(vbNullChar), _
+             Strings.Asc(vbTab) To Strings.Asc(vbCrLf), _
+             Strings.Asc(" ")
+        IsWhiteSpace = True
+    End Select
 End Function
