@@ -2,6 +2,43 @@ Attribute VB_Name = "Utils"
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
+Public Function UncommentString(ByVal Value As String) As String
+    Dim Lines As Variant: Lines = Strings.Split(Value, vbNewLine)
+    Dim i As Long
+    For i = 0 To UBound(Lines)
+        Dim j As Long: j = 1
+        Dim Char As String: Char = Strings.Mid(Lines(i), j, 1)
+        Do While PStrings.IsWhiteSpace(Char)
+            j = j + 1
+            If j > Strings.Len(Lines(i)) Then Exit Do
+            Char = Strings.Mid(Lines(i), j, 1)
+        Loop
+        If j > Strings.Len(Lines(i)) Then
+            Lines(i) = Lines(i)
+        Else
+            Lines(i) = Strings.Right(Lines(i), Strings.Len(Lines(i)) - j)
+        End If
+    Next
+    UncommentString = Strings.Join(Lines, vbNewLine)
+End Function
+
+Public Function CommentString(ByVal Value As String) As String
+    Dim Lines As Variant: Lines = Strings.Split(Value, vbNewLine)
+    Dim i As Long
+    For i = 0 To UBound(Lines)
+        Lines(i) = "'" & Lines(i)
+    Next
+    CommentString = Strings.Join(Lines, vbNewLine)
+End Function
+
+Public Function IsDictionary(ByVal Value As Object) As Boolean
+    IsDictionary = Information.TypeName(Value) = "Dictionary"
+End Function
+
+Public Function IsCollection(ByVal Value As Object) As Boolean
+    IsCollection = Information.TypeName(Value) = "Collection"
+End Function
+
 Public Function ConvertToType(ByVal Value As Variant, ByVal DataType As VbVarType) As Variant
     If Information.VarType(Value) = DataType Then
         ConvertToType = Value
@@ -91,3 +128,4 @@ Public Function IsFalse(ByVal Value As Variant) As Boolean
         Information.Err.Raise 13, "IsFalse", "Cannot detect the type of Value"
     End If
 End Function
+

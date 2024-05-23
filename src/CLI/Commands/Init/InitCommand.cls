@@ -73,17 +73,17 @@ Public Sub CreatePack()
   #Else
     Dim PackModule As Object: Set PackModule = SelectedProject.AddModule("package")
   #End If
+    Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
+    JB.AddObject _
+        "name", PackInfo.Name, _
+        "version", PackInfo.Version, _
+        "description", PackInfo.Description, _
+        "author", PackInfo.Author, _
+        "git", PackInfo.GitURL
+
     With PackModule.CodeModule
         .DeleteLines 1, .CountOfLines
-        .AddFromString PStrings.FString( _
-            "' {\\n" & _
-            "'   ""name"": ""{0}"",\\n" & _
-            "'   ""version"": ""{1}"",\\n" & _
-            "'   ""description"": ""{2}"",\\n" & _
-            "'   ""author"": ""{3}"",\\n" & _
-            "'   ""git"": ""{4}""\\n" & _
-            "' }", _
-            PackInfo.Name, PackInfo.Version, PackInfo.Description, PackInfo.Author, PackInfo.GitURL _
-        )
+        .AddFromString Utils.CommentString(JB.ToString())
     End With
 End Sub
+
