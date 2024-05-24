@@ -28,7 +28,14 @@ Private Function SerializeValue(ByVal Data As Variant, ByVal Indent As Integer, 
         Case VbVarType.vbBoolean
             JSONString = IIf(Data, "true", "false")
 
-        Case IsNumeric(Data)
+        Case VbVarType.vbDouble, _
+             VbVarType.vbInteger, _
+             VbVarType.vbLong, _
+             VbVarType.vbLongLong, _
+             VbVarType.vbDouble, _
+             VbVarType.vbDecimal, _
+             VbVarType.vbByte, _
+             VbVarType.vbCurrency
             JSONString = CStr(Data)
 
         Case VbVarType.vbNull
@@ -42,7 +49,7 @@ Private Function SerializeValue(ByVal Data As Variant, ByVal Indent As Integer, 
                 Dim Key As Variant
                 For Each Key In Data.Keys
                     If JSONString <> StartObject Then
-                        JSONString = JSONString & "," & vbNewLine & Indentation
+                        JSONString = JSONString & ", " & vbNewLine & Indentation
                     End If
                     JSONString = JSONString & """" & Key & """" & ": " & SerializeValue(Data(Key), Indent, Level + 1)
                 Next
@@ -55,7 +62,7 @@ Private Function SerializeValue(ByVal Data As Variant, ByVal Indent As Integer, 
                 Dim i As Long
                 For i = 1 To Data.Count
                     If JSONString <> StartArray Then
-                        JSONString = JSONString & "," & vbNewLine & Indentation
+                        JSONString = JSONString & ", " & vbNewLine & Indentation
                     End If
                     JSONString = JSONString & SerializeValue(Data(i), Indent, Level + 1)
                 Next
@@ -88,10 +95,13 @@ Private Function ParseValue() As Variant
             ParseValue = ParseNumber()
 
         Case """"
-            ParseValue = ParseLiteral()
+            ParseValue = ParseString()
 
         Case "t", "f", "n" ' true, false, null
-            ParseValue = ParseConstants()
+            ParseValue = ParseLiteral()
+
+        Case Else
+            Information.Err.Raise 5, "PJSON", PStrings.FString("Invalid character '{0}' in position {1}", Current, this.Position)
 
     End Select
 End Function
@@ -116,24 +126,7 @@ Private Function ParseObject() As Object
         Dim Key As String: Key = ParseValue()
         If Current = ":" Then
             NextChar
-            Dim Value As Variant
-            Select Case Current
-                Case "{"
-                    Set Container.Item(Key) = ParseObject()
-
-                Case "["
-                    Set Container.Item(Key) = ParseArray()
-
-                Case "0" To "9"
-                    Container.Item(Key) = ParseNumber()
-
-                Case """"
-                    Container.Item(Key) = ParseLiteral()
-
-                Case "t", "f", "n" ' true, false, null
-                    Container.Item(Key) = ParseConstants()
-
-            End Select
+            Container.Add Key, ParseValue()
         End If
 Continue:
     Loop
@@ -166,7 +159,7 @@ Private Function ParseNumber() As Variant
     ParseNumber = Conversion.Val(Value)
 End Function
 
-Private Function ParseLiteral() As String
+Private Function ParseString() As String
     NextChar
     Dim IsEscape As Boolean
     Do While Current <> """"
@@ -178,18 +171,21 @@ Private Function ParseLiteral() As String
         this.Position = this.Position + 1
     Loop
     NextChar
-    ParseLiteral = Value
+    ParseString = Value
 End Function
 
-Private Function ParseConstants() As Variant
+Private Function ParseLiteral() As Variant
     Do While Current Like "[tTrRuUeEfFaAlLsSnNuU]"
         Dim Value As String: Value = Value & Strings.LCase(Current)
         NextChar
     Loop
     If Value = "null" Then
-        ParseConstants = Null
+        ParseLiteral = Null
+    ElseIf Value = "true" Then
+        ParseLiteral = True
+    ElseIf Value = "false" Then
+        ParseLiteral = False
     Else
-        ParseConstants = Value = "true"
+        Information.Err.Raise 5, "PJSON", "Unexpected token " & Value
     End If
 End Function
-
