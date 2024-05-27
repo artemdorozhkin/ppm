@@ -57,6 +57,9 @@ Public Sub CreateCstr(ByVal Name As String)
         Name = Project.GetModule(Name).Name
     End If
 
+    Dim Folder As String
+    Folder = PStrings.FString("'@Folder ""{0}.{1}""", Project.Name, Name)
+
     Dim CstrCode As String
     CstrCode = PStrings.FString( _
         "Public Function New{0}() As {0}\\n" & _
@@ -65,6 +68,7 @@ Public Sub CreateCstr(ByVal Name As String)
         Name _
     )
     With Project.AddModule(PStrings.FString("{0}Cstr", Name)).CodeModule
+        .InsertLines 1, Folder
         .AddFromString CstrCode
     End With
 End Sub

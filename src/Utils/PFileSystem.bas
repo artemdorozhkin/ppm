@@ -2,6 +2,22 @@ Attribute VB_Name = "PFileSystem"
 '@Folder("PearPMProject.src.Utils")
 Option Explicit
 
+Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
+  #If DEV Then
+      Dim SourceStream As TextStream
+  #Else
+    Dim SourceStream As Object
+  #End If
+    Set SourceStream = NewFileSystemObject().OpenTextFile(Path)
+    Dim Content As String
+    If Not SourceStream.AtEndOfStream Then
+        Content = SourceStream.ReadAll()
+    End If
+    SourceStream.Close
+
+    SaveToFile Path, Content, Encoding
+End Sub
+
 Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional ByVal Encoding As String = "UTF-8")
   #If DEV Then
     Dim EncodingStream As Stream: Set EncodingStream = NewStream()

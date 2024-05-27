@@ -2,6 +2,23 @@ Attribute VB_Name = "PStrings"
 '@Folder("PearPMProject.src.Utils")
 Option Explicit
 
+Public Function GetIndexOfChar(ByVal Text As String, ByVal Char As String, Optional ByVal StartFrom As Long = 1) As Long
+    Dim i As Long: i = 1
+    Dim Current As String
+    Current = Strings.Mid(Text, i, 1)
+    Do While Current <> Char
+        i = i + 1
+        If i > Strings.Len(Text) Then Exit Do
+        Current = Strings.Mid(Text, i, 1)
+    Loop
+
+    If Current = Char Then
+        GetIndexOfChar = i
+    Else
+        GetIndexOfChar = -1
+    End If
+End Function
+
 Public Function FirstNonEmptyChar(ByVal Text As String) As String
     Dim i As Long
     For i = 1 To Strings.Len(Text)

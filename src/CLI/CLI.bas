@@ -8,7 +8,8 @@ Public Property Get Commands() As Variant
         "export", _
         "help", _
         "init", _
-        "install" _
+        "install", _
+        "publish" _
     )
 End Property
 

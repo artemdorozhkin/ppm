@@ -120,7 +120,6 @@ Private Function ParseObject() As Object
     Do While Current <> "}"
         If Current = "," Then
             NextChar
-            GoTo Continue
         End If
 
         Dim Key As String: Key = ParseValue()
@@ -140,7 +139,6 @@ Private Function ParseArray() As Collection
     Do While Current <> "]"
         If Current = "," Then
             NextChar
-            GoTo Continue
         End If
 
         Container.Add ParseValue()

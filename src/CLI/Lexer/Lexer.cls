@@ -42,13 +42,18 @@ Public Function Lex() As Tokens
                 this.Position = this.Position + 1
                 GoTo Continue
 
+            Case """", "'"
+                ReadString
+
             Case Else
                 ReadIdentifier
         End Select
 
         Dim Length As Long: Length = this.Position - this.Start
-        Dim Text As String: Text = Strings.Mid(this.Text, this.Start, Length)
+        Dim Text As String
+        Text = Strings.Mid(this.Text, this.Start, Length)
         this.Tokens.Add NewSyntaxToken(this.Kind, Text)
+        If Current = """" Or Current = "'" Then this.Position = this.Position + 1
 Continue:
     Loop
 
@@ -113,4 +118,19 @@ Private Sub ReadIdentifier()
     End If
 End Sub
 
+Private Sub ReadString()
+    Dim OpenQuote As String: OpenQuote = Current
+    this.Position = this.Position + 1
+    this.Start = this.Position
+    Do While Not Current = OpenQuote
+        this.Position = this.Position + 1
+        If Information.IsNull(Current) Then Exit Do
+    Loop
 
+    Dim Length As Long: Length = this.Position - this.Start
+    Dim Text As String: Text = Strings.Mid(this.Text, this.Start, Length)
+    If CLI.Aliases.Exists(Text) Then
+        Text = CLI.Aliases(Text)
+    End If
+    this.Kind = TokenKind.Identifier
+End Sub
