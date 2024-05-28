@@ -47,9 +47,9 @@ Private Sub ICommand_Exec()
 
     Dim ms As Double: ms = DateTime.Timer
     Dim RootFolder As String: RootFolder = CreateExport()
-    SelectedProject.ExportModule RootFolder, SelectedProject.GetModule("package")
+    Dim Pack As Pack: Set Pack = NewPack(SelectedProject)
+    SelectedProject.ExportModule RootFolder, Pack.Module
 
-    Dim PackInfo As Object: Set PackInfo = GetPackInfo()
     Dim ZipName As String
     ZipName = Me.GetBuildName(PackInfo) & ".zip"
     Dim ZipPath As String
@@ -61,15 +61,15 @@ Private Sub ICommand_Exec()
     FileSystem.RmDir RootFolder
 
     Dim IsLocal As Boolean: IsLocal = this.Config.GetValue("to") = "local"
-    If IsLocal Then PublishOnLocal ZipPath, PackInfo Else PublishOnServer ZipPath
+    If IsLocal Then PublishOnLocal ZipPath, Pack Else PublishOnServer ZipPath
 
     Immediate.WriteLine PStrings.FString( _
-        "package '{0}' is published in {1}", PackInfo("name"), Utils.ConvertTime(DateTime.Timer - ms) _
+        "package '{0}' is published in {1}", Pack.Name, Utils.ConvertTime(DateTime.Timer - ms) _
     )
 End Sub
 
-Public Function GetBuildName(ByRef PackInfo As Object) As String
-    GetBuildName = PStrings.FString("{0}_{1}", PackInfo("name"), Strings.Replace(PackInfo("version"), ".", "_"))
+Public Function GetBuildName(ByRef Pack As Pack) As String
+    GetBuildName = PStrings.FString("{0}_{1}", Pack.Name, Strings.Replace(Pack.Version, ".", "_"))
 End Function
 
 Public Function CreateExport() As String
@@ -89,16 +89,7 @@ Public Function CreateExport() As String
     CreateExport = Folder
 End Function
 
-Public Function GetPackInfo() As Object
-    Dim Module As VBComponent
-    Set Module = SelectedProject.GetModule("package")
-    Dim Code As String
-    Code = Utils.UncommentString(Module.CodeModule.Lines(1, Module.CodeModule.CountOfLines))
-
-    Set GetPackInfo = PJSON.Parse(Code)
-End Function
-
-Public Function PublishOnLocal(ByVal ZipPath As String, ByRef PackInfo As Object)
+Public Function PublishOnLocal(ByVal ZipPath As String, ByRef Pack As Pack)
     Dim LocalRegistryPath As String
     LocalRegistryPath = this.Config.GetValue("registry")
 
@@ -107,7 +98,7 @@ Public Function PublishOnLocal(ByVal ZipPath As String, ByRef PackInfo As Object
         PackageFolder = .BuildPath(LocalRegistryPath, SelectedProject.Name)
         If Not .FolderExists(PackageFolder) Then PFileSystem.CreateFolder PackageFolder
         Dim BuildZip As String
-        BuildZip = .BuildPath(PackageFolder, Me.GetBuildName(PackInfo) & ".zip")
+        BuildZip = .BuildPath(PackageFolder, Me.GetBuildName(Pack) & ".zip")
     End With
 
     FileSystem.FileCopy ZipPath, BuildZip

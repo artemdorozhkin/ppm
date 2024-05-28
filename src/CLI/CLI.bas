@@ -99,11 +99,8 @@ Private Sub ShowVersion()
         End If
     Next
 
-    Dim Package As VBComponent: Set Package = Project.GetModule("package")
-    Dim Code As String
-    Code = Package.CodeModule.Lines(1, Package.CodeModule.CountOfLines)
-    Dim Pack As Object
-    Set Pack = PJSON.Parse(Utils.UncommentString(Code))
+    Dim Pack As Pack: Set Pack = NewPack(Project)
+    Pack.Read
 
-    Immediate.WriteLine Pack("version")
+    Immediate.WriteLine Pack.Version
 End Sub
