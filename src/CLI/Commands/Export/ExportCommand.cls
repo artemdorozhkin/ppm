@@ -58,7 +58,7 @@ Private Sub ICommand_Exec()
     Dim Folder As String
     Folder = SelectedProject.Folder
     Dim UserFolder As String
-    UserFolder = this.Config.GetValue("to")
+    UserFolder = this.Config.GetValue("path")
     If Strings.Len(UserFolder) > 0 Then
         Folder = UserFolder
     End If

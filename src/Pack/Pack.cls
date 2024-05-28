@@ -25,6 +25,10 @@ Public Property Set Project(ByVal RHS As Project)
     Set this.Project = RHS
 End Property
 
+Public Property Get JSON() As Object
+    Set JSON = this.Pack
+End Property
+
 Public Property Get Module() As VBComponent
     Set Module = this.Module
 End Property
@@ -34,19 +38,19 @@ Public Property Get Version() As String
 End Property
 
 Public Property Get Name() As String
-    Version = this.Pack("name")
+    Name = this.Pack("name")
 End Property
 
 Public Property Get Description() As String
-    Version = this.Pack("description")
+    Description = this.Pack("description")
 End Property
 
 Public Property Get Author() As String
-    Version = this.Pack("author")
+    Author = this.Pack("author")
 End Property
 
 Public Property Get Git() As String
-    Version = this.Pack("git")
+    Git = this.Pack("git")
 End Property
 
 Public Sub Read()

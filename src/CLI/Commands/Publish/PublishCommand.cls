@@ -41,17 +41,19 @@ End Property
 
 Private Sub ICommand_Exec()
     If Not SelectedProject.IsModuleExists("package") Then
-        Immediate.WriteLine "for publish the package you need to run ppm ""init"""
+        Immediate.WriteLine "ERR: for publish the package you need to run ppm ""init"""
         End
     End If
 
     Dim ms As Double: ms = DateTime.Timer
     Dim RootFolder As String: RootFolder = CreateExport()
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject)
+    Pack.Read
+
     SelectedProject.ExportModule RootFolder, Pack.Module
 
     Dim ZipName As String
-    ZipName = Me.GetBuildName(PackInfo) & ".zip"
+    ZipName = Me.GetBuildName(Pack) & ".zip"
     Dim ZipPath As String
     ZipPath = NewFileSystemObject().BuildPath(Interaction.Environ("TEMP"), ZipName)
     Dim Zip As PZip: Set Zip = NewPZip(ZipPath)
@@ -61,11 +63,24 @@ Private Sub ICommand_Exec()
     FileSystem.RmDir RootFolder
 
     Dim IsLocal As Boolean: IsLocal = this.Config.GetValue("to") = "local"
-    If IsLocal Then PublishOnLocal ZipPath, Pack Else PublishOnServer ZipPath
+    Dim Success As Boolean
+    If IsLocal Then
+        PublishOnLocal ZipPath, Pack
+        Success = True
+    Else
+        Dim Response As TResponse
+        Response = PublishOnServer(ZipPath, Pack)
+        Success = Response.Code = 200 Or _
+                  Response.Code = 201
+    End If
 
-    Immediate.WriteLine PStrings.FString( _
-        "package '{0}' is published in {1}", Pack.Name, Utils.ConvertTime(DateTime.Timer - ms) _
-    )
+    If Success Then
+        Immediate.WriteLine PStrings.FString( _
+            "package '{0}' is published in {1}", Pack.Name, Utils.ConvertTime(DateTime.Timer - ms) _
+        )
+    Else
+        Immediate.WriteLine "ERR: something went wrong, try again later"
+    End If
 End Sub
 
 Public Function GetBuildName(ByRef Pack As Pack) As String
@@ -95,8 +110,8 @@ Public Function PublishOnLocal(ByVal ZipPath As String, ByRef Pack As Pack)
 
     With NewFileSystemObject()
         Dim PackageFolder As String
-        PackageFolder = .BuildPath(LocalRegistryPath, SelectedProject.Name)
-        If Not .FolderExists(PackageFolder) Then PFileSystem.CreateFolder PackageFolder
+        PackageFolder = .BuildPath(LocalRegistryPath, Pack.Name)
+        If Not .FolderExists(PackageFolder) Then PFileSystem.CreateFolder PackageFolder, Recoursive:=True
         Dim BuildZip As String
         BuildZip = .BuildPath(PackageFolder, Me.GetBuildName(Pack) & ".zip")
     End With
@@ -104,14 +119,35 @@ Public Function PublishOnLocal(ByVal ZipPath As String, ByRef Pack As Pack)
     FileSystem.FileCopy ZipPath, BuildZip
     FileSystem.Kill ZipPath
 
-    Me.CreateManifest PackageFolder, PackInfo
+    Me.CreateManifest PackageFolder, Pack
 End Function
 
-Public Function PublishOnServer(ByVal ZipPath As String)
-    
+Public Function PublishOnServer(ByVal ZipPath As String, ByRef Pack As Pack) As TResponse
+    Dim FormData As FormData: Set FormData = New FormData
+    Dim Boundary As String: Boundary = FormData.GenerateBoundary()
+
+    Dim Body() As Byte
+    Body = FormData.Create(ZipPath, Boundary)
+
+    Dim Headers As Object: Set Headers = NewDictionary()
+    Headers("Content-Type") = "multipart/form-data; boundary=" & Boundary
+    Headers("Accept-Encoding") = "gzip, deflate, br"
+
+    Dim URL As String: URL = this.Config.GetValue("registry")
+    If Strings.Right(URL, 1) = "/" Then
+        URL = PStrings.FString("{0}{1}/{2}", URL, Pack.Name, Pack.Version)
+    Else
+        URL = PStrings.FString("{0}/{1}/{2}", URL, Pack.Name, Pack.Version)
+    End If
+
+    Dim HTTP As HTTP: Set HTTP = New HTTP
+    PublishOnServer = HTTP.PostRequest( _
+        URL, Headers, Body _
+    )
+    Immediate.WriteLine GetHash(Body)
 End Function
 
-Public Sub CreateManifest(ByVal PackageFolder As String, ByRef PackInfo As Object)
+Public Sub CreateManifest(ByVal PackageFolder As String, ByRef Pack As Pack)
     With NewFileSystemObject()
         Dim ManifestPath As String
         ManifestPath = .BuildPath(PackageFolder, "manifest.json")
@@ -120,11 +156,9 @@ Public Sub CreateManifest(ByVal PackageFolder As String, ByRef PackInfo As Objec
 
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     JB.AddObject _
-        "name", PackInfo("name"), _
-        "latest", PackInfo("version"), _
-        "buildPath", PStrings.FString("{0}\{1}.zip", PackageFolder, Me.GetBuildName(PackInfo))
+        "name", Pack.Name, _
+        "latest", Pack.Version, _
+        Pack.Version, Pack.JSON
 
     PFileSystem.SaveToFile ManifestPath, JB.ToString()
 End Sub
-
-

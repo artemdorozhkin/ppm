@@ -52,36 +52,36 @@ Public Function GetValue(ByVal DefinitionName As String) As Variant
     If IsTrue(this.Tokens) Then
         If this.Tokens.IncludeDefinition(Definition) Then
             GetValue = GetValueFromDefinition(Definition)
-        End If
-    Else
-        Dim Value As String
-      #If DEV Then
-        Dim Data As Dictionary
-      #Else
-        Dim Data As Object
-      #End If
-        Set Data = this.ProjectConfig.Read()
-        If Data.Exists(Definition.Key) Then
-            GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
             Exit Function
         End If
+    End If
+    Dim Value As String
+  #If DEV Then
+    Dim Data As Dictionary
+  #Else
+    Dim Data As Object
+  #End If
+    Set Data = this.ProjectConfig.Read()
+    If Data.Exists(Definition.Key) Then
+        GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
+        Exit Function
+    End If
 
-        Set Data = this.UserConfig.Read()
-        If Data.Exists(Definition.Key) Then
-            GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
-            Exit Function
-        End If
+    Set Data = this.UserConfig.Read()
+    If Data.Exists(Definition.Key) Then
+        GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
+        Exit Function
+    End If
 
-        Set Data = this.GlobalConfig.Read()
-        If Data.Exists(Definition.Key) Then
-            GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
-            Exit Function
-        End If
-    
-        If Not Information.IsMissing(Definition.Default) Then
-            GetValue = Utils.ConvertToType(Definition.Default, Definition.DataType)
-            Exit Function
-        End If
+    Set Data = this.GlobalConfig.Read()
+    If Data.Exists(Definition.Key) Then
+        GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
+        Exit Function
+    End If
+
+    If Not Information.IsMissing(Definition.Default) Then
+        GetValue = Utils.ConvertToType(Definition.Default, Definition.DataType)
+        Exit Function
     End If
 End Function
 

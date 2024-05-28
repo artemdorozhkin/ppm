@@ -67,7 +67,7 @@ Attribute Items.VB_UserMemId = 0
 
     Set Definition = NewDefinition( _
         Key:="registry", _
-        Default:="" _
+        Default:=Constants.LocalRegistryPath _
     )
     Set Buffer(Definition.Key) = Definition
 
@@ -86,6 +86,12 @@ Attribute Items.VB_UserMemId = 0
     Set Definition = NewDefinition( _
         Key:="no-clear", _
         Default:=False _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
+        Key:="path", _
+        Default:="" _
     )
     Set Buffer(Definition.Key) = Definition
 

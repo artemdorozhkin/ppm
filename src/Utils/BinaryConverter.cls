@@ -20,24 +20,37 @@ Private Sub Class_Initialize()
     Set this.Stream = NewStream()
 End Sub
 
-Public Function FromFile(ByVal Path As String) As String
-    Dim FileNum As Integer: FileNum = FreeFile
-
-    Open Path For Binary Access Read As #FileNum
-    Dim FileData() As Byte
-    ReDim FileData(1 To LOF(FileNum))
-    Get #FileNum, , FileData
-    Close #FileNum
-
-    FromFile = Strings.StrConv(FileData, vbUnicode)
+Public Function TextToBytes(ByVal Text As String) As Variant
+    With NewStream()
+        .Open
+        .Type = 2 ' text
+        .Charset = "_autodetect"
+        .WriteText Text
+        .Position = 0
+        .Type = 1
+        TextToBytes = .Read()
+        .Close
+    End With
 End Function
 
-Public Sub ToFile(ByRef Bytes() As Byte, ByVal Path As String)
+Function FileToBytes(ByVal Path As String) As Byte()
     With this.Stream
+        .Type = 1 'binary
         .Open
-        .Type = 1
-        .Write Bytes
-        .SaveToFile Path, 2 ' 1 = no overwrite, 2 = overwrite
+        .LoadFromFile Path
+        .Position = 0
+        FileToBytes = .Read()
+        .Close
+    End With
+End Function
+
+Public Sub ToFile(ByRef FileBytes() As Byte, ByVal Path As String)
+    With this.Stream
+        .Type = 1 ' Binary type
+        .Open
+        .Write FileBytes
+
+        .SaveToFile Path, 2 ' adSaveCreateOverWrite
         .Close
     End With
 End Sub

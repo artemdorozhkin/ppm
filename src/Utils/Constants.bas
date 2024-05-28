@@ -3,6 +3,14 @@ Attribute VB_Name = "Constants"
 Option Explicit
 
 ' CALCULATED CONSTANTS (PROPERTIES)
+Public Property Get LocalRegistryPath() As String
+    With NewFileSystemObject()
+        Dim PPMPath As String
+        PPMPath = .BuildPath(Interaction.Environ("LOCALAPPDATA"), "ppm")
+        LocalRegistryPath = .BuildPath(PPMPath, "registry")
+    End With
+End Property
+
 Public Property Get ProjectConfigPath() As String
     On Error GoTo Catch
     ProjectConfigPath = GetConfigFilePathFromFolder(Constants.ProjectPath)
