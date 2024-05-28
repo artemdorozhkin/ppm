@@ -1,5 +1,5 @@
 Attribute VB_Name = "PZipCstr"
-'@Folder "PearPMProject.src.PZip"
+'@Folder "PearPMProject.src.Utils.PZip"
 Option Explicit
 
 Public Function NewPZip(ByVal ZipFilePath As String)

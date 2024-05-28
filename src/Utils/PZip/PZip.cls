@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "PearPMProject.src.PZip"
+'@Folder "PearPMProject.src.Utils.PZip"
 Option Explicit
 
 Private Type TPZip

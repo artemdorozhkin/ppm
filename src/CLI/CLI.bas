@@ -60,6 +60,9 @@ Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
     ElseIf Config.GetValue("help") Then
         Set ParseCommand = NewHelpCommand(Config, Tokens)
         Exit Function
+    ElseIf Tokens.Count = 1 And Tokens.IncludeDefinition(Definitions("version")) Then
+        ShowVersion
+        End
     End If
 
     Dim CommandToken As SyntaxToken: Set CommandToken = Tokens(1) ' collection starts from 1
@@ -85,3 +88,22 @@ Public Function FindCommand(ByVal Name As String) As String
         Exit Function
     End If
 End Function
+
+Private Sub ShowVersion()
+    Dim Project As Project
+    Dim VBProject As VBProject
+    For Each VBProject In Application.VBE.VBProjects
+        If PStrings.IsEqual(VBProject.Name, "PearPMProject") Then
+            Set Project = NewProject(VBProject)
+            Exit For
+        End If
+    Next
+
+    Dim Package As VBComponent: Set Package = Project.GetModule("package")
+    Dim Code As String
+    Code = Package.CodeModule.Lines(1, Package.CodeModule.CountOfLines)
+    Dim Pack As Object
+    Set Pack = PJSON.Parse(Utils.UncommentString(Code))
+
+    Immediate.WriteLine Pack("version")
+End Sub
