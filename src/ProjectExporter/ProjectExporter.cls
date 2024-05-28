@@ -264,7 +264,7 @@ Private Function SaveModules(ByVal Encoding As String) As Variant
             DirectoryPath = Strings.Replace(DirectoryPath, ".", Application.PathSeparator)
             
             SaveFolderPath = FSO.BuildPath(this.Destination, DirectoryPath)
-            If Not FSO.FolderExists(SaveFolderPath) Then CreateFoldersRecoursive SaveFolderPath
+            If Not FSO.FolderExists(SaveFolderPath) Then PFileSystem.CreateFolder SaveFolderPath, Recoursive:=True
         End If
         Dim FileName As String
         FileName = SelectedProject.ExportModule(SaveFolderPath, Module)

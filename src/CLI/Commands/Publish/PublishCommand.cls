@@ -76,7 +76,7 @@ Public Function CreateExport() As String
     With NewFileSystemObject()
         Dim Folder As String
         Folder = .BuildPath(Interaction.Environ("TEMP"), .GetTempName())
-        If Not .FolderExists(Folder) Then PFileSystem.CreateFoldersRecoursive Folder
+        If Not .FolderExists(Folder) Then PFileSystem.CreateFolder Folder, Recoursive:=True
     End With
 
     Dim Exporter As ProjectExporter
@@ -105,7 +105,7 @@ Public Function PublishOnLocal(ByVal ZipPath As String, ByRef PackInfo As Object
     With NewFileSystemObject()
         Dim PackageFolder As String
         PackageFolder = .BuildPath(LocalRegistryPath, SelectedProject.Name)
-        If Not .FolderExists(PackageFolder) Then PFileSystem.CreateFoldersRecoursive PackageFolder
+        If Not .FolderExists(PackageFolder) Then PFileSystem.CreateFolder PackageFolder
         Dim BuildZip As String
         BuildZip = .BuildPath(PackageFolder, Me.GetBuildName(PackInfo) & ".zip")
     End With
@@ -135,4 +135,5 @@ Public Sub CreateManifest(ByVal PackageFolder As String, ByRef PackInfo As Objec
 
     PFileSystem.SaveToFile ManifestPath, JB.ToString()
 End Sub
+
 

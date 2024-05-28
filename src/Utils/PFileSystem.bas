@@ -46,7 +46,12 @@ Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional By
     BinaryStream.Close
 End Sub
 
-Public Sub CreateFoldersRecoursive(ByVal Path As String)
+Public Sub CreateFolder(ByVal Path As String, Optional ByVal Recoursive As Boolean = False)
+    If Not Recoursive Then
+        FileSystem.MkDir Path
+        Exit Sub
+    End If
+
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else

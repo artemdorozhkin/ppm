@@ -26,7 +26,7 @@ Public Property Get GlobalConfigPath() As String
     With NewFileSystemObject()
         Dim PPMPath As String
         PPMPath = .BuildPath(Interaction.Environ("APPDATA"), "ppm")
-        If Not .FolderExists(PPMPath) Then CreateFoldersRecoursive PPMPath
+        If Not .FolderExists(PPMPath) Then PFileSystem.CreateFolder PPMPath, Recoursive:=True
         GlobalConfigPath = GetConfigFilePathFromFolder(PPMPath)
     End With
 End Property
@@ -50,7 +50,7 @@ Public Property Get ProjectPath() As String
 
         Dim ThisProjectPath As String
         ThisProjectPath = .BuildPath(ProjectsPath, FolderName)
-        If Not .FolderExists(ThisProjectPath) Then PFileSystem.CreateFoldersRecoursive ThisProjectPath
+        If Not .FolderExists(ThisProjectPath) Then PFileSystem.CreateFolder ThisProjectPath, Recoursive:=True
     End With
 
     ProjectPath = ThisProjectPath
@@ -61,3 +61,4 @@ Private Function GetConfigFilePathFromFolder(ByVal Folder As String) As String
         GetConfigFilePathFromFolder = .BuildPath(Folder, ".ppmrc")
     End With
 End Function
+
