@@ -135,9 +135,9 @@ Public Function PublishOnServer(ByVal ZipPath As String, ByRef Pack As Pack) As 
 
     Dim URL As String: URL = this.Config.GetValue("registry")
     If Strings.Right(URL, 1) = "/" Then
-        URL = PStrings.FString("{0}{1}/{2}", URL, Pack.Name, Pack.Version)
+        URL = PStrings.FString("{0}upload/{1}/{2}", URL, Pack.Name, Pack.Version)
     Else
-        URL = PStrings.FString("{0}/{1}/{2}", URL, Pack.Name, Pack.Version)
+        URL = PStrings.FString("{0}/upload/{1}/{2}", URL, Pack.Name, Pack.Version)
     End If
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
