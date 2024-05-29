@@ -45,6 +45,13 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
+        Key:="dev-dep", _
+        Short:="d", _
+        Default:=False _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
         Key:="encoding", _
         Short:="e", _
         Default:="UTF-8" _

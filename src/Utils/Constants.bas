@@ -3,12 +3,16 @@ Attribute VB_Name = "Constants"
 Option Explicit
 
 ' CALCULATED CONSTANTS (PROPERTIES)
+Public Property Get GlobalPPMPath() As String
+    GlobalPPMPath = NewFileSystemObject().BuildPath(Interaction.Environ("APPDATA"), "ppm")
+End Property
+
+Public Property Get LocalPPMPath() As String
+    LocalPPMPath = NewFileSystemObject().BuildPath(Interaction.Environ("LOCALAPPDATA"), "ppm")
+End Property
+
 Public Property Get LocalRegistryPath() As String
-    With NewFileSystemObject()
-        Dim PPMPath As String
-        PPMPath = .BuildPath(Interaction.Environ("LOCALAPPDATA"), "ppm")
-        LocalRegistryPath = .BuildPath(PPMPath, "registry")
-    End With
+    LocalRegistryPath = NewFileSystemObject().BuildPath(LocalPPMPath, "registry")
 End Property
 
 Public Property Get ProjectConfigPath() As String
@@ -31,20 +35,16 @@ Public Property Get UserConfigPath() As String
 End Property
 
 Public Property Get GlobalConfigPath() As String
-    With NewFileSystemObject()
-        Dim PPMPath As String
-        PPMPath = .BuildPath(Interaction.Environ("APPDATA"), "ppm")
-        If Not .FolderExists(PPMPath) Then PFileSystem.CreateFolder PPMPath, Recoursive:=True
-        GlobalConfigPath = GetConfigFilePathFromFolder(PPMPath)
-    End With
+    If Not NewFileSystemObject().FolderExists(GlobalPPMPath) Then
+        PFileSystem.CreateFolder GlobalPPMPath, Recoursive:=True
+    End If
+    GlobalConfigPath = GetConfigFilePathFromFolder(GlobalPPMPath)
 End Property
 
 Public Property Get ProjectPath() As String
     With NewFileSystemObject()
-        Dim PPMPath As String
-        PPMPath = .BuildPath(Interaction.Environ("LOCALAPPDATA"), "ppm")
         Dim ProjectsPath As String
-        ProjectsPath = .BuildPath(PPMPath, "projects")
+        ProjectsPath = .BuildPath(LocalPPMPath, "projects")
         Dim ProjectName As String
         ProjectName = .GetFileName(SelectedProject.Path)
 

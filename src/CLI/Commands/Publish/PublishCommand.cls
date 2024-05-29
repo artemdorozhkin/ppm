@@ -144,7 +144,6 @@ Public Function PublishOnServer(ByVal ZipPath As String, ByRef Pack As Pack) As 
     PublishOnServer = HTTP.PostRequest( _
         URL, Headers, Body _
     )
-    Immediate.WriteLine GetHash(Body)
 End Function
 
 Public Sub CreateManifest(ByVal PackageFolder As String, ByRef Pack As Pack)
