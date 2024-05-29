@@ -1,5 +1,5 @@
 Attribute VB_Name = "PFileSystem"
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
@@ -17,6 +17,17 @@ Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
 
     SaveToFile Path, Content, Encoding
 End Sub
+
+Public Function ReadFile(ByVal Path As String, Optional ByVal Encoding As String = "UTF-8") As String
+    With NewStream()
+        .Charset = Encoding
+        .Type = adTypeText
+        .Open
+        .LoadFromFile Path
+        ReadFile = .ReadText()
+        .Close
+    End With
+End Function
 
 Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional ByVal Encoding As String = "UTF-8")
   #If DEV Then

@@ -72,8 +72,10 @@ Public Sub DeleteKey(ByVal Key As String)
   #Else
     Dim Data As Object: Set Data = Me.Read()
   #End If
-    Data.Remove Key
-    WriteLines Data
+    If Data.Exists(Key) Then
+        Data.Remove Key
+        WriteLines Data
+    End If
 End Sub
 
 #If DEV Then
@@ -138,3 +140,5 @@ End Function
     Next
     SaveToFile this.ConfigPath, Content
 End Sub
+
+

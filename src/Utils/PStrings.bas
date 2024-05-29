@@ -1,5 +1,5 @@
 Attribute VB_Name = "PStrings"
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 Public Function GetIndexOfChar(ByVal Text As String, ByVal Char As String, Optional ByVal StartFrom As Long = 1) As Long
@@ -88,3 +88,5 @@ Public Function IsWhiteSpace(ByVal Char As String) As Boolean
         IsWhiteSpace = True
     End Select
 End Function
+
+

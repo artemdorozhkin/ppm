@@ -120,6 +120,7 @@ Public Sub ConfigSet(ByVal Config As ConfigIO)
             i, TokenKind.Identifier, "Expected Value token after Key token " & KeyToken.Text _
         )
         Config.CreateOrWrite KeyToken.Text, ValueToken.Text
+        Immediate.WriteLine PStrings.FString("{0}={1}", KeyToken.Text, ValueToken.Text)
 Continue:
     Next
 End Sub
@@ -145,7 +146,10 @@ Public Sub ConfigDelete(ByVal Config As ConfigIO)
     Dim i As Long
     For i = 1 To this.Tokens.Count
         Dim KeyToken As SyntaxToken: Set KeyToken = this.Tokens(i)
-        Config.DeleteKey KeyToken.Text
+        If KeyToken.Kind = TokenKind.Identifier Then
+            Config.DeleteKey KeyToken.Text
+            Immediate.WriteLine PStrings.FString("key '{0}' deleted", KeyToken.Text)
+        End If
     Next
 End Sub
 

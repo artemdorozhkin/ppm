@@ -91,3 +91,5 @@ Public Function GetEncoding() As Variant
         GetEncoding = EncodingDef.Default
     End If
 End Function
+
+

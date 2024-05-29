@@ -41,38 +41,44 @@ End Property
 
 Private Sub ICommand_Exec()
     If Not SelectedProject.IsModuleExists("package") Then
-        Immediate.WriteLine "ERR: for publish the package you need to run ppm ""init"""
+        Immediate.WriteLine "ERR: package module not found"
+        Immediate.WriteLine "for publish the package you need to run ppm ""init"""
         End
     End If
 
+    Immediate.WriteLine "publishing..."
     Dim ms As Double: ms = DateTime.Timer
+
+    MoveProjectToPPM
     Dim RootFolder As String: RootFolder = CreateExport()
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject)
     Pack.Read
-
+    Pack.RenameModule Pack.Name & "Package"
     SelectedProject.ExportModule RootFolder, Pack.Module
+    Pack.RenameModule "package"
 
     Dim ZipName As String
     ZipName = Me.GetBuildName(Pack) & ".zip"
     Dim ZipPath As String
     ZipPath = NewFileSystemObject().BuildPath(Interaction.Environ("TEMP"), ZipName)
     Dim Zip As PZip: Set Zip = NewPZip(ZipPath)
-
     Zip.AddFolderContent RootFolder
     FileSystem.Kill RootFolder & "\*"
     FileSystem.RmDir RootFolder
 
-    Dim IsLocal As Boolean: IsLocal = this.Config.GetValue("to") = "local"
+    Dim Registry As String: Registry = this.Config.GetValue("registry")
     Dim Success As Boolean
-    If IsLocal Then
-        PublishOnLocal ZipPath, Pack
+    If NewFileSystemObject().FolderExists(Registry) Then
+        PublishOnLocal Registry, ZipPath, Pack
         Success = True
     Else
         Dim Response As TResponse
-        Response = PublishOnServer(ZipPath, Pack)
+        Response = PublishOnServer(Registry, ZipPath, Pack)
         Success = Response.Code = 200 Or _
                   Response.Code = 201
     End If
+
+    MovePPMToProject
 
     If Success Then
         Immediate.WriteLine PStrings.FString( _
@@ -80,7 +86,33 @@ Private Sub ICommand_Exec()
         )
     Else
         Immediate.WriteLine "ERR: something went wrong, try again later"
+        Immediate.WriteLine Response.Text
     End If
+End Sub
+
+Public Sub MoveProjectToPPM()
+    Dim Component As VBComponent
+    For Each Component In SelectedProject.Modules
+        Dim Module As Module: Set Module = NewModule(Component)
+        If PStrings.StartsWith(Module.Path, SelectedProject.Name) Then
+            Module.Move "ppm-modules." & Strings.Replace(Module.Path, "Project", "", Count:=1)
+        End If
+    Next
+End Sub
+
+Public Sub MovePPMToProject()
+    Dim Component As VBComponent
+    For Each Component In SelectedProject.Modules
+        Dim Module As Module: Set Module = NewModule(Component)
+        If PStrings.StartsWith(Module.Path, "ppm-modules") Then
+            Dim PackageName As String
+            PackageName = Strings.Replace(SelectedProject.Name, "Project", "")
+            Dim CorrectPath As String
+            CorrectPath = Strings.Replace(Module.Path, PackageName, SelectedProject.Name, Count:=1)
+            CorrectPath = Strings.Replace(CorrectPath, "ppm-modules.", "")
+            Module.Move CorrectPath
+        End If
+    Next
 End Sub
 
 Public Function GetBuildName(ByRef Pack As Pack) As String
@@ -99,18 +131,15 @@ Public Function CreateExport() As String
         Destination:=Folder, _
         RewriteLastExport:=False _
     )
-    Exporter.ExportFolders "UTF-8", SelectedProject.Name
+    Exporter.ExportFolders "UTF-8", "ppm-modules"
 
     CreateExport = Folder
 End Function
 
-Public Function PublishOnLocal(ByVal ZipPath As String, ByRef Pack As Pack)
-    Dim LocalRegistryPath As String
-    LocalRegistryPath = this.Config.GetValue("registry")
-
+Public Function PublishOnLocal(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack) As Boolean
     With NewFileSystemObject()
         Dim PackageFolder As String
-        PackageFolder = .BuildPath(LocalRegistryPath, Pack.Name)
+        PackageFolder = .BuildPath(Registry, Pack.Name)
         If Not .FolderExists(PackageFolder) Then PFileSystem.CreateFolder PackageFolder, Recoursive:=True
         Dim BuildZip As String
         BuildZip = .BuildPath(PackageFolder, Me.GetBuildName(Pack) & ".zip")
@@ -120,42 +149,49 @@ Public Function PublishOnLocal(ByVal ZipPath As String, ByRef Pack As Pack)
     FileSystem.Kill ZipPath
 
     Me.CreateManifest PackageFolder, Pack
+    PublishOnLocal = True
 End Function
 
-Public Function PublishOnServer(ByVal ZipPath As String, ByRef Pack As Pack) As TResponse
+Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack) As TResponse
     Dim FormData As FormData: Set FormData = New FormData
     Dim Boundary As String: Boundary = FormData.GenerateBoundary()
 
+    Dim PackStr As String
+    PackStr = PJSON.Stringify(Pack.JSON)
     Dim Body() As Byte
-    Body = FormData.Create(ZipPath, Boundary)
+    Body = FormData.Create(Boundary, ZipPath, PackStr)
 
     Dim Headers As Object: Set Headers = NewDictionary()
     Headers("Content-Type") = "multipart/form-data; boundary=" & Boundary
-    Headers("Accept-Encoding") = "gzip, deflate, br"
 
-    Dim URL As String: URL = this.Config.GetValue("registry")
-    If Strings.Right(URL, 1) = "/" Then
-        URL = PStrings.FString("{0}upload/{1}/{2}", URL, Pack.Name, Pack.Version)
-    Else
-        URL = PStrings.FString("{0}/upload/{1}/{2}", URL, Pack.Name, Pack.Version)
+    If Strings.Right(Registry, 1) <> "/" Then
+        Registry = Registry & "/"
     End If
+    Dim URL As String
+    URL = Registry & PStrings.FString("{0}/{1}", Pack.Name, Pack.Version)
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     PublishOnServer = HTTP.PostRequest( _
         URL, Headers, Body _
     )
+
+    FileSystem.Kill ZipPath
 End Function
 
 Public Sub CreateManifest(ByVal PackageFolder As String, ByRef Pack As Pack)
+    Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     With NewFileSystemObject()
         Dim ManifestPath As String
         ManifestPath = .BuildPath(PackageFolder, "manifest.json")
-        If .FileExists(ManifestPath) Then Exit Sub
+        If .FileExists(ManifestPath) Then
+            JB.SetJSON PJSON.Parse(PFileSystem.ReadFile(ManifestPath))
+        Else
+            JB.AddObject _
+                "name", Pack.Name
+        End If
     End With
 
-    Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     JB.AddObject _
-        "name", Pack.Name, _
         "latest", Pack.Version, _
         Pack.Version, Pack.JSON
 

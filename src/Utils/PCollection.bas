@@ -1,5 +1,5 @@
 Attribute VB_Name = "PCollection"
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 Public Function ToArray(ByRef Collection As Collection) As Variant

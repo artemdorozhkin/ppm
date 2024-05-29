@@ -1,5 +1,5 @@
 Attribute VB_Name = "Constants"
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 ' CALCULATED CONSTANTS (PROPERTIES)
@@ -69,4 +69,5 @@ Private Function GetConfigFilePathFromFolder(ByVal Folder As String) As String
         GetConfigFilePathFromFolder = .BuildPath(Folder, ".ppmrc")
     End With
 End Function
+
 

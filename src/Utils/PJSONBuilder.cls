@@ -7,11 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 Private Type TPJSONBuilder
-    JSON As Object
+    JSON As Dictionary
 End Type
 
 Private this As TPJSONBuilder
@@ -20,10 +20,19 @@ Private Sub Class_Initialize()
     Set this.JSON = NewDictionary()
 End Sub
 
+Public Function SetJSON(ByRef JSON As Object) As PJSONBuilder
+    Set this.JSON = JSON
+    Set SetJSON = Me
+End Function
+
 Public Function AddObject(ParamArray KeyValuePairs() As Variant) As PJSONBuilder
     Dim i As Long
     For i = 0 To UBound(KeyValuePairs) Step 2
-        this.JSON.Add KeyValuePairs(i), KeyValuePairs(i + 1)
+        If Information.IsObject(KeyValuePairs(i + 1)) Then
+            Set this.JSON.Item(KeyValuePairs(i)) = KeyValuePairs(i + 1)
+        Else
+            this.JSON.Item(KeyValuePairs(i)) = KeyValuePairs(i + 1)
+        End If
     Next
     Set AddObject = Me
 End Function

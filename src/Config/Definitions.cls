@@ -8,7 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 '@PredeclaredId
-'@Folder("PearPMProject.src.Config")
+'@Folder "PearPMProject.src.Config"
 Option Explicit
 
 #If DEV Then
@@ -17,7 +17,6 @@ Attribute Items.VB_UserMemId = 0
 '@DefaultMember
 #Else
   Public Property Get Items() As Object
-Attribute Items.VB_UserMemId = 0
 #End If
   #If DEV Then
     Dim Buffer As Dictionary: Set Buffer = NewDictionary(VbCompareMethod.vbTextCompare)
@@ -106,12 +105,6 @@ Attribute Items.VB_UserMemId = 0
         Key:="save-struct", _
         Short:="s", _
         Default:=False _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
-        Key:="to", _
-        Default:="local" _
     )
     Set Buffer(Definition.Key) = Definition
 

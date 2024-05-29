@@ -16,7 +16,7 @@ End Type
 
 Private this As TFormData
 
-Public Function Create(ByVal Path As String, ByVal Boundary As String) As Byte()
+Public Function Create(ByVal Boundary As String, ByVal Path As String, ByVal Pack As String) As Byte()
     Set this.Converter = New BinaryConverter
 
     Dim FileData() As Byte
@@ -24,15 +24,20 @@ Public Function Create(ByVal Path As String, ByVal Boundary As String) As Byte()
 
     With NewStream()
         Dim FormData As String
-        FormData = "--" & Boundary + vbCrLf
-        FormData = FormData & "Content-Disposition: form-data; name=""file"";"
+        FormData = "--" & Boundary & vbCrLf
+        FormData = FormData & "Content-Disposition: form-data; name=""package"";"
         FormData = FormData & " filename=""" & FileSystem.Dir(Path) & """" & vbCrLf
         FormData = FormData & "Content-Type: application/zip" & vbCrLf & vbCrLf
         .Type = 1 'binary
         .Open
         .Write this.Converter.TextToBytes(FormData)
         .Write FileData
-        .Write this.Converter.TextToBytes(vbCrLf + "--" + Boundary + "--" + vbCrLf)
+        .Write this.Converter.TextToBytes(vbCrLf & "--" & Boundary & vbCrLf)
+
+        FormData = "Content-Disposition: form-data; name=""packInfo""" & vbCrLf & vbCrLf
+        .Write this.Converter.TextToBytes(FormData)
+        .Write this.Converter.TextToBytes("""" & Strings.Replace(Strings.Replace(Pack, """", "\"""), vbNewLine, "") & """")
+        .Write this.Converter.TextToBytes(vbCrLf & "--" & Boundary & "--" & vbCrLf)
         .Position = 0
 
         Create = .Read()

@@ -1,5 +1,5 @@
 Attribute VB_Name = "PQuickConstructors"
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 #If DEV Then
@@ -44,3 +44,5 @@ End Function
         End If
     End With
 End Function
+
+

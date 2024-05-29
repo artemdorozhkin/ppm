@@ -106,3 +106,5 @@ Private Function GetValueFromFile(ByRef LocationDef As Definition, ByRef Definit
     End Select
     GetValueFromFile = Config.Read()(Definition.Key)
 End Function
+
+

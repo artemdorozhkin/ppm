@@ -134,3 +134,5 @@ Private Sub ReadString()
     End If
     this.Kind = TokenKind.Identifier
 End Sub
+
+

@@ -1,5 +1,5 @@
 Attribute VB_Name = "PArray"
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 Public Function IncludesAny(ByRef Data As Variant, ParamArray OneOfValue() As Variant) As Boolean
