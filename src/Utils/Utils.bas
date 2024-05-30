@@ -2,6 +2,52 @@ Attribute VB_Name = "Utils"
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
+Public Function GetNewest(ByVal Current As String, ByVal Other As String) As String
+    Const Major As Integer = 0
+    Const Minor As Integer = 1
+    Const Patch As Integer = 2
+
+    If Strings.Len(Other) = 0 Then
+        GetNewest = Current
+        Exit Function
+    End If
+
+    If Strings.Len(Current) = 0 Then
+        GetNewest = Other
+        Exit Function
+    End If
+
+    If PStrings.IsEqual(Current, "latest") Then
+        GetNewest = Current
+        Exit Function
+    End If
+
+    Dim CurrentParts As Variant: CurrentParts = Strings.Split(Current, ".")
+    Dim OtherParts As Variant: OtherParts = Strings.Split(Other, ".")
+    CurrentParts(Major) = Conversion.CInt(CurrentParts(Major))
+    CurrentParts(Minor) = Conversion.CInt(CurrentParts(Minor))
+    CurrentParts(Patch) = Conversion.CInt(CurrentParts(Patch))
+    OtherParts(Major) = Conversion.CInt(OtherParts(Major))
+    OtherParts(Minor) = Conversion.CInt(OtherParts(Minor))
+    OtherParts(Patch) = Conversion.CInt(OtherParts(Patch))
+
+    If CurrentParts(Major) > OtherParts(Major) Then
+        GetNewest = Current
+    ElseIf CurrentParts(Major) < OtherParts(Major) Then
+        GetNewest = Other
+    ElseIf CurrentParts(Minor) > OtherParts(Minor) Then
+        GetNewest = Current
+    ElseIf CurrentParts(Minor) < OtherParts(Minor) Then
+        GetNewest = Other
+    ElseIf CurrentParts(Patch) > OtherParts(Patch) Then
+        GetNewest = Current
+    ElseIf CurrentParts(Patch) < OtherParts(Patch) Then
+        GetNewest = Other
+    Else
+        GetNewest = Current
+    End If
+End Function
+
 Public Function UncommentString(ByVal Value As String) As String
     Dim Lines As Variant: Lines = Strings.Split(Value, vbNewLine)
     Dim i As Long

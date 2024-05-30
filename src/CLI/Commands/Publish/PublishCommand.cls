@@ -66,9 +66,16 @@ Private Sub ICommand_Exec()
     FileSystem.Kill RootFolder & "\*"
     FileSystem.RmDir RootFolder
 
+    Dim ToLocal As Boolean: ToLocal = this.Config.GetValue("local")
     Dim Registry As String: Registry = this.Config.GetValue("registry")
+    If ToLocal Then
+        If Not NewFileSystemObject().FolderExists(Registry) Then
+            Registry = Constants.LocalRegistryPath
+        End If
+    End If
+
     Dim Success As Boolean
-    If NewFileSystemObject().FolderExists(Registry) Then
+    If ToLocal Then
         PublishOnLocal Registry, ZipPath, Pack
         Success = True
     Else
@@ -116,7 +123,7 @@ Public Sub MovePPMToProject()
 End Sub
 
 Public Function GetBuildName(ByRef Pack As Pack) As String
-    GetBuildName = PStrings.FString("{0}_{1}", Pack.Name, Strings.Replace(Pack.Version, ".", "_"))
+    GetBuildName = PStrings.FString("{0}-{1}", Pack.Name, Pack.Version)
 End Function
 
 Public Function CreateExport() As String
@@ -164,15 +171,9 @@ Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As Strin
     Dim Headers As Object: Set Headers = NewDictionary()
     Headers("Content-Type") = "multipart/form-data; boundary=" & Boundary
 
-    If Strings.Right(Registry, 1) <> "/" Then
-        Registry = Registry & "/"
-    End If
-    Dim URL As String
-    URL = Registry & PStrings.FString("{0}/{1}", Pack.Name, Pack.Version)
-
     Dim HTTP As HTTP: Set HTTP = New HTTP
     PublishOnServer = HTTP.PostRequest( _
-        URL, Headers, Body _
+        Registry, Headers, Body _
     )
 
     FileSystem.Kill ZipPath
@@ -187,13 +188,24 @@ Public Sub CreateManifest(ByVal PackageFolder As String, ByRef Pack As Pack)
             JB.SetJSON PJSON.Parse(PFileSystem.ReadFile(ManifestPath))
         Else
             JB.AddObject _
-                "name", Pack.Name
+                "name", Pack.Name, _
+                "latest", "", _
+                "versions", NewDictionary()
         End If
     End With
+    Dim JSON As Object: Set JSON = PJSON.Parse(JB.ToString())
+    Set JSON("versions")(Pack.Version) = Pack.JSON
+    JSON("latest") = GetLatest(JSON("versions"))
 
-    JB.AddObject _
-        "latest", Pack.Version, _
-        Pack.Version, Pack.JSON
-
-    PFileSystem.SaveToFile ManifestPath, JB.ToString()
+    PFileSystem.SaveToFile ManifestPath, PJSON.Stringify(JSON, 2)
 End Sub
+
+Public Function GetLatest(ByRef Versions As Object) As String
+    Dim Latest As String
+    Dim Vers As Variant
+    For Each Vers In Versions
+        Latest = Utils.GetNewest(Vers, Latest)
+    Next
+
+    GetLatest = Latest
+End Function

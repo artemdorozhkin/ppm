@@ -36,7 +36,7 @@ Public Function Create(ByVal Boundary As String, ByVal Path As String, ByVal Pac
 
         FormData = "Content-Disposition: form-data; name=""packInfo""" & vbCrLf & vbCrLf
         .Write this.Converter.TextToBytes(FormData)
-        .Write this.Converter.TextToBytes("""" & Strings.Replace(Strings.Replace(Pack, """", "\"""), vbNewLine, "") & """")
+        .Write this.Converter.TextToBytes(Strings.Replace(Pack, vbNewLine, ""))
         .Write this.Converter.TextToBytes(vbCrLf & "--" & Boundary & "--" & vbCrLf)
         .Position = 0
 

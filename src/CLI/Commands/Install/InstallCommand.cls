@@ -100,48 +100,12 @@ Public Sub FlatLib(ByRef Libs As Dictionary, ByVal Lib As String)
     End If
 
     If Libs.Exists(LibName) Then
-        LibVersion = GetNewest(Libs(LibName), LibVersion)
+        LibVersion = Utils.GetNewest(Libs(LibName), LibVersion)
         Libs(LibName) = LibVersion
     Else
         Libs.Add LibName, LibVersion
     End If
 End Sub
-
-Public Function GetNewest(ByVal Current As String, ByVal Other As String) As Boolean
-    Const Major As Integer = 0
-    Const Minor As Integer = 1
-    Const Patch As Integer = 2
-
-    If PStrings.IsEqual(Current, "latest") Then
-        GetNewest = Current
-        Exit Function
-    End If
-
-    Dim CurrentParts As Variant: CurrentParts = Strings.Split(Current, ".")
-    Dim OtherParts As Variant: OtherParts = Strings.Split(Other, ".")
-    CurrentParts(Major) = Conversion.CInt(CurrentParts(Major))
-    CurrentParts(Minor) = Conversion.CInt(CurrentParts(Minor))
-    CurrentParts(Patch) = Conversion.CInt(CurrentParts(Patch))
-    OtherParts(Major) = Conversion.CInt(OtherParts(Major))
-    OtherParts(Minor) = Conversion.CInt(OtherParts(Minor))
-    OtherParts(Patch) = Conversion.CInt(OtherParts(Patch))
-
-    If CurrentParts(Major) > OtherParts(Major) Then
-        GetNewest = Current
-    ElseIf CurrentParts(Major) < OtherParts(Major) Then
-        GetNewest = Other
-    ElseIf CurrentParts(Minor) > OtherParts(Minor) Then
-        GetNewest = Current
-    ElseIf CurrentParts(Minor) < OtherParts(Minor) Then
-        GetNewest = Other
-    ElseIf CurrentParts(Patch) > OtherParts(Patch) Then
-        GetNewest = Current
-    ElseIf CurrentParts(Patch) < OtherParts(Patch) Then
-        GetNewest = Other
-    Else
-        GetNewest = Current
-    End If
-End Function
 
 Public Function GetLocalLibs(ByVal Registry As String, ByRef Libs As Dictionary) As Variant
     If Strings.Right(Registry, 1) <> Application.PathSeparator Then
