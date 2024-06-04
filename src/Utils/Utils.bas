@@ -2,6 +2,18 @@ Attribute VB_Name = "Utils"
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
+Public Function CalculateCheckSum(ByVal Path As String) As String
+    With CreateObject("MSXML2.DOMDocument")
+        .LoadXML "<root />"
+        .DocumentElement.DataType = "bin.Hex"
+        Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
+        Dim SHA256 As Object
+        Set SHA256 = CreateObject("System.Security.Cryptography.SHA256Managed")
+        .DocumentElement.nodeTypedValue = SHA256.ComputeHash_2((Converter.FileToBytes(Path)))
+        CalculateCheckSum = Strings.Replace(.DocumentElement.Text, vbLf, "")
+    End With
+End Function
+
 Public Function GetNewest(ByVal Current As String, ByVal Other As String) As String
     Const Major As Integer = 0
     Const Minor As Integer = 1

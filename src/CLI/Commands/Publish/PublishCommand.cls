@@ -163,8 +163,10 @@ Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As Strin
     Dim FormData As FormData: Set FormData = New FormData
     Dim Boundary As String: Boundary = FormData.GenerateBoundary()
 
+    Dim PackJSON As Object: Set PackJSON = Pack.JSON
+    PackJSON("checkSum") = Utils.CalculateCheckSum(ZipPath)
     Dim PackStr As String
-    PackStr = PJSON.Stringify(Pack.JSON)
+    PackStr = PJSON.Stringify(PackJSON)
     Dim Body() As Byte
     Body = FormData.Create(Boundary, ZipPath, PackStr)
 
