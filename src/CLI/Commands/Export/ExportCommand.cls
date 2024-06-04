@@ -27,7 +27,7 @@ Private Sub Class_Initialize()
     this.CommandInfo.Params.Item("encoding") = "\\t\\tExport files with set encoding."
     this.CommandInfo.Params.Item("save-struct") = "\\tSave the RubberDuck structure when exporting a project."
     this.CommandInfo.Params.Item("to") = "\\tFolder to export."
-    this.CommandInfo.Params.Item("no-clear") = "\\tFolder to export."
+    this.CommandInfo.Params.Item("no-clear") = "\\tDo not delete the files of the last export.."
     this.CommandInfo.Usage = Array("[<options>]")
 End Sub
 

@@ -84,7 +84,7 @@ Public Sub CreatePack()
     With PackModule.CodeModule
         .DeleteLines 1, .CountOfLines
         .AddFromString Utils.CommentString(JB.ToString())
-        .InsertLines 1, PStrings.FString("'@Folder""{0}""", SelectedProject.Name)
+        .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
     End With
 End Sub
 

@@ -96,15 +96,34 @@ Public Function Update( _
     If Not Information.IsMissing(Description) Then this.Pack("description") = Description
     If Not Information.IsMissing(Author) Then this.Pack("author") = Author
     If Not Information.IsMissing(Git) Then this.Pack("git") = Git
-    If Not Information.IsMissing(Dependencies) Then Set this.Pack("dependencies") = Dependencies
-    If Not Information.IsMissing(DevDependencies) Then Set this.Pack("devDependencies") = DevDependencies
+
+    Dim DepName As Variant
+    If Not Information.IsMissing(Dependencies) Then
+        If this.Pack.Exists("dependencies") Then
+            
+            For Each DepName In Dependencies
+                this.Pack("dependencies")(DepName) = Dependencies(DepName)
+            Next
+        Else
+            Set this.Pack("dependencies") = Dependencies
+        End If
+    End If
+
+    If Not Information.IsMissing(DevDependencies) Then
+        If this.Pack.Exists("devDependencies") Then
+            For Each DepName In DevDependencies
+                this.Pack("devDependencies")(DepName) = DevDependencies(DepName)
+            Next
+        Else
+            Set this.Pack("devDependencies") = DevDependencies
+        End If
+    End If
 
     Dim JSON As String: JSON = PJSON.Stringify(this.Pack, 2)
     With this.Module.CodeModule
         .DeleteLines 1, .CountOfLines
+        .AddFromString PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
         .AddFromString Utils.CommentString(JSON)
     End With
     Set Update = Me
 End Function
-
-

@@ -56,10 +56,10 @@ Public Sub ExportAll(ByVal Encoding As String)
         this.Destination = SelectedProject.Folder
     End If
 
-    If Not this.SaveStruct Then
-        Set this.Modules = ParseModules()
-    Else
+    If this.SaveStruct Then
         Set this.Modules = ParseModulesWithDirectory()
+    Else
+        Set this.Modules = ParseModules()
     End If
 
     If this.RewriteLastExport Then
@@ -82,10 +82,10 @@ Public Sub ExportFolders(ByVal Encoding As String, ParamArray Folders() As Varia
         this.Destination = SelectedProject.Folder
     End If
 
-    If Not this.SaveStruct Then
-        Set this.Modules = ParseModules()
-    Else
+    If this.SaveStruct Then
         Set this.Modules = ParseModulesWithDirectory()
+    Else
+        Set this.Modules = ParseModules()
     End If
 
     If this.RewriteLastExport Then
@@ -261,6 +261,7 @@ Private Function SaveModules(ByVal Encoding As String) As Variant
             Dim DirectoryPath As String
             DirectoryPath = Strings.Split(ModuleKey, ":")(1)
             DirectoryPath = Strings.Replace(DirectoryPath, SelectedProject.Name & ".", "", Count:=1)
+            DirectoryPath = Strings.Replace(DirectoryPath, SelectedProject.Name, "", Count:=1)
             DirectoryPath = Strings.Replace(DirectoryPath, ".", Application.PathSeparator)
             
             SaveFolderPath = FSO.BuildPath(this.Destination, DirectoryPath)
