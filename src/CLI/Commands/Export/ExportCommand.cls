@@ -24,10 +24,10 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "export"
     this.CommandInfo.Description = "Exports the selected project."
-    this.CommandInfo.Params.Item("encoding") = "\\t\\tExport files with set encoding."
+    this.CommandInfo.Params.Item("encoding") = "\\t\\tExport files with specified encoding."
     this.CommandInfo.Params.Item("save-struct") = "\\tSave the RubberDuck structure when exporting a project."
-    this.CommandInfo.Params.Item("to") = "\\tFolder to export."
-    this.CommandInfo.Params.Item("no-clear") = "\\tDo not delete the files of the last export.."
+    this.CommandInfo.Params.Item("path") = "\\t\\t\\tFolder to export."
+    this.CommandInfo.Params.Item("no-clear") = "\\t\\t\\tDo not delete files from the last export."
     this.CommandInfo.Usage = Array("[<options>]")
 End Sub
 
@@ -91,5 +91,3 @@ Public Function GetEncoding() As Variant
         GetEncoding = EncodingDef.Default
     End If
 End Function
-
-

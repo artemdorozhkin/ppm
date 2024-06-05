@@ -104,6 +104,7 @@ Attribute Items.VB_UserMemId = 0
 
     Set Definition = NewDefinition( _
         Key:="path", _
+        Short:="p", _
         Default:="" _
     )
     Set Buffer(Definition.Key) = Definition

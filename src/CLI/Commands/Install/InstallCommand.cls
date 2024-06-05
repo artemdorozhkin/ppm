@@ -27,6 +27,8 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "install"
     this.CommandInfo.Description = "Installs the selected packages."
+    this.CommandInfo.Params.Item("local") = "\\tInstall packages and dependencies from local registry."
+    this.CommandInfo.Params.Item("registry") = "\\tSpecific registry path or url."
     this.CommandInfo.Usage = Array("[<some package>@<some version>] [<options>]")
 End Sub
 
@@ -199,7 +201,7 @@ Public Function GetManifestFromServer(ByVal LibName As String, ByVal Version As 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Response As TResponse
     Response = HTTP.GetRequest(URL)
-    If Response.Code <> 200 Then
+    If Response.Code <> HTTPCodes.OK_200 Then
         Immediate.WriteLine "ERR: something went wrong, try again later"
         Immediate.WriteLine Response.Text
         End
@@ -257,7 +259,7 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
         URL = PStrings.FString("{0}{1}/{2}", Registry, Name, Version)
         Dim Response As TResponse
         Response = HTTP.GetRequest(URL)
-        If Response.Code <> 200 Then
+        If Response.Code <> HTTPCodes.OK_200 Then
             Information.Err.Raise _
                 17, _
                 Information.TypeName(Me), _
@@ -267,7 +269,7 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
         Dim Manifest As Object: Set Manifest = PJSON.Parse(Response.Text)
         URL = Manifest("packUrl")
         Response = HTTP.GetRequest(URL)
-        If Response.Code <> 200 Then
+        If Response.Code <> HTTPCodes.OK_200 Then
             Information.Err.Raise _
                 17, _
                 Information.TypeName(Me), _

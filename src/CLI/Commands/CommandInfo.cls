@@ -25,11 +25,14 @@ End Sub
 
 Public Function GetUsage() As String
     Dim Usage As String
-    Usage = PStrings.FString(Me.Description & "\\n")
-    Usage = Usage & PStrings.FString("\\nUsage:\\nppm ""{0} {1}""\\n", Me.Name, Strings.Join(Me.Usage, "\\n  "))
+    Usage = PStrings.FString(Me.Description & "\\n\\nUsage:")
+    Dim UseCase As Variant
+    For Each UseCase In Me.Usage
+        Usage = Usage & PStrings.FString("\\nppm ""{0} {1}""", Me.Name, UseCase)
+    Next
 
     If Me.Params.Count > 0 Then
-        Usage = Usage & "\\nOptions:\\n"
+        Usage = Usage & "\\n\\nOptions:\\n"
         Dim Param As Variant
         For Each Param In Me.Params
             Dim Definition As Definition: Set Definition = Definitions(Param)
@@ -59,5 +62,3 @@ Public Function GetUsage() As String
 
     GetUsage = PStrings.FString(Usage)
 End Function
-
-

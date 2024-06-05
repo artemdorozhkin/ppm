@@ -23,7 +23,9 @@ Private this As TExportCommand
 Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "publish"
-    this.CommandInfo.Description = ""
+    this.CommandInfo.Description = "Publishes the package to the server or locally."
+    this.CommandInfo.Params.Item("local") = "\\tPublish the package to the local registry."
+    this.CommandInfo.Params.Item("registry") = "\\tSpecific registry path or url."
     this.CommandInfo.Usage = Array("[<options>]")
 End Sub
 
@@ -81,8 +83,8 @@ Private Sub ICommand_Exec()
     Else
         Dim Response As TResponse
         Response = PublishOnServer(Registry, ZipPath, Pack)
-        Success = Response.Code = 200 Or _
-                  Response.Code = 201
+        Success = Response.Code = HTTPCodes.OK_200 Or _
+                  Response.Code = HTTPCodes.CREATED_201
     End If
 
     MovePPMToProject
