@@ -11,36 +11,53 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TFormData
+    Stream As Stream
     Converter As BinaryConverter
+    Boundary As String
+    ContentDisposition As String
 End Type
 
 Private this As TFormData
 
-Public Function Create(ByVal Boundary As String, ByVal Path As String, ByVal Pack As String) As Byte()
+Public Function Create(ByVal Boundary As String) As FormData
+    this.Boundary = Boundary
+    Set this.Stream = NewStream()
     Set this.Converter = New BinaryConverter
+    this.ContentDisposition = "Content-Disposition: form-data; name=""{0}"";"
+    Set Create = Me
+End Function
 
-    Dim FileData() As Byte
-    FileData = this.Converter.FileToBytes(Path)
-
-    With NewStream()
+Public Function AddFile(ByVal Path As String, ByVal FormDataName As String, ByVal ContentType As String) As FormData
+    With this.Stream
         Dim FormData As String
-        FormData = "--" & Boundary & vbCrLf
-        FormData = FormData & "Content-Disposition: form-data; name=""package"";"
+        FormData = "--" & this.Boundary & vbCrLf
+        FormData = FormData & PStrings.FString(this.ContentDisposition, FormDataName)
         FormData = FormData & " filename=""" & FileSystem.Dir(Path) & """" & vbCrLf
-        FormData = FormData & "Content-Type: application/zip" & vbCrLf & vbCrLf
+        FormData = FormData & "Content-Type: " & ContentType & vbCrLf & vbCrLf
         .Type = 1 'binary
         .Open
         .Write this.Converter.TextToBytes(FormData)
-        .Write FileData
-        .Write this.Converter.TextToBytes(vbCrLf & "--" & Boundary & vbCrLf)
+        .Write this.Converter.FileToBytes(Path)
+    End With
+    Set AddFile = Me
+End Function
 
-        FormData = "Content-Disposition: form-data; name=""packInfo""" & vbCrLf & vbCrLf
+Public Function AddText(ByVal Text As String, ByVal FormDataName As String) As FormData
+    With this.Stream
+        .Write this.Converter.TextToBytes(vbCrLf & "--" & this.Boundary & vbCrLf)
+        Dim FormData As String
+        FormData = PStrings.FString(this.ContentDisposition, FormDataName) & vbCrLf & vbCrLf
         .Write this.Converter.TextToBytes(FormData)
-        .Write this.Converter.TextToBytes(Strings.Replace(Pack, vbNewLine, ""))
-        .Write this.Converter.TextToBytes(vbCrLf & "--" & Boundary & "--" & vbCrLf)
-        .Position = 0
+        .Write this.Converter.TextToBytes(Strings.Replace(Text, vbNewLine, ""))
+    End With
+    Set AddText = Me
+End Function
 
-        Create = .Read()
+Public Function ToBytes() As Byte()
+    With this.Stream
+        .Write this.Converter.TextToBytes(vbCrLf & "--" & this.Boundary & "--" & vbCrLf)
+        .Position = 0
+        ToBytes = .Read()
         .Close
     End With
 End Function
@@ -52,18 +69,4 @@ Public Function GenerateBoundary(Optional ByVal Seed As Long = 1) As String
     BoundaryCode = Conversion.Hex(CurrentDate)
 
     GenerateBoundary = "WebKitFormBoundary" & BoundaryCode
-End Function
-
-Function StringToBytes(str As String) As Byte()
-    With CreateObject("ADODB.Stream")
-        .Type = 2 'adTypeText
-        .Charset = "iso-8859-1"
-        .Open
-        .WriteText str
-        .Position = 0
-        .Type = 1 'adTypeBinary
-        .Position = 3 ' Skip BOM
-        StringToBytes = .Read
-        .Close
-    End With
 End Function

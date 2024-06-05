@@ -170,7 +170,10 @@ Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As Strin
     Dim PackStr As String
     PackStr = PJSON.Stringify(PackJSON)
     Dim Body() As Byte
-    Body = FormData.Create(Boundary, ZipPath, PackStr)
+    Body = FormData.Create(Boundary) _
+                   .AddFile(ZipPath, "package", "application/zip") _
+                   .AddText(PackStr, "packInfo") _
+                   .ToBytes()
 
     Dim Headers As Object: Set Headers = NewDictionary()
     Headers("Content-Type") = "multipart/form-data; boundary=" & Boundary
