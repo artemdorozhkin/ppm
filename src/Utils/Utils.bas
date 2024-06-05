@@ -2,15 +2,20 @@ Attribute VB_Name = "Utils"
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
-Public Function CalculateCheckSum(ByVal Path As String) As String
+Public Function CalculateFileCheckSum(ByVal Path As String) As String
+    Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
+    CalculateFileCheckSum = CalculateBytesCheckSum(Converter.FileToBytes(Path))
+End Function
+
+Public Function CalculateBytesCheckSum(ByRef Bytes() As Byte) As String
     With CreateObject("MSXML2.DOMDocument")
         .LoadXML "<root />"
         .DocumentElement.DataType = "bin.Hex"
         Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
         Dim SHA256 As Object
         Set SHA256 = CreateObject("System.Security.Cryptography.SHA256Managed")
-        .DocumentElement.nodeTypedValue = SHA256.ComputeHash_2((Converter.FileToBytes(Path)))
-        CalculateCheckSum = Strings.Replace(.DocumentElement.Text, vbLf, "")
+        .DocumentElement.nodeTypedValue = SHA256.ComputeHash_2((Bytes))
+        CalculateBytesCheckSum = Strings.Replace(.DocumentElement.Text, vbLf, "")
     End With
 End Function
 
@@ -87,6 +92,10 @@ Public Function CommentString(ByVal Value As String) As String
         Lines(i) = "'" & Lines(i)
     Next
     CommentString = Strings.Join(Lines, vbNewLine)
+End Function
+
+Public Function IsVBComponent(ByVal Value As Object) As Boolean
+    IsVBComponent = Information.TypeName(Value) = "VBComponent"
 End Function
 
 Public Function IsDictionary(ByVal Value As Object) As Boolean
@@ -190,5 +199,3 @@ Public Function IsFalse(ByVal Value As Variant) As Boolean
         Information.Err.Raise 13, "IsFalse", "Cannot detect the type of Value"
     End If
 End Function
-
-

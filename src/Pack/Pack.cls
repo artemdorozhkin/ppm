@@ -11,26 +11,21 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TPack
-    Project As Project
     Pack As Object
-    Module As VBComponent
+    Component As VBComponent
 End Type
 
 Private this As TPack
 
-Public Property Get Project() As Project
-    Set Project = this.Project
-End Property
-Public Property Set Project(ByVal RHS As Project)
-    Set this.Project = RHS
-End Property
-
 Public Property Get JSON() As Object
     Set JSON = this.Pack
 End Property
+Public Property Set JSON(ByVal RHS As Object)
+    Set this.Pack = RHS
+End Property
 
-Public Property Get Module() As VBComponent
-    Set Module = this.Module
+Public Property Get Component() As VBComponent
+    Set Component = this.Component
 End Property
 
 Public Property Get Version() As String
@@ -61,14 +56,19 @@ Public Property Get DevDependencies() As Dictionary
     Set DevDependencies = this.Pack("devDependencies")
 End Property
 
-Public Function Read() As Pack
-    Set this.Module = this.Project.GetModule("package")
+Public Function Read(ByRef Component As VBComponent) As Pack
+    Set this.Component = Component
     Dim Code As String
-    Code = this.Module.CodeModule.Lines(1, this.Module.CodeModule.CountOfLines)
+    Code = this.Component.CodeModule.Lines(1, this.Component.CodeModule.CountOfLines)
+
+    Dim OpenedBraces As Long
     Dim Lines As Collection: Set Lines = New Collection
     Dim Line As Variant
     For Each Line In Strings.Split(Code, vbNewLine)
-        If PStrings.StartsWith(Line, "'") And Not PStrings.Contains(Line, "@Folder") Then
+        Dim LineWithoutSpaces As String: LineWithoutSpaces = Strings.Replace(Line, " ", "")
+        If PStrings.StartsWith(LineWithoutSpaces, "'{") Or OpenedBraces > 0 Then
+            If PStrings.Contains(LineWithoutSpaces, "{") Then OpenedBraces = OpenedBraces + 1
+            If PStrings.Contains(LineWithoutSpaces, "}") Then OpenedBraces = OpenedBraces - 1
             Lines.Add Line
         End If
     Next
@@ -78,7 +78,7 @@ Public Function Read() As Pack
 End Function
 
 Public Function RenameModule(ByVal Name As String) As Pack
-    this.Module.Name = Name
+    this.Component.Name = Name
     Set RenameModule = Me
 End Function
 
@@ -120,7 +120,7 @@ Public Function Update( _
     End If
 
     Dim JSON As String: JSON = PJSON.Stringify(this.Pack, 2)
-    With this.Module.CodeModule
+    With this.Component.CodeModule
         .DeleteLines 1, .CountOfLines
         .AddFromString PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
         .AddFromString Utils.CommentString(JSON)

@@ -98,14 +98,14 @@ Public Function GetLibsFromTokens() As Object
             Version = Parts(1)
             LibName = Parts(0)
         End If
-        Dim Manifest As Object
+        Dim LibPack As Pack
         If this.FromLocal Then
-            Set Manifest = Me.GetLocalManifest(LibName, Version)
+            Set LibPack = Me.GetLocalLibPack(LibName, Version)
         Else
-            Set Manifest = Me.GetManifestFromServer(LibName, Version)
+            Set LibPack = Me.GetLibPackFromServer(LibName, Version)
         End If
-        this.Parents.Add Manifest("name"), Manifest("version")
-        AddFromManifest Manifest, Libs
+        this.Parents.Add LibPack.Name, LibPack.Version
+        AddFromLibPack LibPack, Libs
 Continue:
     Next
 
@@ -114,7 +114,7 @@ End Function
 
 Public Function GetLibsFromDependencies() As Object
     Dim Libs As Dictionary: Set Libs = NewDictionary(vbTextCompare)
-    Dim Dependencies As Object: Set Dependencies = NewPack(SelectedProject).Read().Dependencies
+    Dim Dependencies As Object: Set Dependencies = NewPack(SelectedProject.GetModule("package")).Dependencies
     If IsFalse(Dependencies) Then
         Set GetLibsFromDependencies = Libs
         Exit Function
@@ -130,9 +130,9 @@ Public Function GetLibsFromDependencies() As Object
         Dim Version As String: Version = Dependencies(LibName)
         this.Parents.Add LibName, Version
         If this.FromLocal Then
-            AddFromManifest Me.GetLocalManifest(LibName, Dependencies(LibName)), Libs
+            AddFromLibPack Me.GetLocalLibPack(LibName, Dependencies(LibName)), Libs
         Else
-            AddFromManifest Me.GetManifestFromServer(LibName, Version), Libs
+            AddFromLibPack Me.GetLibPackFromServer(LibName, Version), Libs
         End If
 Continue:
     Next
@@ -140,12 +140,12 @@ Continue:
     Set GetLibsFromDependencies = Libs
 End Function
 
-Public Sub AddFromManifest(ByRef Manifest As Object, ByRef Libs As Object)
-    Dim LibName As String: LibName = Manifest("name")
-    Dim Version As String: Version = Manifest("version")
+Public Sub AddFromLibPack(ByRef LibPack As Pack, ByRef Libs As Object)
+    Dim LibName As String: LibName = LibPack.Name
+    Dim Version As String: Version = LibPack.Version
     Dim Dependencies As Object
-    If Manifest.Exists("dependencies") Then
-        Set Dependencies = Manifest("dependencies")
+    If IsTrue(LibPack.Dependencies) Then
+        Set Dependencies = LibPack.Dependencies
     End If
 
     If Libs.Exists(LibName) Then
@@ -167,30 +167,30 @@ Public Sub AddFromManifest(ByRef Manifest As Object, ByRef Libs As Object)
         Newest = Utils.GetNewest(Dependencies(DepName), Libs(DepName))
         If Not Libs.Exists(DepName) Or Libs(DepName) <> Newest Then
             If this.FromLocal Then
-                AddFromManifest Me.GetLocalManifest(DepName, Dependencies(DepName)), Libs
+                AddFromLibPack Me.GetLocalLibPack(DepName, Dependencies(DepName)), Libs
             Else
-                AddFromManifest Me.GetManifestFromServer(DepName, Dependencies(DepName)), Libs
+                AddFromLibPack Me.GetLibPackFromServer(DepName, Dependencies(DepName)), Libs
             End If
         End If
     Next
 End Sub
 
-Public Function GetLocalManifest(ByVal LibName As String, ByVal Version As String) As Object
+Public Function GetLocalLibPack(ByVal LibName As String, ByVal Version As String) As Pack
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
     Dim ManifestPath As String
     ManifestPath = FSO.BuildPath(this.Registry, LibName)
     ManifestPath = FSO.BuildPath(ManifestPath, "manifest.json")
 
     Dim JSONString As String: JSONString = PFileSystem.ReadFile(ManifestPath)
-    Dim Manifest As Object: Set Manifest = PJSON.Parse(JSONString)
+    Dim Manifest As Manifest: Set Manifest = NewManifest(JSONString)
     If PStrings.IsEqual(Version, "latest") Then
-        Version = Manifest("latest")
+        Version = Manifest.Latest
     End If
 
-    Set GetLocalManifest = Manifest("versions")(Version)
+    Set GetLocalLibPack = NewPack(Manifest.Versions(Version))
 End Function
 
-Public Function GetManifestFromServer(ByVal LibName As String, ByVal Version As String) As Object
+Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As String) As Pack
     Dim URL As String
     If Strings.Right(this.Registry, 1) <> "/" Then
         URL = this.Registry & PStrings.FString("/{0}/{1}", LibName, Version)
@@ -207,7 +207,7 @@ Public Function GetManifestFromServer(ByVal LibName As String, ByVal Version As 
         End
     End If
 
-    Set GetManifestFromServer = PJSON.Parse(Response.Text)
+    Set GetLibPackFromServer = NewPack(PJSON.Parse(Response.Text))
 End Function
 
 Public Function GetLocalLibs(ByRef Libs As Dictionary) As Variant
@@ -276,6 +276,16 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
                 "ERR: download failed: " & PStrings.FString("{0}@{1}\\n{2}", Name, Version, Response.Text)
         End If
 
+        If Not PStrings.IsEqual( _
+            Manifest("checkSum"), _
+            Utils.CalculateBytesCheckSum(Response.Body) _
+        ) Then
+            Information.Err.Raise _
+                59, _
+                Information.TypeName(Me), _
+                "invalid checksum"
+        End If
+
         Dim Parts As Variant: Parts = Strings.Split(URL, "/")
         Dim FileName As String
         FileName = Parts(UBound(Parts))
@@ -319,5 +329,5 @@ Public Sub ImportModules(ByVal Path As String)
 End Sub
 
 Public Sub UpdatePack()
-    NewPack(SelectedProject).Read().Update Dependencies:=this.Parents
+    NewPack(SelectedProject.GetModule("package")).Update Dependencies:=this.Parents
 End Sub
