@@ -7,6 +7,8 @@
 Currently, `ppm` supports a few commands:
 
 - `init`: Initialises the package.
+- `publish`: Uploads the project to the server or local registry.
+- `install`: Installs packages with dependencies into the project.
 - `export`: Exports modules to the project root folder.
 - `config`: Manages configurations.
 - `help`: Provides usage assistance and descriptions for commands.
