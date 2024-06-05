@@ -7,3 +7,8 @@ Public Type TResponse
     Text As String
     Code As Long
 End Type
+
+Public Enum HTTPCodes
+    OK_200 = 200
+    CREATED_201 = 201
+End Enum

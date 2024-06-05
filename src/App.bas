@@ -2,7 +2,6 @@ Attribute VB_Name = "App"
 '@Folder "PearPMProject.src"
 Option Explicit
 
-Public Const Version = "0.2.0"
 Public SelectedProject As Project
 
 Public Sub ppm(Optional ByVal StringArgs As String)
@@ -20,5 +19,3 @@ Catch:
         Information.Err.Description _
     )
 End Sub
-
-

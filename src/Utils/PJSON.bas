@@ -187,5 +187,3 @@ Private Function ParseLiteral() As Variant
         Information.Err.Raise 5, "PJSON", "Unexpected token " & Value
     End If
 End Function
-
-
