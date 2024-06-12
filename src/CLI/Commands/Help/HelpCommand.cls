@@ -92,7 +92,8 @@ Public Function GetCommandName() As String
 End Function
 
 Public Function ShowPPMInfo()
-    Immediate.WriteLine PStrings.FString("Pear Package Manager, v{0}\\n", App.Version)
+    Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetModule("package"))
+    Immediate.WriteLine PStrings.FString("Pear Package Manager, v{0}\\n", Pack.Version)
     Immediate.WriteLine "Usage:"
     Immediate.WriteLine PStrings.FString( _
         "ppm ""install""\\nppm ""install <package>""\\nppm ""init""\\nppm ""init <package name>""\\n" _
