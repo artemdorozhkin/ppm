@@ -118,28 +118,6 @@ Public Function ConvertToType(ByVal Value As Variant, ByVal DataType As VbVarTyp
     End If
 End Function
 
-Public Sub CreateCstr(ByVal Name As String)
-    Dim Project As Project: Set Project = NewProject(Application.VBE.ActiveVBProject)
-    If Project.IsModuleExists(Name) Then
-        Name = Project.GetModule(Name).Name
-    End If
-
-    Dim Folder As String
-    Folder = PStrings.FString("'@Folder ""{0}.{1}""", Project.Name, Name)
-
-    Dim CstrCode As String
-    CstrCode = PStrings.FString( _
-        "Public Function New{0}() As {0}\\n" & _
-        "\\tSet New{0} = New {0}\\n" & _
-        "End Function", _
-        Name _
-    )
-    With Project.AddModule(PStrings.FString("{0}Cstr", Name)).CodeModule
-        .InsertLines 1, Folder
-        .AddFromString CstrCode
-    End With
-End Sub
-
 Public Function ConvertTime(ByVal Value As Double) As String
     Dim s As Double: s = 1000
     Dim m As Double: m = s * 60
