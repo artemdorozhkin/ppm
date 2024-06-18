@@ -1,0 +1,26 @@
+<root>
+    <commands>
+        <init>
+            <description>
+                Создает модуль package.
+            </description>
+            <param name="name">
+                \\t\\tУстановить имя проекта.
+            </param>
+            <param name="yes">
+                \\tПропустить диалог и установить значения по умолчанию.
+            </param>
+            <usage>
+                &lt;имя пакета&gt;
+            </usage>
+            <messages>
+                <initialized>
+                    package инициализован за {0}
+                </initialized>
+                <exists>
+                    модуль уже существует
+                </exists>
+            </messages>
+        </init>
+    </commands>
+</root>

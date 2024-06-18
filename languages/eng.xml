@@ -1,0 +1,26 @@
+<root>
+    <commands>
+        <init>
+            <description>
+                Create a package module.
+            </description>
+            <param name="name">
+                \\t\\tSet project name.
+            </param>
+            <param name="yes">
+                \\tSkips dialog and sets default values.
+            </param>
+            <usage>
+                &lt;package name&gt;
+            </usage>
+            <messages>
+                <initialized>
+                    package is initialized in {0}
+                </initialized>
+                <exists>
+                    module already exists
+                </exists>
+            </messages>
+        </init>
+    </commands>
+</root>
