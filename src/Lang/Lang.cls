@@ -1,0 +1,54 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "Lang"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'@Folder "PearPMProject.src.Lang"
+Option Explicit
+
+Private Type TLang
+    LangPath As String
+    XML As DOMDocument60
+    Current As IXMLDOMElement
+End Type
+
+Private this As TLang
+
+Public Sub SetLang(ByVal Language As Languages)
+    ' Path name is ISO 639 language codes
+    Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+    Dim Root As String: Root = FSO.BuildPath(Constants.GlobalPPMPath, "languages")
+
+    Select Case Language
+        Case Languages.Russian
+            this.LangPath = FSO.BuildPath(Root, "rus.xml")
+        Case Languages.English
+            this.LangPath = FSO.BuildPath(Root, "eng.xml")
+    End Select
+
+    Set this.XML = CreateObject("MSXML2.DOMDocument.6.0")
+    this.XML.Load this.LangPath
+End Sub
+
+Public Function SetBlock(ByVal Path As String) As Lang
+    Set this.Current = this.XML.SelectSingleNode(Path)
+    Set SetBlock = Me
+End Function
+
+Public Function GetValue(ByVal Block As String, Optional ByVal Attr As String) As String
+    Dim Node As IXMLDOMElement: Set Node = this.Current.SelectSingleNode(Block)
+    If Strings.Len(Attr) > 0 Then
+        Dim Name As String: Name = Strings.Split(Attr, "=")(0)
+        Dim Value As String: Value = Strings.Split(Attr, "=")(1)
+        Dim Query As String: Query = PStrings.FString("{0}[@{1}='{2}']", Block, Name, Value)
+        Dim Nodes As IXMLDOMSelection
+        Set Nodes = this.Current.SelectNodes(Query)
+        If Nodes.Length = 0 Then Exit Function
+        Set Node = Nodes(0)
+    End If
+    GetValue = Node.Text
+End Function

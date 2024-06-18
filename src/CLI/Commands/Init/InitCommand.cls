@@ -16,17 +16,21 @@ Private Type TInitCommand
     CommandInfo As CommandInfo
     Config As Config
     Tokens As Tokens
+    Lang As Lang
 End Type
 
 Private this As TInitCommand
 
 Private Sub Class_Initialize()
+    Set this.Lang = NewLang(Russian)
+    this.Lang.SetBlock "/root/commands/init"
+
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "init"
-    this.CommandInfo.Description = "Create a package module."
-    this.CommandInfo.Params.Item("name") = "\\t\\tSet project name."
-    this.CommandInfo.Params.Item("yes") = "\\tSkips dialog and sets default values."
-    this.CommandInfo.Usage = Array("<package name>")
+    this.CommandInfo.Description = this.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("name") = this.Lang.GetValue("param", "name=name")
+    this.CommandInfo.Params.Item("yes") = this.Lang.GetValue("param", "name=yes")
+    this.CommandInfo.Usage = Array(this.Lang.GetValue("usage"))
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)
@@ -56,7 +60,7 @@ Private Sub ICommand_Exec()
         Dim ms As Double: ms = DateTime.Timer
         Me.CreatePack
         ms = DateTime.Timer - ms
-        Immediate.WriteLine PStrings.FString("package is initialized in {0}", ConvertTime(ms))
+        Immediate.WriteLine PStrings.FString(this.Lang.GetValue("initialized"), ConvertTime(ms))
     Else
         InitDialog.Start
     End If
@@ -64,7 +68,7 @@ End Sub
 
 Public Sub CreatePack()
     If SelectedProject.IsModuleExists("package") Then
-        Immediate.WriteLine "module already exists"
+        Immediate.WriteLine this.Lang.GetValue("exists")
         Exit Sub
     End If
 
@@ -87,5 +91,3 @@ Public Sub CreatePack()
         .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
     End With
 End Sub
-
-
