@@ -78,6 +78,12 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
+        Key:="language", _
+        Default:="eng" _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
         Key:="local", _
         Short:="l", _
         Default:=False _

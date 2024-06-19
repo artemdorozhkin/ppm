@@ -21,17 +21,14 @@ End Type
 Private this As TConfigCommand
 
 Private Sub Class_Initialize()
+    CLI.Lang.SetBlock "/root/ppmCommands/config"
+
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "config"
-    this.CommandInfo.Description = "Manage the ppm configuration file."
-    this.CommandInfo.Params.Item("global") = "\\tUse global config."
-    this.CommandInfo.Params.Item("location") = "\\tUse config from specify location <global|user|project>."
-    this.CommandInfo.Usage = Array( _
-        "set <key>=<value>", _
-        "get <key>=<value>", _
-        "edit", _
-        "delete <key>" _
-    )
+    this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("global") = CLI.Lang.GetValue("param", "name=global")
+    this.CommandInfo.Params.Item("location") = CLI.Lang.GetValue("param", "name=location")
+    this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)
@@ -102,7 +99,11 @@ Public Function GetConfig() As ConfigIO
                 Set GetConfig = Configs.GetGlobalConfig()
 
             Case Else
-                Information.Err.Raise 9, Information.TypeName(Me), "Unknown config type: " & Location
+                Information.Err.Raise _
+                    9, _
+                    Information.TypeName(Me), _
+                    PStrings.FString(CLI.Lang.GetValue("messages/unknownConfigType"), Location)
+
         End Select
     End If
 End Function
@@ -117,7 +118,9 @@ Public Sub ConfigSet(ByVal Config As ConfigIO)
         
         Dim ValueToken As SyntaxToken
         Set ValueToken = this.Tokens.MatchToken( _
-            i, TokenKind.Identifier, "Expected Value token after Key token " & KeyToken.Text _
+            i, _
+            TokenKind.Identifier, _
+            PStrings.FString(CLI.Lang.GetValue("messages/expectedValue"), KeyToken.Text) _
         )
         Config.CreateOrWrite KeyToken.Text, ValueToken.Text
         Immediate.WriteLine PStrings.FString("{0}={1}", KeyToken.Text, ValueToken.Text)
@@ -148,7 +151,7 @@ Public Sub ConfigDelete(ByVal Config As ConfigIO)
         Dim KeyToken As SyntaxToken: Set KeyToken = this.Tokens(i)
         If KeyToken.Kind = TokenKind.Identifier Then
             Config.DeleteKey KeyToken.Text
-            Immediate.WriteLine PStrings.FString("key '{0}' deleted", KeyToken.Text)
+            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/deleted"), KeyToken.Text)
         End If
     Next
 End Sub

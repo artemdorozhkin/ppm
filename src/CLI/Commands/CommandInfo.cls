@@ -24,15 +24,17 @@ Private Sub Class_Initialize()
 End Sub
 
 Public Function GetUsage() As String
+    CLI.Lang.SetBlock "/root"
+
     Dim Usage As String
-    Usage = PStrings.FString(Me.Description & "\\n\\nUsage:")
+    Usage = PStrings.FString("{0}\\n\\n{1}", Me.Description, CLI.Lang.GetValue("usage"))
     Dim UseCase As Variant
     For Each UseCase In Me.Usage
         Usage = Usage & PStrings.FString("\\nppm ""{0} {1}""", Me.Name, UseCase)
     Next
 
     If Me.Params.Count > 0 Then
-        Usage = Usage & "\\n\\nOptions:\\n"
+        Usage = PStrings.FString("{0}\\n\\n{1}\\n", Usage, CLI.Lang.GetValue("options"))
         Dim Param As Variant
         For Each Param In Me.Params
             Dim Definition As Definition: Set Definition = Definitions(Param)
@@ -57,7 +59,12 @@ Public Function GetUsage() As String
     Next
 
     If CommandAliases.Count > 0 Then
-        Usage = Usage & PStrings.FString("\\nAliases:\\n{0}\\n", Strings.Join(PCollection.ToArray(CommandAliases), ", "))
+        Usage = PStrings.FString( _
+            "{0}\\n{1}\\n{2}\\n", _
+            Usage, _
+            CLI.Lang.GetValue("aliases"), _
+            Strings.Join(PCollection.ToArray(CommandAliases), ", ") _
+        )
     End If
 
     GetUsage = PStrings.FString(Usage)

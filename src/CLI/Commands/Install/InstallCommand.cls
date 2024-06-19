@@ -24,12 +24,14 @@ End Type
 Private this As TInstallCommand
 
 Private Sub Class_Initialize()
+    CLI.Lang.SetBlock "/root/ppmCommands/install"
+
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "install"
-    this.CommandInfo.Description = "Installs the selected packages."
-    this.CommandInfo.Params.Item("local") = "\\tInstall packages and dependencies from local registry."
-    this.CommandInfo.Params.Item("registry") = "\\tSpecific registry path or url."
-    this.CommandInfo.Usage = Array("[<some package>@<some version>] [<options>]")
+    this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("local") = CLI.Lang.GetValue("param", "name=local")
+    this.CommandInfo.Params.Item("registry") = CLI.Lang.GetValue("param", "name=registry")
+    this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)
@@ -54,7 +56,7 @@ Private Sub ICommand_Exec()
         End If
     End If
     Dim ms As Double: ms = DateTime.Timer
-    Immediate.WriteLine "installing..."
+    Immediate.WriteLine CLI.Lang.GetValue("messages/installling")
     Dim Libs As Object: Set Libs = Me.GetFlattedLibs()
 
     Dim Paths As Variant
@@ -67,11 +69,11 @@ Private Sub ICommand_Exec()
     UpdatePack
 
     If Libs.Count = 0 Then
-        Immediate.WriteLine "libs to install not found"
+        Immediate.WriteLine CLI.Lang.GetValue("messages/libsNotFound")
     Else
         ms = DateTime.Timer - ms
         Immediate.WriteLine PStrings.FString( _
-            "successfully installed {0} libs in {1}", _
+            CLI.Lang.GetValue("messages/installed"), _
             Libs.Count, _
             Utils.ConvertTime(ms) _
         )
@@ -202,7 +204,7 @@ Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As S
     Dim Response As TResponse
     Response = HTTP.GetRequest(URL)
     If Response.Code <> HTTPCodes.OK_200 Then
-        Immediate.WriteLine "ERR: something went wrong, try again later"
+        Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
         Immediate.WriteLine Response.Text
         End
     End If
@@ -263,7 +265,10 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
             Information.Err.Raise _
                 17, _
                 Information.TypeName(Me), _
-                "ERR: download failed: " & PStrings.FString("{0}@{1}\\n{2}", Name, Version, Response.Text)
+                PStrings.FString( _
+                    CLI.Lang.GetValue("messages/downloadFailed"), _
+                    PStrings.FString("{0}@{1}\\n{2}", Name, Version, Response.Text) _
+                )
         End If
 
         Dim Manifest As Object: Set Manifest = PJSON.Parse(Response.Text)
@@ -273,7 +278,10 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
             Information.Err.Raise _
                 17, _
                 Information.TypeName(Me), _
-                "ERR: download failed: " & PStrings.FString("{0}@{1}\\n{2}", Name, Version, Response.Text)
+                PStrings.FString( _
+                    CLI.Lang.GetValue("messages/downloadFailed"), _
+                    PStrings.FString("{0}@{1}\\n{2}", Name, Version, Response.Text) _
+                )
         End If
 
         If Not PStrings.IsEqual( _
@@ -283,7 +291,7 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
             Information.Err.Raise _
                 59, _
                 Information.TypeName(Me), _
-                "invalid checksum"
+                CLI.Lang.GetValue("messages/invalidCheckSum")
         End If
 
         Dim Parts As Variant: Parts = Strings.Split(URL, "/")

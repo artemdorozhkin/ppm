@@ -21,7 +21,12 @@ Private this As TLang
 Public Sub SetLang(ByVal Language As Languages)
     ' Path name is ISO 639 language codes
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #If DEV Then
+    Dim Root As String
+    Root = FSO.BuildPath(FSO.GetParentFolderName(Application.VBE.ActiveVBProject.FileName), "languages")
+  #Else
     Dim Root As String: Root = FSO.BuildPath(Constants.GlobalPPMPath, "languages")
+  #End If
 
     Select Case Language
         Case Languages.Russian
@@ -39,16 +44,33 @@ Public Function SetBlock(ByVal Path As String) As Lang
     Set SetBlock = Me
 End Function
 
-Public Function GetValue(ByVal Block As String, Optional ByVal Attr As String) As String
-    Dim Node As IXMLDOMElement: Set Node = this.Current.SelectSingleNode(Block)
+Public Function GetValues(ByVal Block As String, Optional ByVal Attr As String) As Variant
+    Dim Nodes As IXMLDOMSelection: Set Nodes = this.Current.SelectNodes(Block)
     If Strings.Len(Attr) > 0 Then
         Dim Name As String: Name = Strings.Split(Attr, "=")(0)
         Dim Value As String: Value = Strings.Split(Attr, "=")(1)
         Dim Query As String: Query = PStrings.FString("{0}[@{1}='{2}']", Block, Name, Value)
-        Dim Nodes As IXMLDOMSelection
         Set Nodes = this.Current.SelectNodes(Query)
-        If Nodes.Length = 0 Then Exit Function
-        Set Node = Nodes(0)
     End If
-    GetValue = Node.Text
+    If Nodes.Length = 0 Then Exit Function
+
+    Dim Items As Collection: Set Items = New Collection
+    Dim Child As IXMLDOMElement
+    For Each Child In Nodes
+        Items.Add Child.Text
+    Next
+    GetValues = PCollection.ToArray(Items)
+End Function
+
+Public Function GetValue(ByVal Block As String, Optional ByVal Attr As String) As Variant
+    Dim Nodes As IXMLDOMSelection: Set Nodes = this.Current.SelectNodes(Block)
+    If Strings.Len(Attr) > 0 Then
+        Dim Name As String: Name = Strings.Split(Attr, "=")(0)
+        Dim Value As String: Value = Strings.Split(Attr, "=")(1)
+        Dim Query As String: Query = PStrings.FString("{0}[@{1}='{2}']", Block, Name, Value)
+        Set Nodes = this.Current.SelectNodes(Query)
+    End If
+
+    If Nodes.Length = 0 Then Exit Function
+    GetValue = Nodes(0).Text
 End Function

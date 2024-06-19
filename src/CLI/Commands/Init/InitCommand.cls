@@ -16,21 +16,19 @@ Private Type TInitCommand
     CommandInfo As CommandInfo
     Config As Config
     Tokens As Tokens
-    Lang As Lang
 End Type
 
 Private this As TInitCommand
 
 Private Sub Class_Initialize()
-    Set this.Lang = NewLang(Russian)
-    this.Lang.SetBlock "/root/commands/init"
+    CLI.Lang.SetBlock "/root/ppmCommands/init"
 
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "init"
-    this.CommandInfo.Description = this.Lang.GetValue("description")
-    this.CommandInfo.Params.Item("name") = this.Lang.GetValue("param", "name=name")
-    this.CommandInfo.Params.Item("yes") = this.Lang.GetValue("param", "name=yes")
-    this.CommandInfo.Usage = Array(this.Lang.GetValue("usage"))
+    this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("name") = CLI.Lang.GetValue("param", "name=name")
+    this.CommandInfo.Params.Item("yes") = CLI.Lang.GetValue("param", "name=yes")
+    this.CommandInfo.Usage = CLI.Lang.GetValues("usage/item")
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)
@@ -60,7 +58,7 @@ Private Sub ICommand_Exec()
         Dim ms As Double: ms = DateTime.Timer
         Me.CreatePack
         ms = DateTime.Timer - ms
-        Immediate.WriteLine PStrings.FString(this.Lang.GetValue("initialized"), ConvertTime(ms))
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValues("messages/initialized"), ConvertTime(ms))
     Else
         InitDialog.Start
     End If
@@ -68,7 +66,7 @@ End Sub
 
 Public Sub CreatePack()
     If SelectedProject.IsModuleExists("package") Then
-        Immediate.WriteLine this.Lang.GetValue("exists")
+        Immediate.WriteLine CLI.Lang.GetValues("exists")
         Exit Sub
     End If
 
@@ -91,3 +89,4 @@ Public Sub CreatePack()
         .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
     End With
 End Sub
+

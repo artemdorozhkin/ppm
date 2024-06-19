@@ -21,10 +21,12 @@ End Type
 Private this As THelpCommand
 
 Private Sub Class_Initialize()
+    CLI.Lang.SetBlock "/root/ppmCommands/help"
+
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "help"
-    this.CommandInfo.Description = "Shows information about the command."
-    this.CommandInfo.Usage = Array("[<command>]")
+    this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Usage = CLI.Lang.GetValues("usage/item")
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)
@@ -67,7 +69,8 @@ Private Sub ICommand_Exec()
 Exit Sub
 
 Catch:
-    Immediate.WriteLine "Unknown command " & CommandName
+    CLI.Lang.SetBlock "/root/errors"
+    Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/unknownCommand"), CommandName)
 End Sub
 
 Public Function GetCommandName() As String
@@ -92,13 +95,13 @@ Public Function GetCommandName() As String
 End Function
 
 Public Function ShowPPMInfo()
+    CLI.Lang.SetBlock "/root"
+
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetModule("package"))
     Immediate.WriteLine PStrings.FString("Pear Package Manager, v{0}\\n", Pack.Version)
-    Immediate.WriteLine "Usage:"
-    Immediate.WriteLine PStrings.FString( _
-        "ppm ""install""\\nppm ""install <package>""\\nppm ""init""\\nppm ""init <package name>""\\n" _
-    )
-    Immediate.WriteLine "Commands:"
+    Immediate.WriteLine CLI.Lang.GetValue("usage")
+    Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("usageExample"))
+    Immediate.WriteLine CLI.Lang.GetValue("commands")
 
     Dim List As Collection: Set List = New Collection
     Dim Command As Variant
@@ -119,5 +122,3 @@ Public Function ShowPPMInfo()
 
     Immediate.WriteLine Strings.Join(PCollection.ToArray(List), vbNewLine)
 End Function
-
-

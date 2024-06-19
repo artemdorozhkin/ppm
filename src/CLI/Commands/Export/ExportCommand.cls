@@ -21,14 +21,16 @@ End Type
 Private this As TExportCommand
 
 Private Sub Class_Initialize()
+    CLI.Lang.SetBlock "/root/ppmCommands/export"
+
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "export"
-    this.CommandInfo.Description = "Exports the selected project."
-    this.CommandInfo.Params.Item("encoding") = "\\t\\tExport files with specified encoding."
-    this.CommandInfo.Params.Item("save-struct") = "\\tSave the RubberDuck structure when exporting a project."
-    this.CommandInfo.Params.Item("path") = "\\t\\t\\tFolder to export."
-    this.CommandInfo.Params.Item("no-clear") = "\\t\\t\\tDo not delete files from the last export."
-    this.CommandInfo.Usage = Array("[<options>]")
+    this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("encoding") = CLI.Lang.GetValue("param", "name=encoding")
+    this.CommandInfo.Params.Item("save-struct") = CLI.Lang.GetValue("param", "name=save-struct")
+    this.CommandInfo.Params.Item("path") = CLI.Lang.GetValue("param", "name=path")
+    this.CommandInfo.Params.Item("no-clear") = CLI.Lang.GetValue("param", "name=no-clear")
+    this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)
@@ -75,7 +77,7 @@ Private Sub ICommand_Exec()
 
     ms = DateTime.Timer - ms
     Immediate.WriteLine PStrings.FString( _
-        "exported {0} module{1} in {2}\\nroot folder: {3}\\n", _
+        CLI.Lang.GetValue("messages/exported"), _
         Exporter.Modules.Count, _
         IIf(Exporter.Modules.Count > 1, "s", ""), _
         ConvertTime(ms), _

@@ -1,5 +1,5 @@
 <root>
-    <commands>
+    <ppmCommands>
         <init>
             <description>
                 Create a package module.
@@ -11,7 +11,9 @@
                 \\tSkips dialog and sets default values.
             </param>
             <usage>
-                &lt;package name&gt;
+                <item>
+                    &lt;package name&gt;
+                </item>
             </usage>
             <messages>
                 <initialized>
@@ -22,5 +24,157 @@
                 </exists>
             </messages>
         </init>
-    </commands>
+        <help>
+            <description>
+                Shows information about the command.
+            </description>
+            <usage>
+                <item>
+                    [&lt;command&gt;]
+                </item>
+            </usage>
+            <messages>
+                <unknownCommand>
+                    ERR: Unknown command {0}
+                </unknownCommand>
+            </messages>
+        </help>
+        <export>
+            <description>
+                Exports the selected project.
+            </description>
+            <param name="encoding">
+                \\t\\tExport files with specified encoding.
+            </param>
+            <param name="save-struct">
+                \\tSave the RubberDuck structure when exporting a project.
+            </param>
+            <param name="path">
+                \\t\\t\\tExport to specified folder.
+            </param>
+            <param name="no-clear">
+                \\t\\t\\tDo not delete files from the last export.
+            </param>
+            <usage>
+                <item>
+                    [&lt;options&gt;]
+                </item>
+            </usage>
+            <messages>
+                <exported>
+                    exported {0} module{1} in {2}\\nroot folder: {3}\\n
+                </exported>
+            </messages>
+        </export>
+        <config>
+            <description>
+                Manages the ppm configuration file.
+            </description>
+            <param name="global">
+                \\tUse global config.
+            </param>
+            <param name="location">
+                \\tUse config from specify location &lt;global|user|project&gt;.
+            </param>
+            <usage>
+                <item>
+                    set &lt;key&gt;=&lt;value&gt;
+                </item>
+                <item>
+                    get &lt;key&gt;=&lt;value&gt;
+                </item>
+                <item>
+                    delete &lt;key&gt;
+                </item>
+                <item>
+                    edit
+                </item>
+            </usage>
+            <messages>
+                <unknownConfigType>
+                    Unknown config type: {0}
+                </unknownConfigType>
+                <expectedValue>
+                    Expected Value token after Key token {0}
+                </expectedValue>
+                <deleted>
+                    key '{0}' deleted
+                </deleted>
+            </messages>
+        </config>
+        <install>
+            <description>
+                Installs the selected packages.
+            </description>
+            <param name="local">
+                \\tInstall packages and dependencies from local registry.
+            </param>
+            <param name="registry">
+                \\tSpecific registry path or url.
+            </param>
+            <usage>
+                <item>
+                    [&lt;some package&gt;@&lt;some version&gt;] [&lt;options&gt;]
+                </item>
+            </usage>
+            <messages>
+                <installing>
+                    installing...
+                </installing>
+                <libsNotFound>
+                    ERR: packages to install not found
+                </libsNotFound>
+                <somethingWentWrong>
+                    ERR: something went wrong, try again later
+                </somethingWentWrong>
+                <downloadFailed>
+                    ERR: download failed: {0}
+                </downloadFailed>
+                <invalidCheckSum>
+                    ERR: invalid check sum
+                </invalidCheckSum>
+                <installed>
+                    successfully installed {0} packages in {1}
+                </installed>
+            </messages>
+        </install>
+        <publish>
+            <description>
+                Publishes the package to the server or locally.
+            </description>
+            <param name="local">
+                \\tPublish the package to the local registry.
+            </param>
+            <param name="registry">
+                \\tSpecific registry path or url.
+            </param>
+            <usage>
+                <item>
+                    [&lt;options&gt;]
+                </item>
+            </usage>
+            <messages>
+                <packageModuleNotFound>
+                    ERR: package module not found\\nbefor publish the package you need to run ppm
+                    "init"
+                </packageModuleNotFound>
+                <somethingWentWrong>
+                    ERR: something went wrong, try again later
+                </somethingWentWrong>
+                <publishing>
+                    publishing...
+                </publishing>
+                <published>
+                    package '{0}' is published in {1}
+                </published>
+            </messages>
+        </publish>
+    </ppmCommands>
+    <usage>Usage:</usage>
+    <commands>Commands:</commands>
+    <options>Options:</options>
+    <aliases>Aliases:</aliases>
+    <usageExample>
+        ppm "install"\\nppm "install &lt;package&gt;"\\nppm "init"\\nppm "init &lt;package name&gt;"\\n
+    </usageExample>
 </root>

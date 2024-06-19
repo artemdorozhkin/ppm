@@ -21,12 +21,14 @@ End Type
 Private this As TExportCommand
 
 Private Sub Class_Initialize()
+    CLI.Lang.SetBlock "/root/ppmCommands/publish"
+
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "publish"
-    this.CommandInfo.Description = "Publishes the package to the server or locally."
-    this.CommandInfo.Params.Item("local") = "\\tPublish the package to the local registry."
-    this.CommandInfo.Params.Item("registry") = "\\tSpecific registry path or url."
-    this.CommandInfo.Usage = Array("[<options>]")
+    this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("local") = CLI.Lang.GetValue("param", "name=local")
+    this.CommandInfo.Params.Item("registry") = CLI.Lang.GetValue("param", "name=registry")
+    this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)
@@ -43,12 +45,11 @@ End Property
 
 Private Sub ICommand_Exec()
     If Not SelectedProject.IsModuleExists("package") Then
-        Immediate.WriteLine "ERR: package module not found"
-        Immediate.WriteLine "for publish the package you need to run ppm ""init"""
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/packageModuleNotFound"))
         End
     End If
 
-    Immediate.WriteLine "publishing..."
+    Immediate.WriteLine CLI.Lang.GetValue("messages/publishing")
     Dim ms As Double: ms = DateTime.Timer
 
     MoveProjectToPPM
@@ -90,10 +91,10 @@ Private Sub ICommand_Exec()
 
     If Success Then
         Immediate.WriteLine PStrings.FString( _
-            "package '{0}' is published in {1}", Pack.Name, Utils.ConvertTime(DateTime.Timer - ms) _
+            CLI.Lang.GetValue("messages/published"), Pack.Name, Utils.ConvertTime(DateTime.Timer - ms) _
         )
     Else
-        Immediate.WriteLine "ERR: something went wrong, try again later"
+        Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
         Immediate.WriteLine Response.Text
     End If
 End Sub

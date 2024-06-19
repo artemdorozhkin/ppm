@@ -2,6 +2,16 @@ Attribute VB_Name = "CLI"
 '@Folder "PearPMProject.src.CLI"
 Option Explicit
 
+Private Type TCLI
+    Lang As Lang
+End Type
+
+Private this As TCLI
+
+Public Property Get Lang() As Lang
+    Set Lang = this.Lang
+End Property
+
 Public Property Get Commands() As Variant
     Commands = Array( _
         "config", _
@@ -88,6 +98,17 @@ Public Function FindCommand(ByVal Name As String) As String
         Exit Function
     End If
 End Function
+
+Public Sub InitLang()
+    Dim Config As Config: Set Config = NewConfig(Definitions.Items)
+    Dim SelectedLang As Languages
+    Select Case Strings.LCase(Config.GetValue("language"))
+        Case "rus": SelectedLang = Languages.Russian
+        Case "eng": SelectedLang = Languages.English
+    End Select
+
+    Set this.Lang = NewLang(SelectedLang)
+End Sub
 
 Private Sub ShowVersion()
     Dim Project As Project
