@@ -95,6 +95,7 @@ End Sub
 #End If
     Dim Ext As String: Ext = GetComponentExt(Component)
     Dim Path As String: Path = NewFileSystemObject().BuildPath(Folder, Component.Name & Ext)
+    TrimCodeEnd Component
     Component.Export Path
     ExportComponent = Path
 End Function
@@ -131,3 +132,27 @@ End Function
     Case Else: GetComponentExt = ".txt"
     End Select
 End Function
+
+Private Sub TrimCodeEnd(ByRef Component As VBComponent)
+    Dim Module As Module: Set Module = NewModule(Component)
+    Dim Lines As Variant: Lines = Strings.Split(Module.Code, vbNewLine)
+
+    Dim Count As Long: Count = UBound(Lines)
+    Dim i As Long
+    For i = Count To 0 Step -1
+        Dim TrimmedLine As String
+        TrimmedLine = Strings.Trim(Lines(i))
+        If Strings.Len(TrimmedLine) = 0 Then GoTo Continue
+        i = i + 1
+        Exit For
+Continue:
+    Next
+
+    If Count < i Then Exit Sub
+
+    If i = -1 Then
+        Module.Code = ""
+    Else
+        Component.CodeModule.DeleteLines i + 1, Count + 1 - i
+    End If
+End Sub
