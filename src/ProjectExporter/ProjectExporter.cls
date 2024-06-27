@@ -215,7 +215,9 @@ End Function
 #Else
   Private Function GetDirectory(ByRef Code As Object) As String
 #End If
+    If Code.CountOfDeclarationLines = 0 Then Exit Function
     Dim Lines As Variant: Lines = Strings.Split(Code.Lines(1, Code.CountOfDeclarationLines), vbNewLine)
+
     Dim Line As Variant
     For Each Line In Lines
         Dim i As Long
