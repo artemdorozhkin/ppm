@@ -1,4 +1,5 @@
 Attribute VB_Name = "InitDialog"
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.CLI.Commands.Init"
 Option Explicit
 
@@ -18,7 +19,6 @@ Public Sub Start()
 End Sub
 
 Public Sub Step2(Optional ByVal ProjectName As String)
-    Dim Name As String
     If Strings.Len(PackInfo.Name) = 0 Then
         PackInfo.Name = GetOrDefault(ProjectName, "name")
     End If

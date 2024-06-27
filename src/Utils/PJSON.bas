@@ -9,13 +9,21 @@ End Type
 
 Private this As TPJSON
 
-Public Function Parse(ByVal JSONString As String) As Object
+#If DEV Then
+  Public Function Parse(ByVal JSONString As String) As Dictionary
+#Else
+  Public Function Parse(ByVal JSONString As String) As Object
+#End If
     this.JSON = JSONString
     this.Position = 1
     Set Parse = ParseValue()
 End Function
 
-Public Function Stringify(ByVal JSONObject As Object, Optional ByVal Indent As Integer = 0)
+#If DEV Then
+  Public Function Stringify(ByVal JSONObject As Dictionary, Optional ByVal Indent As Integer = 0)
+#Else
+  Public Function Stringify(ByVal JSONObject As Object, Optional ByVal Indent As Integer = 0)
+#End If
     Stringify = SerializeValue(JSONObject, Indent, 1)
 End Function
 
@@ -23,7 +31,7 @@ Private Function SerializeValue(ByVal Data As Variant, ByVal Indent As Integer, 
     Dim JSONString As String
     Select Case Information.VarType(Data)
         Case VbVarType.vbString
-            JSONString = PStrings.FString("""{0}""", Data)
+            JSONString = """" & Data & """"
 
         Case VbVarType.vbBoolean
             JSONString = IIf(Data, "true", "false")
@@ -114,9 +122,17 @@ Private Sub SkipWhitespaces()
     Loop
 End Sub
 
-Private Function ParseObject() As Object
+#If DEV Then
+  Private Function ParseObject() As Dictionary
+#Else
+  Private Function ParseObject() As Object
+#End If
     NextChar
+  #If DEV Then
+    Dim Container As Dictionary: Set Container = NewDictionary()
+  #Else
     Dim Container As Object: Set Container = NewDictionary()
+  #End If
     Do While Current <> "}"
         If Current = "," Then
             NextChar
@@ -127,7 +143,6 @@ Private Function ParseObject() As Object
             NextChar
             Container.Add Key, ParseValue()
         End If
-Continue:
     Loop
     NextChar
     Set ParseObject = Container
@@ -142,7 +157,6 @@ Private Function ParseArray() As Collection
         End If
 
         Container.Add ParseValue()
-Continue:
     Loop
     NextChar
     Set ParseArray = Container

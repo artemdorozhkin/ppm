@@ -55,9 +55,9 @@ Private Sub ICommand_Exec()
     MoveProjectToPPM
     Dim RootFolder As String: RootFolder = CreateExport()
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
-    Pack.RenameModule Pack.Name & "Package"
+    Pack.RenameComponent Pack.Name & "Package"
     SelectedProject.ExportComponent RootFolder, Pack.Component
-    Pack.RenameModule "package"
+    Pack.RenameComponent "package"
 
     Dim ZipName As String
     ZipName = Me.GetBuildName(Pack) & ".zip"
@@ -100,7 +100,11 @@ Private Sub ICommand_Exec()
 End Sub
 
 Public Sub MoveProjectToPPM()
+  #If DEV Then
     Dim Component As VBComponent
+  #Else
+    Dim Component As Object
+  #End If
     For Each Component In SelectedProject.Components
         Dim Module As Module: Set Module = NewModule(Component)
         If PStrings.StartsWith(Module.Path, SelectedProject.Name) Then
@@ -110,7 +114,11 @@ Public Sub MoveProjectToPPM()
 End Sub
 
 Public Sub MovePPMToProject()
+  #If DEV Then
     Dim Component As VBComponent
+  #Else
+    Dim Component As Object
+  #End If
     For Each Component In SelectedProject.Components
         Dim Module As Module: Set Module = NewModule(Component)
         If PStrings.StartsWith(Module.Path, "ppm-modules") Then
@@ -157,27 +165,34 @@ Public Function PublishOnLocal(ByVal Registry As String, ByVal ZipPath As String
     FileSystem.FileCopy ZipPath, BuildZip
     FileSystem.Kill ZipPath
 
-    Pack.JSON("packUrl") = BuildZip
+    Dim Sep As String: Sep = Application.PathSeparator
+    Pack.JSON("packUrl") = Strings.Replace(BuildZip, Sep, Sep & Sep)
     Me.CreateOrUpdateManifest PackageFolder, Pack
     PublishOnLocal = True
 End Function
 
 Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack) As TResponse
     Dim FormData As FormData: Set FormData = New FormData
-    Dim Boundary As String: Boundary = FormData.GenerateBoundary()
 
+  #If DEV Then
+    Dim PackJSON As Dictionary: Set PackJSON = Pack.JSON
+  #Else
     Dim PackJSON As Object: Set PackJSON = Pack.JSON
+  #End If
     PackJSON("checkSum") = Utils.CalculateFileCheckSum(ZipPath)
     Dim PackStr As String
     PackStr = PJSON.Stringify(PackJSON)
     Dim Body() As Byte
-    Body = FormData.Create(Boundary) _
+    Body = FormData.Create() _
                    .AddFile(ZipPath, "package", "application/zip") _
                    .AddText(PackStr, "packInfo") _
                    .ToBytes()
-
+  #If DEV Then
+    Dim Headers As Dictionary: Set Headers = NewDictionary()
+  #Else
     Dim Headers As Object: Set Headers = NewDictionary()
-    Headers("Content-Type") = "multipart/form-data; boundary=" & Boundary
+  #End If
+    Headers("Content-Type") = "multipart/form-data; boundary=" & FormData.Boundary
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     PublishOnServer = HTTP.PostRequest( _
@@ -208,7 +223,11 @@ Public Sub CreateOrUpdateManifest(ByVal PackageFolder As String, ByRef Pack As P
     PFileSystem.SaveToFile ManifestPath, Manifest.ToString()
 End Sub
 
-Public Function GetLatest(ByRef Versions As Object) As String
+#If DEV Then
+  Public Function GetLatest(ByRef Versions As Dictionary) As String
+#Else
+  Public Function GetLatest(ByRef Versions As Object) As String
+#End If
     Dim Latest As String
     Dim Vers As Variant
     For Each Vers In Versions

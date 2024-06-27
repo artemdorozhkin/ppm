@@ -1,4 +1,5 @@
 Attribute VB_Name = "PJSONTests"
+'@IgnoreModule LineLabelNotUsed, AssignmentNotUsed, VariableNotUsed
 '@TestModule
 '@Folder("Tests")
 
@@ -49,7 +50,11 @@ Private Sub EmptyJSON_Test()
     
     'Arrange:
     Dim JSONString As String: JSONString = "{}"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
+  #End If
     
     'Act:
     Assert.AreEqual Conversion.CLng(0), Result.Count, "Check keys count."
@@ -73,7 +78,11 @@ Private Sub SimpleObject_Test()
     
     'Arrange:
     Dim JSONString As String: JSONString = "{ ""key"": ""value"" }"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
+  #End If
     
     'Act:
     Assert.AreEqual Conversion.CLng(1), Result.Count, "Check keys count."
@@ -99,8 +108,12 @@ Private Sub MultilevelObject_Test()
     
     'Arrange:
     Dim JSONString As String: JSONString = "{ ""key"": { ""key2"": ""value"" } }"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
-    
+  #End If
+  
     'Act:
     Assert.AreEqual Conversion.CLng(1), Result.Count, "Check keys count."
     Assert.AreEqual "key", Result.Keys()(0), "Check key."
@@ -129,7 +142,11 @@ Private Sub Array_Test()
     
     'Arrange:
     Dim JSONString As String: JSONString = "{ ""array"": [1, 2, 3] }"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
+  #End If
     
     'Act:
     Assert.IsTrue Information.IsObject(Result("array")), "Check is array."
@@ -159,7 +176,11 @@ Private Sub DifferentTypes_Test()
 
     Dim JSONString As String
     JSONString = "{""string"": ""value"", ""number"": 123, ""boolean"": true, ""null"": null}"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
+  #End If
     
     'Act:
     Assert.AreEqual "value", Result("string"), "Check string value."
@@ -195,7 +216,11 @@ Private Sub InvalidValue_Test()
     
     'Arrange:
     Dim JSONString As String: JSONString = "{ ""key"": value }"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
+  #End If
     
     'Act:
     
@@ -219,7 +244,11 @@ Private Sub MultiNested_Test()
     'Arrange:
     Dim JSONString As String
     JSONString = "{""object"": {""array"": [1, 2, {""nested"": ""object""}]}, ""bool"": false}"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
+  #End If
     
     'Act:
     Assert.IsTrue Utils.IsDictionary(Result("object")), "Check if is object."
@@ -247,7 +276,11 @@ Private Sub Float_Test()
     'Arrange:
     Dim JSONString As String
     JSONString = "{""float"": 123.456}"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
+  #End If
     
     'Act:
     Assert.IsTrue Information.VarType(Result("float")) = VbVarType.vbDouble, "Check if is double."
@@ -273,7 +306,11 @@ Private Sub ArrayOfObjects_Test()
     'Arrange:
     Dim JSONString As String
     JSONString = "[{""obj1"": ""value1""}, {""obj2"": ""value2""}]"
+  #If DEV Then
+    Dim Result As Dictionary: Set Result = PJSON.Parse(JSONString)
+  #Else
     Dim Result As Object: Set Result = PJSON.Parse(JSONString)
+  #End If
     
     'Act:
     Assert.IsTrue Utils.IsCollection(Result), "Check if is array."
@@ -302,10 +339,17 @@ Private Sub Stringify_Test()
     'Arrange:
     Dim Expected As String
     Expected = "{""object"": {""array"": [1, 2, {""nested"": ""object""}]}, ""bool"": false}"
+  #If DEV Then
+    Dim JSONRoot As Dictionary: Set JSONRoot = NewDictionary()
+    Dim JSONObject As Dictionary: Set JSONObject = NewDictionary()
+    Dim JSONArray As Collection: Set JSONArray = New Collection
+    Dim JSONNested As Dictionary: Set JSONNested = NewDictionary()
+  #Else
     Dim JSONRoot As Object: Set JSONRoot = NewDictionary()
     Dim JSONObject As Object: Set JSONObject = NewDictionary()
     Dim JSONArray As Collection: Set JSONArray = New Collection
     Dim JSONNested As Object: Set JSONNested = NewDictionary()
+  #End If
 
     JSONNested("nested") = "object"
     JSONArray.Add 1

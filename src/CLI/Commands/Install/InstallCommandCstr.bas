@@ -1,4 +1,5 @@
 Attribute VB_Name = "InstallCommandCstr"
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.CLI.Commands.Install"
 Option Explicit
 

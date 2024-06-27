@@ -7,19 +7,32 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.Manifest"
 Option Explicit
 
 Private Type TManifest
+  #If DEV Then
+    JSON As Dictionary
+  #Else
     JSON As Object
+  #End If
 End Type
 
 Private this As TManifest
 
-Public Property Get JSON() As Object
+#If DEV Then
+  Public Property Get JSON() As Dictionary
+#Else
+  Public Property Get JSON() As Object
+#End If
     Set JSON = this.JSON
 End Property
-Public Property Set JSON(ByVal RHS As Object)
+#If DEV Then
+  Public Property Set JSON(ByVal RHS As Dictionary)
+#Else
+  Public Property Set JSON(ByVal RHS As Object)
+#End If
     Set this.JSON = RHS
 End Property
 
@@ -37,10 +50,18 @@ Public Property Let Latest(ByVal RHS As String)
     this.JSON("latest") = RHS
 End Property
 
-Public Property Get Versions() As Object
+#If DEV Then
+  Public Property Get Versions() As Dictionary
+#Else
+  Public Property Get Versions() As Object
+#End If
     Set Versions = this.JSON("versions")
 End Property
-Public Property Set Versions(ByVal RHS As Object)
+#If DEV Then
+  Public Property Set Versions(ByVal RHS As Dictionary)
+#Else
+  Public Property Set Versions(ByVal RHS As Object)
+#End If
     Set this.JSON("versions") = RHS
 End Property
 

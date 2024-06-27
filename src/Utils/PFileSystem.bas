@@ -4,7 +4,7 @@ Option Explicit
 
 Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
   #If DEV Then
-      Dim SourceStream As TextStream
+    Dim SourceStream As TextStream
   #Else
     Dim SourceStream As Object
   #End If

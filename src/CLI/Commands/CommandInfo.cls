@@ -50,7 +50,11 @@ Public Function GetUsage() As String
     End If
 
     Dim CommandAliases As Collection: Set CommandAliases = New Collection
+  #If DEV Then
+    Dim CLIAliases As Dictionary: Set CLIAliases = CLI.Aliases
+  #Else
     Dim CLIAliases As Object: Set CLIAliases = CLI.Aliases
+  #End If
     Dim Alias As Variant
     For Each Alias In CLIAliases
         If IsEqual(CLIAliases(Alias), Me.Name) Then

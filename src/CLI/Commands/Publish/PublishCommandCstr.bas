@@ -1,4 +1,5 @@
 Attribute VB_Name = "PublishCommandCstr"
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.CLI.Commands.Publish"
 Option Explicit
 

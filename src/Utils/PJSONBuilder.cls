@@ -7,11 +7,16 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 Private Type TPJSONBuilder
+  #If DEV Then
     JSON As Dictionary
+  #Else
+    JSON As Object
+  #End If
 End Type
 
 Private this As TPJSONBuilder
@@ -20,7 +25,11 @@ Private Sub Class_Initialize()
     Set this.JSON = NewDictionary()
 End Sub
 
-Public Function SetJSON(ByRef JSON As Object) As PJSONBuilder
+#If DEV Then
+  Public Function SetJSON(ByRef JSON As Dictionary) As PJSONBuilder
+#Else
+  Public Function SetJSON(ByRef JSON As Object) As PJSONBuilder
+#End If
     Set this.JSON = JSON
     Set SetJSON = Me
 End Function

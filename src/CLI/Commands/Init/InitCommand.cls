@@ -58,7 +58,7 @@ Private Sub ICommand_Exec()
         Dim ms As Double: ms = DateTime.Timer
         Me.CreatePack
         ms = DateTime.Timer - ms
-        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValues("messages/initialized"), ConvertTime(ms))
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/initialized"), ConvertTime(ms))
     Else
         InitDialog.Start
     End If
@@ -71,9 +71,9 @@ Public Sub CreatePack()
     End If
 
   #If DEV Then
-    Dim PackModule As VBComponent: Set PackModule = SelectedProject.AddComponent("package")
+    Dim PackComponent As VBComponent: Set PackComponent = SelectedProject.AddComponent("package")
   #Else
-    Dim PackModule As Object: Set PackModule = SelectedProject.AddModule("package")
+    Dim PackComponent As Object: Set PackComponent = SelectedProject.AddComponent("package")
   #End If
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     JB.AddObject _
@@ -83,7 +83,7 @@ Public Sub CreatePack()
         "author", PackInfo.Author, _
         "git", PackInfo.GitURL
 
-    With PackModule.CodeModule
+    With PackComponent.CodeModule
         .DeleteLines 1, .CountOfLines
         .AddFromString Utils.CommentString(JB.ToString())
         .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
