@@ -182,9 +182,9 @@
                 <synchronisation>
                     синхронизация...
                 </synchronisation>
-                <synchronized>
-                    успешно синхронизировано модулей '{0}' за {1} 
-                </synchronized>
+                <synchronised>
+                    успешно синхронизировано модулей: {0}, за {1} 
+                </synchronised>
             </messages>
         </sync>
     </ppmCommands>

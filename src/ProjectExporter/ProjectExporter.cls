@@ -92,7 +92,7 @@ Public Sub ExportFolders(ByVal Encoding As String, ParamArray Folders() As Varia
         this.LastExport = SaveComponents(Encoding)
         SaveLastExport
     Else
-        SaveModules Encoding
+        SaveComponents Encoding
     End If
 End Sub
 

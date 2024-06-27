@@ -182,9 +182,9 @@
                 <synchronisation>
                     synchronisation...
                 </synchronisation>
-                <synchronized>
+                <synchronised>
                     successfully synchronised {0} modules in {1} 
-                </synchronized>
+                </synchronised>
             </messages>
         </sync>
     </ppmCommands>

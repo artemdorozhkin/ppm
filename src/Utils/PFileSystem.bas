@@ -30,6 +30,8 @@ Public Function ReadFile(ByVal Path As String, Optional ByVal Encoding As String
 End Function
 
 Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional ByVal Encoding As String = "UTF-8")
+    Dim IsUTF8 As Boolean: IsUTF8 = PStrings.IsEqual(Encoding, "utf-8")
+
   #If DEV Then
     Dim EncodingStream As Stream: Set EncodingStream = NewStream()
   #Else
@@ -39,7 +41,7 @@ Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional By
     EncodingStream.Charset = Encoding
     EncodingStream.Open
     EncodingStream.WriteText Content
-    EncodingStream.Position = 3 'skip BOM
+    EncodingStream.Position = Interaction.IIf(IsUTF8, 3, 0) 'skip BOM
 
   #If DEV Then
     Dim BinaryStream As Stream: Set BinaryStream = NewStream()

@@ -44,6 +44,10 @@ End Property
 Private Sub ICommand_Exec()
     Dim ms As Double: ms = DateTime.Timer
 
+    Immediate.WriteLine CLI.Lang.GetValue("messages/synchronisation")
+
+    Dim ActivePaneName As String
+    ActivePaneName = Application.VBE.ActiveCodePane.CodeModule.Parent.Name
     Dim SyncPaths As Dictionary: Set SyncPaths = NewDictionary()
     Me.CollectPaths SelectedProject.Folder, SyncPaths
 
@@ -55,17 +59,20 @@ Private Sub ICommand_Exec()
     For Each Name In SyncPaths
         Dim Path As String: Path = SyncPaths(Name)
         Dim Ext As String: Ext = FSO.GetExtensionName(Path)
-        Immediate.WriteLine Name, Ext
         Set Module = NewModule(SelectedProject.GetComponent(Name))
         Dim Code As String: Code = Me.ReadCode(Path)
 
+        Dim CodePage As String: CodePage = Locale.GetAnsiCodePage()
+        Dim LocalePath As String
+        LocalePath = FSO.BuildPath(FSO.GetParentFolderName(Path), PStrings.FString("{0}{1}.{2}", Name, CodePage, Ext))
+        PFileSystem.SaveToFile LocalePath, PFileSystem.ReadFile(Path), PStrings.FString("Windows-{0}", CodePage)
         If IsFalse(Module) And Not PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
-            SelectedProject.ImportComponent Path
+            SelectedProject.ImportComponent LocalePath
         ElseIf IsFalse(Module) And PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
             ' TODO: need logic for creation the sheet and paste the code
             Information.Err.Raise 5, Information.TypeName(Me), "Non implemented"
         ElseIf IsFalse(Module) Then
-            SelectedProject.ImportComponent Path
+            SelectedProject.ImportComponent LocalePath
         ElseIf IsTrue(Module) And PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
             Module.Code = Code
         Else
@@ -73,25 +80,26 @@ Private Sub ICommand_Exec()
             Dim DelName As String: DelName = Strings.Left("d" & Name, MAX_NAME_LEN)
             DelNames.Add DelName, Empty
             Module.Name = DelName
-            SelectedProject.ImportComponent Path
+            SelectedProject.ImportComponent LocalePath
             SelectedProject.RemoveComponent DelName
         End If
-    Next
-
-    Dim Component As VBComponent
-    Dim Components As VBComponents: Set Components = SelectedProject.Components
-    For Each Component In Components
-        If DelNames.Exists(Component.Name) Then
-            Components.Remove Component
-        End If
+        FileSystem.Kill LocalePath
     Next
 
     ms = DateTime.Timer - ms
+    ' Throws a message when an Ambiguous name detected.
+    ' This is normal behaviour if PPMProject is set as the active project.
+    ' The error should not occur in other projects.
     Immediate.WriteLine PStrings.FString( _
-        CLI.Lang.GetValue("messages/synchronized"), _
+        CLI.Lang.GetValue("messages/synchronised"), _
         SyncPaths.Count, _
         Utils.ConvertTime(ms) _
     )
+
+    Dim Components As VBComponents: Set Components = SelectedProject.Components
+    On Error Resume Next ' if this component was deleted
+    Components(ActivePaneName).Activate
+    On Error GoTo 0
 End Sub
 
 Public Sub CollectPaths(ByVal FolderPath As String, ByRef Paths As Dictionary)
