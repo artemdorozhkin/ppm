@@ -82,10 +82,11 @@ Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
         End
     End If
 
-    Dim Command As String: Command = CLI.FindCommand(CommandToken.Text)
-    Set ParseCommand = Application.Run( _
-        PStrings.FString("New{0}Command", Command), Config, Tokens _
+    Dim CommandName As String: CommandName = CLI.FindCommand(CommandToken.Text)
+    Dim Command As Variant: Set Command = Application.Run( _
+        PStrings.FString("New{0}Command", CommandName), Config, Tokens _
     )
+    Set ParseCommand = Command
 End Function
 
 Public Function FindCommand(ByVal Name As String) As String
