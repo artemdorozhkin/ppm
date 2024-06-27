@@ -28,11 +28,11 @@ End Type
 Private this As TProject
 
 #If DEV Then
-  Public Property Get Modules() As VBComponents
+  Public Property Get Components() As VBComponents
 #Else
-  Public Property Get Modules() As Object
+  Public Property Get Components() As Object
 #End If
-    Set Modules = this.Project.VBComponents
+    Set Components = this.Project.VBComponents
 End Property
 
 Public Property Get Name() As String
@@ -56,49 +56,58 @@ End Property
 End Property
 
 #If DEV Then
-  Public Function GetModule(ByVal Name As String) As VBComponent
+  Public Function GetComponent(ByVal Name As String) As VBComponent
 #Else
-  Public Function GetModule(ByVal Name As String) As Object
+  Public Function GetComponent(ByVal Name As String) As Object
 #End If
-    If Not Me.IsModuleExists(Name) Then Exit Function
-    Set GetModule = this.Project.VBComponents(Name)
+    If Not Me.IsComponentExists(Name) Then Exit Function
+    Set GetComponent = this.Project.VBComponents(Name)
 End Function
 
 #If DEV Then
-  Public Function AddModule(ByVal Name As String) As VBComponent
+  Public Function AddComponent(ByVal Name As String) As VBComponent
 #Else
-  Public Function AddModule(ByVal Name As String) As Object
+  Public Function AddComponent(ByVal Name As String) As Object
 #End If
-    Set AddModule = this.Project.VBComponents.Add(ModuleType.StdModule)
-    AddModule.Name = Name
+    Set AddComponent = this.Project.VBComponents.Add(ModuleType.StdModule)
+    AddComponent.Name = Name
 End Function
 
-Public Function ImportModule(ByVal Path As String)
+#If DEV Then
+  Public Function ImportComponent(ByVal Path As String) As VBComponent
+#Else
+  Public Function ImportComponent(ByVal Path As String) As Object
+#End If
     If Not IsValidType(Path) Then Information.Err.Raise 13, Information.TypeName(Me), "unsupproted type: '" & GetFileExt(Path) & "'"
-    If IsModuleExists(Path) Then Information.Err.Raise 58, Information.TypeName(Me), "this module already exists: '" & GetFileName(Path) & "'"
-    Set ImportModule = this.Project.VBComponents.Import(Path)
+    If IsComponentExists(Path) Then Information.Err.Raise 58, Information.TypeName(Me), "this module already exists: '" & GetFileName(Path) & "'"
+    Set ImportComponent = this.Project.VBComponents.Import(Path)
 End Function
+
+Public Sub RemoveComponent(ByVal Name As String)
+    If Not IsComponentExists(Name) Then Exit Sub
+    this.Project.VBComponents.Remove this.Project.VBComponents(Name)
+End Sub
 
 #If DEV Then
-  Public Function ExportModule(ByVal Folder As String, ByRef Module As VBComponent) As String
+  Public Function ExportComponent(ByVal Folder As String, ByRef Component As VBComponent) As String
 #Else
-  Public Function ExportModule(ByVal Folder As String, ByRef Module As Object) As String
+  Public Function ExportComponent(ByVal Folder As String, ByRef Component As Object) As String
 #End If
-    Dim Ext As String: Ext = GetModuleExt(Module)
-    Dim Path As String: Path = NewFileSystemObject().BuildPath(Folder, Module.Name & Ext)
-    Module.Export Path
-    ExportModule = Path
+    Dim Ext As String: Ext = GetComponentExt(Component)
+    Dim Path As String: Path = NewFileSystemObject().BuildPath(Folder, Component.Name & Ext)
+    Component.Export Path
+    ExportComponent = Path
 End Function
 
-Public Function IsModuleExists(ByVal NameOrPath As String) As Boolean
+Public Function IsComponentExists(ByVal NameOrPath As String) As Boolean
     On Error GoTo Catch
     Dim Name As String: Name = GetFileNameWithoutExt(NameOrPath)
-    IsModuleExists = this.Project.VBComponents(Name).Name <> ""
+    IsComponentExists = this.Project.VBComponents(Name).Name <> ""
 Exit Function
 
 Catch:
     If Information.Err.Number = 9 Then
-        IsModuleExists = False
+        IsComponentExists = False
     Else
         Information.Err.Raise Information.Err.Number, Information.TypeName(Me)
     End If
@@ -110,15 +119,15 @@ Private Function IsValidType(ByVal Path As String) As Boolean
 End Function
 
 #If DEV Then
-  Private Function GetModuleExt(ByRef Module As VBComponent) As String
+  Private Function GetComponentExt(ByRef Module As VBComponent) As String
 #Else
-  Private Function GetModuleExt(ByRef Module As Object) As String
+  Private Function GetComponentExt(ByRef Module As Object) As String
 #End If
     Select Case Module.Type
-    Case ModuleType.StdModule: GetModuleExt = ".bas"
-    Case ModuleType.ClassModule: GetModuleExt = ".cls"
-    Case ModuleType.FormModule: GetModuleExt = ".frm"
-    Case ModuleType.DocModule: GetModuleExt = ".doccls"
-    Case Else: GetModuleExt = ".txt"
+    Case ModuleType.StdModule: GetComponentExt = ".bas"
+    Case ModuleType.ClassModule: GetComponentExt = ".cls"
+    Case ModuleType.FormModule: GetComponentExt = ".frm"
+    Case ModuleType.DocModule: GetComponentExt = ".doccls"
+    Case Else: GetComponentExt = ".txt"
     End Select
 End Function

@@ -65,13 +65,13 @@ Private Sub ICommand_Exec()
 End Sub
 
 Public Sub CreatePack()
-    If SelectedProject.IsModuleExists("package") Then
+    If SelectedProject.IsComponentExists("package") Then
         Immediate.WriteLine CLI.Lang.GetValues("exists")
         Exit Sub
     End If
 
   #If DEV Then
-    Dim PackModule As VBComponent: Set PackModule = SelectedProject.AddModule("package")
+    Dim PackModule As VBComponent: Set PackModule = SelectedProject.AddComponent("package")
   #Else
     Dim PackModule As Object: Set PackModule = SelectedProject.AddModule("package")
   #End If

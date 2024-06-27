@@ -44,7 +44,7 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
-    If Not SelectedProject.IsModuleExists("package") Then
+    If Not SelectedProject.IsComponentExists("package") Then
         Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/packageModuleNotFound"))
         End
     End If
@@ -54,9 +54,9 @@ Private Sub ICommand_Exec()
 
     MoveProjectToPPM
     Dim RootFolder As String: RootFolder = CreateExport()
-    Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetModule("package"))
+    Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
     Pack.RenameModule Pack.Name & "Package"
-    SelectedProject.ExportModule RootFolder, Pack.Component
+    SelectedProject.ExportComponent RootFolder, Pack.Component
     Pack.RenameModule "package"
 
     Dim ZipName As String
@@ -101,7 +101,7 @@ End Sub
 
 Public Sub MoveProjectToPPM()
     Dim Component As VBComponent
-    For Each Component In SelectedProject.Modules
+    For Each Component In SelectedProject.Components
         Dim Module As Module: Set Module = NewModule(Component)
         If PStrings.StartsWith(Module.Path, SelectedProject.Name) Then
             Module.Move "ppm-modules." & Strings.Replace(Module.Path, "Project", "", Count:=1)
@@ -111,7 +111,7 @@ End Sub
 
 Public Sub MovePPMToProject()
     Dim Component As VBComponent
-    For Each Component In SelectedProject.Modules
+    For Each Component In SelectedProject.Components
         Dim Module As Module: Set Module = NewModule(Component)
         If PStrings.StartsWith(Module.Path, "ppm-modules") Then
             Dim PackageName As String

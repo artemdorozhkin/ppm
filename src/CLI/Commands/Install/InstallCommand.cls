@@ -116,7 +116,7 @@ End Function
 
 Public Function GetLibsFromDependencies() As Object
     Dim Libs As Dictionary: Set Libs = NewDictionary(vbTextCompare)
-    Dim Dependencies As Object: Set Dependencies = NewPack(SelectedProject.GetModule("package")).Dependencies
+    Dim Dependencies As Object: Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
     If IsFalse(Dependencies) Then
         Set GetLibsFromDependencies = Libs
         Exit Function
@@ -331,11 +331,11 @@ Public Sub ImportModules(ByVal Path As String)
     Dim File As File
     For Each File In Folder.Files
         On Error Resume Next
-        SelectedProject.ImportModule File.Path
+        SelectedProject.ImportComponent File.Path
         File.Delete Force:=True
     Next
 End Sub
 
 Public Sub UpdatePack()
-    NewPack(SelectedProject.GetModule("package")).Update Dependencies:=this.Parents
+    NewPack(SelectedProject.GetComponent("package")).Update Dependencies:=this.Parents
 End Sub

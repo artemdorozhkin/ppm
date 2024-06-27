@@ -120,7 +120,7 @@ Private Sub ShowVersion()
         End If
     Next
 
-    Dim Pack As Pack: Set Pack = NewPack(Project.GetModule("package"))
+    Dim Pack As Pack: Set Pack = NewPack(Project.GetComponent("package"))
 
     Immediate.WriteLine Pack.Version
 End Sub

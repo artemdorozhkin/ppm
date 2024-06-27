@@ -78,8 +78,8 @@ Private Sub ICommand_Exec()
     ms = DateTime.Timer - ms
     Immediate.WriteLine PStrings.FString( _
         CLI.Lang.GetValue("messages/exported"), _
-        Exporter.Modules.Count, _
-        IIf(Exporter.Modules.Count > 1, "s", ""), _
+        Exporter.Components.Count, _
+        IIf(Exporter.Components.Count > 1, "s", ""), _
         ConvertTime(ms), _
         SelectedProject.Folder _
     )

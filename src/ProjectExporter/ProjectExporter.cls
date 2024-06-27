@@ -11,7 +11,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TProjectExporter
-    Modules As Object
+    Components As Object
     SaveStruct As Boolean
     Destination As String
     RewriteLastExport As Boolean
@@ -21,8 +21,8 @@ End Type
 
 Private this As TProjectExporter
 
-Public Property Get Modules() As Object
-    Set Modules = this.Modules
+Public Property Get Components() As Object
+    Set Components = this.Components
 End Property
 
 Public Property Get SaveStruct() As Boolean
@@ -57,16 +57,16 @@ Public Sub ExportAll(ByVal Encoding As String)
     End If
 
     If this.SaveStruct Then
-        Set this.Modules = ParseModulesWithDirectory()
+        Set this.Components = ParseComponentsWithDirectory()
     Else
-        Set this.Modules = ParseModules()
+        Set this.Components = ParseComponents()
     End If
-
+    
     If this.RewriteLastExport Then
-        this.LastExport = SaveModules(Encoding)
+        this.LastExport = SaveComponents(Encoding)
         SaveLastExport
     Else
-        SaveModules Encoding
+        SaveComponents Encoding
     End If
 End Sub
 
@@ -83,13 +83,13 @@ Public Sub ExportFolders(ByVal Encoding As String, ParamArray Folders() As Varia
     End If
 
     If this.SaveStruct Then
-        Set this.Modules = ParseModulesWithDirectory()
+        Set this.Components = ParseComponentsWithDirectory()
     Else
-        Set this.Modules = ParseModules()
+        Set this.Components = ParseComponents()
     End If
 
     If this.RewriteLastExport Then
-        this.LastExport = SaveModules(Encoding)
+        this.LastExport = SaveComponents(Encoding)
         SaveLastExport
     Else
         SaveModules Encoding
@@ -148,51 +148,51 @@ Catch:
 End Sub
 
 #If DEV Then
-  Private Function ParseModules() As Dictionary
+  Private Function ParseComponents() As Dictionary
 #Else
-  Private Function ParseModules() As Object
+  Private Function ParseComponents() As Object
 #End If
   #If DEV Then
-    Dim Modules As Dictionary: Set Modules = NewDictionary()
-    Dim Module As VBComponent
+    Dim Components As Dictionary: Set Components = NewDictionary()
+    Dim Component As VBComponent
   #Else
-    Dim Modules As Object: Set Modules = NewDictionary()
-    Dim Module As Object
+    Dim Components As Object: Set Components = NewDictionary()
+    Dim Component As Object
   #End If
-    For Each Module In SelectedProject.Modules
+    For Each Component In SelectedProject.Components
         Dim Directory As String
-        Directory = GetDirectory(Module.CodeModule)
+        Directory = GetDirectory(Component.CodeModule)
         If IsExportingFolder(Directory) Then
-            Set Modules(Module.Name) = Module
+            Set Components(Component.Name) = Component
         End If
     Next
 
-    Set ParseModules = Modules
+    Set ParseComponents = Components
 End Function
 
 #If DEV Then
-  Private Function ParseModulesWithDirectory() As Dictionary
+  Private Function ParseComponentsWithDirectory() As Dictionary
 #Else
-  Private Function ParseModulesWithDirectory() As Object
+  Private Function ParseComponentsWithDirectory() As Object
 #End If
   #If DEV Then
-    Dim Modules As Dictionary: Set Modules = NewDictionary()
-    Dim Module As VBComponent
+    Dim Components As Dictionary: Set Components = NewDictionary()
+    Dim Component As VBComponent
   #Else
-    Dim Modules As Object: Set Modules = NewDictionary()
-    Dim Module As Object
+    Dim Components As Object: Set Components = NewDictionary()
+    Dim Component As Object
   #End If
-    For Each Module In SelectedProject.Modules
+    For Each Component In SelectedProject.Components
         Dim Directory As String
-        Directory = GetDirectory(Module.CodeModule)
+        Directory = GetDirectory(Component.CodeModule)
         If IsExportingFolder(Directory) Then
-            Dim ModuleKey As String
-            ModuleKey = PStrings.FString("{0}:{1}", Module.Name, Directory)
-            Set Modules(ModuleKey) = Module
+            Dim ComponentKey As String
+            ComponentKey = PStrings.FString("{0}:{1}", Component.Name, Directory)
+            Set Components(ComponentKey) = Component
         End If
     Next
 
-    Set ParseModulesWithDirectory = Modules
+    Set ParseComponentsWithDirectory = Components
 End Function
 
 Private Function IsExportingFolder(ByVal Directory As String) As Boolean
@@ -239,7 +239,7 @@ Continue:
     Next
 End Function
 
-Private Function SaveModules(ByVal Encoding As String) As Variant
+Private Function SaveComponents(ByVal Encoding As String) As Variant
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
@@ -247,19 +247,19 @@ Private Function SaveModules(ByVal Encoding As String) As Variant
   #End If
     Dim FileList As Collection: Set FileList = New Collection
 
-    Dim ModuleKey As Variant
-    For Each ModuleKey In this.Modules
+    Dim ComponentKey As Variant
+    For Each ComponentKey In this.Components
       #If DEV Then
-        Dim Module As VBComponent: Set Module = this.Modules(ModuleKey)
+        Dim Component As VBComponent: Set Component = this.Components(ComponentKey)
       #Else
-        Dim Module As Object: Set Module = this.Modules(ModuleKey)
+        Dim Component As Object: Set Component = this.Components(ComponentKey)
       #End If
         Dim SaveFolderPath As String
         If Not this.SaveStruct Then
             SaveFolderPath = this.Destination
         Else
             Dim DirectoryPath As String
-            DirectoryPath = Strings.Split(ModuleKey, ":")(1)
+            DirectoryPath = Strings.Split(ComponentKey, ":")(1)
             DirectoryPath = Strings.Replace(DirectoryPath, SelectedProject.Name & ".", "", Count:=1)
             DirectoryPath = Strings.Replace(DirectoryPath, SelectedProject.Name, "", Count:=1)
             DirectoryPath = Strings.Replace(DirectoryPath, ".", Application.PathSeparator)
@@ -268,12 +268,12 @@ Private Function SaveModules(ByVal Encoding As String) As Variant
             If Not FSO.FolderExists(SaveFolderPath) Then PFileSystem.CreateFolder SaveFolderPath, Recoursive:=True
         End If
         Dim FileName As String
-        FileName = SelectedProject.ExportModule(SaveFolderPath, Module)
+        FileName = SelectedProject.ExportComponent(SaveFolderPath, Component)
         PFileSystem.ChangeFileEncoding FileName, Encoding
 
         If SaveFolderPath <> this.Destination Then FileList.Add SaveFolderPath
         FileList.Add FileName
     Next
 
-    SaveModules = PCollection.ToArray(FileList)
+    SaveComponents = PCollection.ToArray(FileList)
 End Function
