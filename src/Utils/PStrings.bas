@@ -1,4 +1,5 @@
 Attribute VB_Name = "PStrings"
+'@IgnoreModule AssignmentNotUsed, ProcedureNotUsed, ParameterNotUsed
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 

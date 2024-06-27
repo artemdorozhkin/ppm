@@ -11,7 +11,11 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type THTTP
+  #If DEV Then
+    HTTP As MSXML2.XMLHTTP60
+  #Else
     HTTP As Object
+  #End If
 End Type
 
 Private this As THTTP
@@ -29,7 +33,19 @@ Public Function GetRequest(ByVal URL As String) As TResponse
     GetRequest.Code = this.HTTP.Status
 End Function
 
-Public Function PostRequest(ByVal URL As String, ByRef Headers As Object, Optional ByVal Body As Variant) As TResponse
+#If DEV Then
+  Public Function PostRequest( _
+    ByVal URL As String, _
+    ByRef Headers As Dictionary, _
+    Optional ByVal Body As Variant _
+  ) As TResponse
+#Else
+  Public Function PostRequest( _
+    ByVal URL As String, _
+    ByRef Headers As Object, _
+    Optional ByVal Body As Variant _
+  ) As TResponse
+#End If
     this.HTTP.Open "POST", URL, False
     Dim Title As Variant
     For Each Title In Headers

@@ -49,11 +49,6 @@ Private Sub ICommand_Exec()
     Dim ms As Double: ms = DateTime.Timer
     Dim Encoding As String: Encoding = Me.GetEncoding()
 
-  #If DEV Then
-    Dim Modules As Dictionary: Set Modules = NewDictionary()
-  #Else
-    Dim Modules As Object: Set Modules = NewDictionary()
-  #End If
     Dim SaveStruct As Boolean
     SaveStruct = this.Config.GetValue("save-struct")
 

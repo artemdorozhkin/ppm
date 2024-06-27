@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@IgnoreModule AssignmentNotUsed
 '@Folder "PearPMProject.src.Config"
 Option Explicit
 
@@ -55,7 +56,6 @@ Public Function GetValue(ByVal DefinitionName As String) As Variant
             Exit Function
         End If
     End If
-    Dim Value As String
   #If DEV Then
     Dim Data As Dictionary
   #Else
@@ -93,16 +93,4 @@ Private Function GetValueFromDefinition(ByRef Definition As Definition) As Varia
             this.Tokens.GetTokenByDefinition(Definition).Text, Definition.DataType _
         )
     End If
-End Function
-
-Private Function GetValueFromFile(ByRef LocationDef As Definition, ByRef Definition As Definition) As Variant
-    Dim Location As String
-    Location = Strings.LCase(this.Tokens.GetTokenByDefinition(LocationDef).Text)
-    Dim Config As ConfigIO
-    Select Case Location
-        Case "project": Set Config = this.ProjectConfig
-        Case "user": Set Config = this.UserConfig
-        Case "global": Set Config = this.GlobalConfig
-    End Select
-    GetValueFromFile = Config.Read()(Definition.Key)
 End Function

@@ -11,7 +11,6 @@ Public Function CalculateBytesCheckSum(ByRef Bytes() As Byte) As String
     With CreateObject("MSXML2.DOMDocument")
         .LoadXML "<root />"
         .DocumentElement.DataType = "bin.Hex"
-        Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
         Dim SHA256 As Object
         Set SHA256 = CreateObject("System.Security.Cryptography.SHA256Managed")
         .DocumentElement.nodeTypedValue = SHA256.ComputeHash_2((Bytes))
@@ -123,8 +122,6 @@ Public Function ConvertTime(ByVal Value As Double) As String
     Dim m As Double: m = s * 60
     Dim h As Double: h = m * 60
     Dim d As Double: d = h * 24
-    Dim w As Double: w = d * 7
-    Dim y As Double: y = d * 365.25
 
     Value = Math.Round(Math.Abs(Value * s))
     If Value >= d Then

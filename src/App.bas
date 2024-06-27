@@ -2,11 +2,19 @@ Attribute VB_Name = "App"
 '@Folder "PearPMProject.src"
 Option Explicit
 
-Public SelectedProject As Project
+Private Type TApp
+    SelectedProject As Project
+End Type
+
+Private this As TApp
+
+Public Property Get SelectedProject() As Project
+    Set SelectedProject = this.SelectedProject
+End Property
 
 Public Sub ppm(Optional ByVal StringArgs As String)
     On Error GoTo Catch
-    Set SelectedProject = NewProject(Application.VBE.ActiveVBProject)
+    Set this.SelectedProject = NewProject(Application.VBE.ActiveVBProject)
     CLI.InitLang
     Dim Command As ICommand: Set Command = CLI.ParseCommand(NewLexer(StringArgs).Lex())
     Command.Exec

@@ -94,7 +94,7 @@ Public Function GetCommandName() As String
     End If
 End Function
 
-Public Function ShowPPMInfo()
+Public Sub ShowPPMInfo()
     CLI.Lang.SetBlock "/root"
 
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
@@ -121,4 +121,4 @@ Public Function ShowPPMInfo()
     If Strings.Len(Line) > 0 Then List.Add Line
 
     Immediate.WriteLine Strings.Join(PCollection.ToArray(List), vbNewLine)
-End Function
+End Sub

@@ -1,4 +1,5 @@
 Attribute VB_Name = "SyncCommandCstr"
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.CLI.Commands.Sync"
 Option Explicit
 

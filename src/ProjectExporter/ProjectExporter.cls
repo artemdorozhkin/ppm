@@ -7,11 +7,16 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.ProjectExporter"
 Option Explicit
 
 Private Type TProjectExporter
+  #If DEV Then
+    Components As Dictionary
+  #Else
     Components As Object
+  #End If
     SaveStruct As Boolean
     Destination As String
     RewriteLastExport As Boolean
@@ -21,7 +26,11 @@ End Type
 
 Private this As TProjectExporter
 
-Public Property Get Components() As Object
+#If DEV Then
+  Public Property Get Components() As Dictionary
+#Else
+  Public Property Get Components() As Object
+#End If
     Set Components = this.Components
 End Property
 

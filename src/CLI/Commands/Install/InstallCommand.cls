@@ -18,7 +18,11 @@ Private Type TInstallCommand
     Tokens As Tokens
     Registry As String
     FromLocal As Boolean
+  #If DEV Then
+    Parents As Dictionary
+  #Else
     Parents As Object
+  #End If
 End Type
 
 Private this As TInstallCommand
@@ -57,7 +61,11 @@ Private Sub ICommand_Exec()
     End If
     Dim ms As Double: ms = DateTime.Timer
     Immediate.WriteLine CLI.Lang.GetValue("messages/installling")
+  #If DEV Then
+    Dim Libs As Dictionary: Set Libs = Me.GetFlattedLibs()
+  #Else
     Dim Libs As Object: Set Libs = Me.GetFlattedLibs()
+  #End If
 
     Dim Paths As Variant
     If this.FromLocal Then
@@ -80,7 +88,11 @@ Private Sub ICommand_Exec()
     End If
 End Sub
 
-Public Function GetFlattedLibs() As Object
+#If DEV Then
+  Public Function GetFlattedLibs() As Dictionary
+#Else
+  Public Function GetFlattedLibs() As Object
+#End If
     If this.Tokens.IncludeTokenKind(TokenKind.Identifier) Then
         Set GetFlattedLibs = Me.GetLibsFromTokens()
     Else
@@ -88,8 +100,16 @@ Public Function GetFlattedLibs() As Object
     End If
 End Function
 
-Public Function GetLibsFromTokens() As Object
+#If DEV Then
+  Public Function GetLibsFromTokens() As Dictionary
+#Else
+  Public Function GetLibsFromTokens() As Object
+#End If
+  #If DEV Then
     Dim Libs As Dictionary: Set Libs = NewDictionary(vbTextCompare)
+  #Else
+    Dim Libs As Object: Set Libs = NewDictionary(vbTextCompare)
+  #End If
     Dim Token As SyntaxToken
     For Each Token In this.Tokens
         If Token.Kind <> TokenKind.Identifier Then GoTo Continue
@@ -114,9 +134,20 @@ Continue:
     Set GetLibsFromTokens = Libs
 End Function
 
-Public Function GetLibsFromDependencies() As Object
+#If DEV Then
+  Public Function GetLibsFromDependencies() As Dictionary
+#Else
+  Public Function GetLibsFromDependencies() As Object
+#End If
+  #If DEV Then
     Dim Libs As Dictionary: Set Libs = NewDictionary(vbTextCompare)
-    Dim Dependencies As Object: Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
+    Dim Dependencies As Dictionary
+    Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
+  #Else
+    Dim Libs As Object: Set Libs = NewDictionary(vbTextCompare)
+    Dim Dependencies As Object
+    Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
+  #End If
     If IsFalse(Dependencies) Then
         Set GetLibsFromDependencies = Libs
         Exit Function
@@ -136,16 +167,23 @@ Public Function GetLibsFromDependencies() As Object
         Else
             AddFromLibPack Me.GetLibPackFromServer(LibName, Version), Libs
         End If
-Continue:
     Next
 
     Set GetLibsFromDependencies = Libs
 End Function
 
-Public Sub AddFromLibPack(ByRef LibPack As Pack, ByRef Libs As Object)
+#If DEV Then
+  Public Sub AddFromLibPack(ByRef LibPack As Pack, ByRef Libs As Dictionary)
+#Else
+  Public Sub AddFromLibPack(ByRef LibPack As Pack, ByRef Libs As Object)
+#End If
     Dim LibName As String: LibName = LibPack.Name
     Dim Version As String: Version = LibPack.Version
-    Dim Dependencies As Object
+  #If DEV Then
+      Dim Dependencies As Dictionary
+  #Else
+      Dim Dependencies As Object
+  #End If
     If IsTrue(LibPack.Dependencies) Then
         Set Dependencies = LibPack.Dependencies
     End If
@@ -178,7 +216,11 @@ Public Sub AddFromLibPack(ByRef LibPack As Pack, ByRef Libs As Object)
 End Sub
 
 Public Function GetLocalLibPack(ByVal LibName As String, ByVal Version As String) As Pack
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
     Dim ManifestPath As String
     ManifestPath = FSO.BuildPath(this.Registry, LibName)
     ManifestPath = FSO.BuildPath(ManifestPath, "manifest.json")
@@ -212,13 +254,22 @@ Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As S
     Set GetLibPackFromServer = NewPack(PJSON.Parse(Response.Text))
 End Function
 
-Public Function GetLocalLibs(ByRef Libs As Dictionary) As Variant
+#If DEV Then
+  Public Function GetLocalLibs(ByRef Libs As Dictionary) As Variant
+#Else
+  Public Function GetLocalLibs(ByRef Libs As Object) As Variant
+#End If
     Dim Paths As Collection: Set Paths = New Collection
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
     Dim CacheFolder As String
     CacheFolder = FSO.BuildPath(Constants.LocalPPMPath, "cache")
     PFileSystem.CreateFolder CacheFolder, Recoursive:=True
 
+    ' TODO: use manifest packUrl (don't forget replace escaped \\ in path)
     Dim Name As Variant
     For Each Name In Libs
         Dim Version As String: Version = Libs(Name)
@@ -240,7 +291,11 @@ Public Function GetLocalLibs(ByRef Libs As Dictionary) As Variant
     GetLocalLibs = PCollection.ToArray(Paths)
 End Function
 
-Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
+#If DEV Then
+  Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
+#Else
+  Public Function DownloadLibs(ByRef Libs As Object) As Variant
+#End If
     Dim Registry As String
     If Strings.Right(this.Registry, 1) <> "/" Then
         Registry = this.Registry & "/"
@@ -249,7 +304,11 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
     Dim Paths As Collection: Set Paths = New Collection
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
     Dim CacheFolder As String
     CacheFolder = FSO.BuildPath(Constants.LocalPPMPath, "cache")
     PFileSystem.CreateFolder CacheFolder, Recoursive:=True
@@ -271,7 +330,11 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
                 )
         End If
 
+      #If DEV Then
+        Dim Manifest As Dictionary: Set Manifest = PJSON.Parse(Response.Text)
+      #Else
         Dim Manifest As Object: Set Manifest = PJSON.Parse(Response.Text)
+      #End If
         URL = Manifest("packUrl")
         Response = HTTP.GetRequest(URL)
         If Response.Code <> HTTPCodes.OK_200 Then
@@ -310,7 +373,11 @@ Public Function DownloadLibs(ByRef Libs As Dictionary) As Variant
 End Function
 
 Public Sub InstallLibs(ByRef Paths As Variant)
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
     Dim Zip As PZip: Set Zip = New PZip
     Dim Path As Variant
     For Each Path In Paths
@@ -320,15 +387,20 @@ Public Sub InstallLibs(ByRef Paths As Variant)
         TempFolder = FSO.BuildPath(FSO.GetParentFolderName(Path), FSO.GetTempName())
         Zip.Unzip TempFolder
         FileSystem.Kill Path
-        Me.ImportModules TempFolder
+        Me.ImportComponents TempFolder
         FileSystem.RmDir TempFolder
 Continue:
     Next
 End Sub
 
-Public Sub ImportModules(ByVal Path As String)
-    Dim Folder As Folder: Set Folder = NewFolder(Path)
+Public Sub ImportComponents(ByVal Path As String)
+  #If DEV Then
+    Dim Folder As Scripting.Folder: Set Folder = NewFolder(Path)
     Dim File As File
+  #Else
+    Dim Folder As Object: Set Folder = NewFolder(Path)
+    Dim File As Object
+  #End If
     For Each File In Folder.Files
         On Error Resume Next
         SelectedProject.ImportComponent File.Path

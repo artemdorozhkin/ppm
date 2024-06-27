@@ -7,11 +7,16 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@IgnoreModule UnassignedVariableUsage, ProcedureNotUsed
 '@Folder "PearPMProject.src.Module"
 Option Explicit
 
 Private Type TModule
+  #If DEV Then
     Item As VBComponent
+  #Else
+    Item As Object
+  #End If
 End Type
 
 Private this As TModule
@@ -31,10 +36,18 @@ Public Property Get Kind() As ModuleType
     Kind = this.Item.Type
 End Property
 
-Public Property Get Item() As VBComponent
+#If DEV Then
+  Public Property Get Item() As VBComponent
+#Else
+  Public Property Get Item() As Object
+#End If
     Set Item = this.Item
 End Property
-Public Property Set Item(ByVal RHS As VBComponent)
+#If DEV Then
+  Public Property Set Item(ByVal RHS As VBComponent)
+#Else
+  Public Property Set Item(ByVal RHS As Object)
+#End If
     Set this.Item = RHS
 End Property
 
@@ -48,10 +61,6 @@ Public Property Let Code(ByVal RHS As String)
     End If
     this.Item.CodeModule.AddFromString RHS
 End Property
-
-Public Sub Rename(ByVal Name As String)
-    this.Item.Name = Name
-End Sub
 
 Public Sub Move(ByVal ToPath As String)
     Dim FromPath As String: FromPath = GetPath()

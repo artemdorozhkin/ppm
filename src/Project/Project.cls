@@ -120,11 +120,11 @@ Private Function IsValidType(ByVal Path As String) As Boolean
 End Function
 
 #If DEV Then
-  Private Function GetComponentExt(ByRef Module As VBComponent) As String
+  Private Function GetComponentExt(ByRef Component As VBComponent) As String
 #Else
-  Private Function GetComponentExt(ByRef Module As Object) As String
+  Private Function GetComponentExt(ByRef Component As Object) As String
 #End If
-    Select Case Module.Type
+    Select Case Component.Type
     Case ModuleType.StdModule: GetComponentExt = ".bas"
     Case ModuleType.ClassModule: GetComponentExt = ".cls"
     Case ModuleType.FormModule: GetComponentExt = ".frm"
@@ -133,7 +133,11 @@ End Function
     End Select
 End Function
 
-Private Sub TrimCodeEnd(ByRef Component As VBComponent)
+#If DEV Then
+  Private Sub TrimCodeEnd(ByRef Component As VBComponent)
+#Else
+  Private Sub TrimCodeEnd(ByRef Component As Object)
+#End If
     Dim Module As Module: Set Module = NewModule(Component)
     Dim Lines As Variant: Lines = Strings.Split(Module.Code, vbNewLine)
 

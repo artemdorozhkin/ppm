@@ -19,8 +19,12 @@ End Type
 
 Private this As TFormData
 
-Public Function Create(ByVal Boundary As String) As FormData
-    this.Boundary = Boundary
+Public Property Get Boundary() As String
+    Boundary = this.Boundary
+End Property
+
+Public Function Create() As FormData
+    this.Boundary = GenerateBoundary()
     Set this.Stream = NewStream()
     Set this.Converter = New BinaryConverter
     this.ContentDisposition = "Content-Disposition: form-data; name=""{0}"";"
@@ -62,7 +66,7 @@ Public Function ToBytes() As Byte()
     End With
 End Function
 
-Public Function GenerateBoundary(Optional ByVal Seed As Long = 1) As String
+Private Function GenerateBoundary() As String
     Dim CurrentDate As String
     CurrentDate = Strings.Format(DateTime.Now, "YYYYMMDDhhnnss")
     Dim BoundaryCode As String

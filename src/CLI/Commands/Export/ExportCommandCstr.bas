@@ -1,4 +1,5 @@
 Attribute VB_Name = "ExportCommandCstr"
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.CLI.Commands.Export"
 Option Explicit
 

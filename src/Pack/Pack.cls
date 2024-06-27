@@ -7,24 +7,42 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@IgnoreModule AssignmentNotUsed, ProcedureNotUsed
 '@Folder "PearPMProject.src.Pack"
 Option Explicit
 
 Private Type TPack
-    Pack As Object
+  #If DEV Then
+    Pack As Dictionary
     Component As VBComponent
+  #Else
+    Pack As Object
+    Component As Object
+  #End If
 End Type
 
 Private this As TPack
 
-Public Property Get JSON() As Object
+#If DEV Then
+  Public Property Get JSON() As Dictionary
+#Else
+  Public Property Get JSON() As Object
+#End If
     Set JSON = this.Pack
 End Property
-Public Property Set JSON(ByVal RHS As Object)
+#If DEV Then
+  Public Property Set JSON(ByVal RHS As Dictionary)
+#Else
+  Public Property Set JSON(ByVal RHS As Object)
+#End If
     Set this.Pack = RHS
 End Property
 
-Public Property Get Component() As VBComponent
+#If DEV Then
+  Public Property Get Component() As VBComponent
+#Else
+  Public Property Get Component() As Object
+#End If
     Set Component = this.Component
 End Property
 
@@ -48,15 +66,27 @@ Public Property Get Git() As String
     Git = this.Pack("git")
 End Property
 
-Public Property Get Dependencies() As Dictionary
+#If DEV Then
+  Public Property Get Dependencies() As Dictionary
+#Else
+  Public Property Get Dependencies() As Object
+#End If
     Set Dependencies = this.Pack("dependencies")
 End Property
 
-Public Property Get DevDependencies() As Dictionary
+#If DEV Then
+  Public Property Get DevDependencies() As Dictionary
+#Else
+  Public Property Get DevDependencies() As Object
+#End If
     Set DevDependencies = this.Pack("devDependencies")
 End Property
 
-Public Function Read(ByRef Component As VBComponent) As Pack
+#If DEV Then
+  Public Function Read(ByRef Component As VBComponent) As Pack
+#Else
+  Public Function Read(ByRef Component As Object) As Pack
+#End If
     Set this.Component = Component
     Dim Code As String
     Code = this.Component.CodeModule.Lines(1, this.Component.CodeModule.CountOfLines)
@@ -77,9 +107,9 @@ Public Function Read(ByRef Component As VBComponent) As Pack
     Set Read = Me
 End Function
 
-Public Function RenameModule(ByVal Name As String) As Pack
+Public Function RenameComponent(ByVal Name As String) As Pack
     this.Component.Name = Name
-    Set RenameModule = Me
+    Set RenameComponent = Me
 End Function
 
 Public Function Update( _

@@ -11,7 +11,11 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TBinaryConverter
+  #If DEV Then
+    Stream As ADODB.Stream
+  #Else
     Stream As Object
+  #End If
 End Type
 
 Private this As TBinaryConverter
@@ -33,7 +37,7 @@ Public Function TextToBytes(ByVal Text As String) As Variant
     End With
 End Function
 
-Function FileToBytes(ByVal Path As String) As Byte()
+Public Function FileToBytes(ByVal Path As String) As Byte()
     With this.Stream
         .Type = 1 'binary
         .Open

@@ -32,7 +32,7 @@ End Function
 End Function
 
 #If DEV Then
-  Public Function NewFolder(ByVal Path As String) As Folder
+  Public Function NewFolder(ByVal Path As String) As Scripting.Folder
 #Else
   Public Function NewFolder(ByVal Path As String) As Object
 #End If
@@ -43,4 +43,12 @@ End Function
             Set NewFolder = .GetFile(Path).ParentFolder
         End If
     End With
+End Function
+
+#If DEV Then
+  Public Function NewShell() As Shell32.Shell
+#Else
+  Public Function NewShell() As Object
+#End If
+    Set NewShell = CreateObject("Shell.Application")
 End Function

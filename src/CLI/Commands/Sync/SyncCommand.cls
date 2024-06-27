@@ -48,12 +48,15 @@ Private Sub ICommand_Exec()
 
     Dim ActivePaneName As String
     ActivePaneName = Application.VBE.ActiveCodePane.CodeModule.Parent.Name
+  #If DEV Then
     Dim SyncPaths As Dictionary: Set SyncPaths = NewDictionary()
+    Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim SyncPaths As Object: Set SyncPaths = NewDictionary()
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
     Me.CollectPaths SelectedProject.Folder, SyncPaths
 
-    Dim DelNames As Dictionary: Set DelNames = NewDictionary()
-
-    Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
     Dim Module As Module
     Dim Name As Variant
     For Each Name In SyncPaths
@@ -78,7 +81,6 @@ Private Sub ICommand_Exec()
         Else
             Const MAX_NAME_LEN As Integer = 31
             Dim DelName As String: DelName = Strings.Left("d" & Name, MAX_NAME_LEN)
-            DelNames.Add DelName, Empty
             Module.Name = DelName
             SelectedProject.ImportComponent LocalePath
             SelectedProject.RemoveComponent DelName
@@ -96,21 +98,39 @@ Private Sub ICommand_Exec()
         Utils.ConvertTime(ms) _
     )
 
+  #If DEV Then
     Dim Components As VBComponents: Set Components = SelectedProject.Components
+  #Else
+    Dim Components As Object: Set Components = SelectedProject.Components
+  #End If
     On Error Resume Next ' if this component was deleted
     Components(ActivePaneName).Activate
     On Error GoTo 0
 End Sub
 
-Public Sub CollectPaths(ByVal FolderPath As String, ByRef Paths As Dictionary)
-    Dim Folder As Folder: Set Folder = NewFolder(FolderPath)
-    Dim SubFolder As Folder
+#If DEV Then
+  Public Sub CollectPaths(ByVal FolderPath As String, ByRef Paths As Dictionary)
+#Else
+  Public Sub CollectPaths(ByVal FolderPath As String, ByRef Paths As Object)
+#End If
+  #If DEV Then
+    Dim Folder As Scripting.Folder: Set Folder = NewFolder(FolderPath)
+    Dim SubFolder As Scripting.Folder
+  #Else
+    Dim Folder As Object: Set Folder = NewFolder(FolderPath)
+    Dim SubFolder As Object
+  #End If
     For Each SubFolder In Folder.SubFolders
         CollectPaths SubFolder.Path, Paths
     Next
 
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
     Dim File As File
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim File As Object
+  #End If
     For Each File In Folder.Files
         Dim Ext As String: Ext = Strings.LCase(FSO.GetExtensionName(File.Path))
         Dim Name As String: Name = FSO.GetBaseName(File.Path)
@@ -121,9 +141,12 @@ Public Sub CollectPaths(ByVal FolderPath As String, ByRef Paths As Dictionary)
 End Sub
 
 Public Function ReadCode(ByVal Path As String) As String
+  #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
+  #Else
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
+  #End If
     Dim Ext As String: Ext = Strings.LCase(FSO.GetExtensionName(Path))
-    Dim Name As String: Name = FSO.GetBaseName(Path)
     Dim VBAttr As String
 
     Select Case Ext

@@ -1,4 +1,5 @@
 Attribute VB_Name = "InitCommandCstr"
+'@IgnoreModule ProcedureNotUsed
 '@Folder "PearPMProject.src.CLI.Commands.Init"
 Option Explicit
 
