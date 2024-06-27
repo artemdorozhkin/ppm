@@ -45,6 +45,8 @@ Public Function SetBlock(ByVal Path As String) As Lang
 End Function
 
 Public Function GetValues(ByVal Block As String, Optional ByVal Attr As String) As Variant
+    If IsFalse(this.Current) Then Exit Function
+
     Dim Nodes As IXMLDOMSelection: Set Nodes = this.Current.SelectNodes(Block)
     If Strings.Len(Attr) > 0 Then
         Dim Name As String: Name = Strings.Split(Attr, "=")(0)
@@ -63,6 +65,8 @@ Public Function GetValues(ByVal Block As String, Optional ByVal Attr As String) 
 End Function
 
 Public Function GetValue(ByVal Block As String, Optional ByVal Attr As String) As Variant
+    If IsFalse(this.Current) Then Exit Function
+
     Dim Nodes As IXMLDOMSelection: Set Nodes = this.Current.SelectNodes(Block)
     If Strings.Len(Attr) > 0 Then
         Dim Name As String: Name = Strings.Split(Attr, "=")(0)
