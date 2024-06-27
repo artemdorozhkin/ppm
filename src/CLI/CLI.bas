@@ -19,7 +19,8 @@ Public Property Get Commands() As Variant
         "help", _
         "init", _
         "install", _
-        "publish" _
+        "publish", _
+        "sync" _
     )
 End Property
 

@@ -23,6 +23,9 @@ End Property
 Public Property Get Name() As String
     Name = this.Item.Name
 End Property
+Public Property Let Name(ByVal RHS As String)
+    this.Item.Name = RHS
+End Property
 
 Public Property Get Kind() As ModuleType
     Kind = this.Item.Type
@@ -36,7 +39,14 @@ Public Property Set Item(ByVal RHS As VBComponent)
 End Property
 
 Public Property Get Code() As String
+    If this.Item.CodeModule.CountOfLines = 0 Then Exit Property
     Code = this.Item.CodeModule.Lines(1, this.Item.CodeModule.CountOfLines)
+End Property
+Public Property Let Code(ByVal RHS As String)
+    If this.Item.CodeModule.CountOfLines > 0 Then
+        this.Item.CodeModule.DeleteLines 1, this.Item.CodeModule.CountOfLines
+    End If
+    this.Item.CodeModule.AddFromString RHS
 End Property
 
 Public Sub Rename(ByVal Name As String)
