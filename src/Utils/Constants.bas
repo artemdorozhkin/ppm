@@ -69,5 +69,3 @@ Private Function GetConfigFilePathFromFolder(ByVal Folder As String) As String
         GetConfigFilePathFromFolder = .BuildPath(Folder, ".ppmrc")
     End With
 End Function
-
-

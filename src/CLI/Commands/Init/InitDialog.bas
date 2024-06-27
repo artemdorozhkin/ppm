@@ -96,5 +96,3 @@ Public Function SetDefault() As TPackageInfo
 
     SetDefault = PackInfo
 End Function
-
-

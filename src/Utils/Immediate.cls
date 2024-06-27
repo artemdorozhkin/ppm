@@ -44,5 +44,3 @@ Public Sub ReadLine(ByVal Text As String, Optional ByVal NextFunction As String)
     If Strings.Len(NextFunction) > 0 Then NextFunction = NextFunction & " _"
     Debug.Print Text & vbNewLine & Space(100) & NextFunction
 End Sub
-
-

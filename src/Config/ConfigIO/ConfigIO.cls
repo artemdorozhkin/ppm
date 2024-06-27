@@ -140,5 +140,3 @@ End Function
     Next
     SaveToFile this.ConfigPath, Content
 End Sub
-
-

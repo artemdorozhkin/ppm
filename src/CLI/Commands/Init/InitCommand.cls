@@ -89,4 +89,3 @@ Public Sub CreatePack()
         .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
     End With
 End Sub
-

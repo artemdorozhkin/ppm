@@ -12,5 +12,3 @@ Public Function NewProjectExporter( _
     NewProjectExporter.SaveStruct = SaveStruct
     NewProjectExporter.RewriteLastExport = RewriteLastExport
 End Function
-
-

@@ -88,5 +88,3 @@ Public Function IsWhiteSpace(ByVal Char As String) As Boolean
         IsWhiteSpace = True
     End Select
 End Function
-
-

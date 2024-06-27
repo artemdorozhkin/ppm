@@ -13,4 +13,3 @@ End Function
 Public Function GetGlobalConfig() As ConfigIO
     Set GetGlobalConfig = NewConfigIO(Constants.GlobalConfigPath)
 End Function
-

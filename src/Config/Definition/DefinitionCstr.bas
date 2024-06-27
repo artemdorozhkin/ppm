@@ -25,5 +25,3 @@ Public Function NewDefinition( _
         .Description = Description
     End With
 End Function
-
-
