@@ -1,71 +1,5 @@
 <root>
     <ppmCommands>
-        <init>
-            <description>
-                Create a package module.
-            </description>
-            <param name="name">
-                \\t\\tSet project name.
-            </param>
-            <param name="yes">
-                \\tSkips dialog and sets default values.
-            </param>
-            <usage>
-                <item>
-                    &lt;package name&gt;
-                </item>
-            </usage>
-            <messages>
-                <initialized>
-                    package is initialized in {0}
-                </initialized>
-                <exists>
-                    module already exists
-                </exists>
-            </messages>
-        </init>
-        <help>
-            <description>
-                Shows information about the command.
-            </description>
-            <usage>
-                <item>
-                    [&lt;command&gt;]
-                </item>
-            </usage>
-            <messages>
-                <unknownCommand>
-                    ERR: Unknown command {0}
-                </unknownCommand>
-            </messages>
-        </help>
-        <export>
-            <description>
-                Exports the selected project.
-            </description>
-            <param name="encoding">
-                \\t\\tExport files with specified encoding.
-            </param>
-            <param name="save-struct">
-                \\tSave the RubberDuck structure when exporting a project.
-            </param>
-            <param name="path">
-                \\t\\t\\tExport to specified folder.
-            </param>
-            <param name="no-clear">
-                \\t\\t\\tDo not delete files from the last export.
-            </param>
-            <usage>
-                <item>
-                    [&lt;options&gt;]
-                </item>
-            </usage>
-            <messages>
-                <exported>
-                    exported {0} module{1} in {2}\\nroot folder: {3}\\n
-                </exported>
-            </messages>
-        </export>
         <config>
             <description>
                 Manages the ppm configuration file.
@@ -102,6 +36,72 @@
                 </deleted>
             </messages>
         </config>
+        <export>
+            <description>
+                Exports the selected project.
+            </description>
+            <param name="encoding">
+                \\t\\tExport files with specified encoding.
+            </param>
+            <param name="save-struct">
+                \\tSave the RubberDuck structure when exporting a project.
+            </param>
+            <param name="path">
+                \\t\\t\\tExport to specified folder.
+            </param>
+            <param name="no-clear">
+                \\t\\t\\tDo not delete files from the last export.
+            </param>
+            <usage>
+                <item>
+                    [&lt;options&gt;]
+                </item>
+            </usage>
+            <messages>
+                <exported>
+                    exported {0} module{1} in {2}\\nroot folder: {3}\\n
+                </exported>
+            </messages>
+        </export>
+        <help>
+            <description>
+                Shows information about the command.
+            </description>
+            <usage>
+                <item>
+                    [&lt;command&gt;]
+                </item>
+            </usage>
+            <messages>
+                <unknownCommand>
+                    ERR: Unknown command {0}
+                </unknownCommand>
+            </messages>
+        </help>
+        <init>
+            <description>
+                Create a package module.
+            </description>
+            <param name="name">
+                \\t\\tSet project name.
+            </param>
+            <param name="yes">
+                \\tSkips dialog and sets default values.
+            </param>
+            <usage>
+                <item>
+                    &lt;package name&gt;
+                </item>
+            </usage>
+            <messages>
+                <initialized>
+                    package is initialized in {0}
+                </initialized>
+                <exists>
+                    module already exists
+                </exists>
+            </messages>
+        </init>
         <install>
             <description>
                 Installs the selected packages.
@@ -169,6 +169,24 @@
                 </published>
             </messages>
         </publish>
+        <sync>
+            <description>
+                Synchronises project modules with files from the root folder.
+            </description>
+            <usage>
+                <item>
+                    [&lt;options&gt;]
+                </item>
+            </usage>
+            <messages>
+                <synchronisation>
+                    synchronisation...
+                </synchronisation>
+                <synchronized>
+                    successfully synchronised {0} modules in {1} 
+                </synchronized>
+            </messages>
+        </sync>
     </ppmCommands>
     <usage>Usage:</usage>
     <commands>Commands:</commands>

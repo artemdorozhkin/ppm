@@ -1,71 +1,5 @@
 <root>
     <ppmCommands>
-        <init>
-            <description>
-                Создает модуль package.
-            </description>
-            <param name="name">
-                \\t\\tУстановить имя проекта.
-            </param>
-            <param name="yes">
-                \\tПропустить диалог и установить значения по умолчанию.
-            </param>
-            <usage>
-                <item>
-                    &lt;имя пакета&gt;
-                </item>
-            </usage>
-            <messages>
-                <initialized>
-                    package инициализован за {0}
-                </initialized>
-                <exists>
-                    модуль уже существует
-                </exists>
-            </messages>
-        </init>
-        <help>
-            <description>
-                Показывает справку о команде.
-            </description>
-            <usage>
-                <item>
-                    [&lt;команда&gt;]
-                </item>
-            </usage>
-            <messages>
-                <unknownCommand>
-                    ERR: Неизвестная команда {0}
-                </unknownCommand>
-            </messages>
-        </help>
-        <export>
-            <description>
-                Экспортирует выбранный проект.
-            </description>
-            <param name="encoding">
-                \\t\\tЭкспортировать файлы с указанной кодировкой.
-            </param>
-            <param name="save-struct">
-                \\tСохранить структуру RubberDuck при экспорте проекта.
-            </param>
-            <param name="path">
-                \\t\\t\\tЭкспортировать в указанную папку.
-            </param>
-            <param name="no-clear">
-                \\t\\t\\tНе удалять файлы последнего экспорта.
-            </param>
-            <usage>
-                <item>
-                    [&lt;опции&gt;]
-                </item>
-            </usage>
-            <messages>
-                <exported>
-                    экспортировано модулей: {0}, за {2}\\nкорневая папка: {3}\\n
-                </exported>
-            </messages>
-        </export>
         <config>
             <description>
                 Управляет конфигурационным файлом ppm.
@@ -102,6 +36,72 @@
                 </deleted>
             </messages>
         </config>
+        <export>
+            <description>
+                Экспортирует выбранный проект.
+            </description>
+            <param name="encoding">
+                \\t\\tЭкспортировать файлы с указанной кодировкой.
+            </param>
+            <param name="save-struct">
+                \\tСохранить структуру RubberDuck при экспорте проекта.
+            </param>
+            <param name="path">
+                \\t\\t\\tЭкспортировать в указанную папку.
+            </param>
+            <param name="no-clear">
+                \\t\\t\\tНе удалять файлы последнего экспорта.
+            </param>
+            <usage>
+                <item>
+                    [&lt;опции&gt;]
+                </item>
+            </usage>
+            <messages>
+                <exported>
+                    экспортировано модулей: {0}, за {2}\\nкорневая папка: {3}\\n
+                </exported>
+            </messages>
+        </export>
+        <help>
+            <description>
+                Показывает справку о команде.
+            </description>
+            <usage>
+                <item>
+                    [&lt;команда&gt;]
+                </item>
+            </usage>
+            <messages>
+                <unknownCommand>
+                    ERR: Неизвестная команда {0}
+                </unknownCommand>
+            </messages>
+        </help>
+        <init>
+            <description>
+                Создает модуль package.
+            </description>
+            <param name="name">
+                \\t\\tУстановить имя проекта.
+            </param>
+            <param name="yes">
+                \\tПропустить диалог и установить значения по умолчанию.
+            </param>
+            <usage>
+                <item>
+                    &lt;имя пакета&gt;
+                </item>
+            </usage>
+            <messages>
+                <initialized>
+                    package инициализован за {0}
+                </initialized>
+                <exists>
+                    модуль уже существует
+                </exists>
+            </messages>
+        </init>
         <install>
             <description>
                 Устанавливает выбранные пакеты.
@@ -169,6 +169,24 @@
                 </published>
             </messages>
         </publish>
+        <sync>
+            <description>
+                Синхронизирует модули проекта с файлами из root папки.
+            </description>
+            <usage>
+                <item>
+                    [&lt;опции&gt;]
+                </item>
+            </usage>
+            <messages>
+                <synchronisation>
+                    синхронизация...
+                </synchronisation>
+                <synchronized>
+                    успешно синхронизировано модулей '{0}' за {1} 
+                </synchronized>
+            </messages>
+        </sync>
     </ppmCommands>
     <usage>Использование:</usage>
     <commands>Команды:</commands>
