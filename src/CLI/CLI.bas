@@ -113,20 +113,6 @@ Public Sub InitLang()
 End Sub
 
 Private Sub ShowVersion()
-    Dim Project As Project
-  #If DEV Then
-    Dim VBProject As VBProject
-  #Else
-    Dim VBProject As Object
-  #End If
-    For Each VBProject In Application.VBE.VBProjects
-        If PStrings.IsEqual(VBProject.Name, "PearPMProject") Then
-            Set Project = NewProject(VBProject)
-            Exit For
-        End If
-    Next
-
-    Dim Pack As Pack: Set Pack = NewPack(Project.GetComponent("package"))
-
+    Dim Pack As Pack: Set Pack = NewPack(ThisProject.GetComponent("package"))
     Immediate.WriteLine Pack.Version
 End Sub

@@ -97,7 +97,7 @@ End Function
 Public Sub ShowPPMInfo()
     CLI.Lang.SetBlock "/root"
 
-    Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
+    Dim Pack As Pack: Set Pack = NewPack(ThisProject.GetComponent("package"))
     Immediate.WriteLine PStrings.FString("Pear Package Manager, v{0}\\n", Pack.Version)
     Immediate.WriteLine CLI.Lang.GetValue("usage")
     Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("usageExample"))
