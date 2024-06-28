@@ -133,6 +133,12 @@
                 <invalidCheckSum>
                     ERR: некорректная контрольная сумма
                 </invalidCheckSum>
+                <wrongURL>
+                    ERR: неверно указан url реестра: {0}
+                </wrongURL>
+                <manifestNotFound>
+                    ERR: файл манифеста не найден для пакета: {0}
+                </manifestNotFound>
                 <installed>
                     успешно установлено пакетов: {0}, за {1}
                 </installed>

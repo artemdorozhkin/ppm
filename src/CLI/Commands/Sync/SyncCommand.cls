@@ -67,8 +67,15 @@ Private Sub ICommand_Exec()
 
         Dim CodePage As String: CodePage = Locale.GetAnsiCodePage()
         Dim LocalePath As String
-        LocalePath = FSO.BuildPath(FSO.GetParentFolderName(Path), PStrings.FString("{0}{1}.{2}", Name, CodePage, Ext))
-        PFileSystem.SaveToFile LocalePath, PFileSystem.ReadFile(Path), PStrings.FString("Windows-{0}", CodePage)
+        LocalePath = FSO.BuildPath( _
+            FSO.GetParentFolderName(Path), _
+            PStrings.FString("{0}{1}.{2}", Name, CodePage, Ext) _
+        )
+        PFileSystem.SaveToFile _
+            LocalePath, _
+            PFileSystem.ReadFile(Path), _
+            PStrings.FString("Windows-{0}", CodePage)
+
         If IsFalse(Module) And Not PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
             SelectedProject.ImportComponent LocalePath
         ElseIf IsFalse(Module) And PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then

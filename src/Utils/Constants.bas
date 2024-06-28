@@ -17,6 +17,7 @@ End Property
 
 Public Property Get ProjectConfigPath() As String
     On Error GoTo Catch
+    If IsFalse(Constants.ProjectPath) Then Exit Property
     ProjectConfigPath = GetConfigFilePathFromFolder(Constants.ProjectPath)
     On Error GoTo 0
 Exit Property
@@ -47,6 +48,7 @@ Public Property Get ProjectPath() As String
         ProjectsPath = .BuildPath(LocalPPMPath, "projects")
         Dim ProjectName As String
         ProjectName = .GetFileName(SelectedProject.Path)
+        If IsFalse(ProjectName) Then Exit Property
 
         Dim ProjectTimeStamp As String
         ProjectTimeStamp = Strings.Format( _

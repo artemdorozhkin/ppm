@@ -53,9 +53,9 @@ Private Sub ICommand_Exec()
     Dim ms As Double: ms = DateTime.Timer
 
     MoveProjectToPPM
-    Dim RootFolder As String: RootFolder = CreateExport()
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
     Pack.RenameComponent Pack.Name & "Package"
+    Dim RootFolder As String: RootFolder = CreateExport()
     SelectedProject.ExportComponent RootFolder, Pack.Component
     Pack.RenameComponent "package"
 
@@ -78,8 +78,7 @@ Private Sub ICommand_Exec()
 
     Dim Success As Boolean
     If ToLocal Then
-        PublishOnLocal Registry, ZipPath, Pack
-        Success = True
+        Success = PublishOnLocal(Registry, ZipPath, Pack)
     Else
         Dim Response As TResponse
         Response = PublishOnServer(Registry, ZipPath, Pack)

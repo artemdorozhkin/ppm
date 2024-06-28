@@ -12,11 +12,13 @@ Attribute VB_Exposed = False
 Option Explicit
 
 #If DEV Then
+  '@DefaultMember
   Public Property Get Items() As Dictionary
 Attribute Items.VB_UserMemId = 0
-'@DefaultMember
 #Else
+  '@DefaultMember
   Public Property Get Items() As Object
+Attribute Items.VB_UserMemId = 0
 #End If
   #If DEV Then
     Dim Buffer As Dictionary: Set Buffer = NewDictionary(VbCompareMethod.vbTextCompare)
