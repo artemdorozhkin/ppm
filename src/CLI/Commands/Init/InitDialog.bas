@@ -19,8 +19,10 @@ Public Sub Start()
 End Sub
 
 Public Sub Step2(Optional ByVal ProjectName As String)
-    If Strings.Len(PackInfo.Name) = 0 Then
+    If IsFalse(PackInfo.Name) And IsFalse(ProjectName) Then
         PackInfo.Name = GetOrDefault(ProjectName, "name")
+    ElseIf IsTrue(ProjectName) Then
+        PackInfo.Name = ProjectName
     End If
 
     Dim Default As String: Default = GetOrDefault("", "version")
