@@ -417,14 +417,30 @@ Public Sub ImportComponents(ByVal Path As String)
   #If DEV Then
     Dim Folder As Scripting.Folder: Set Folder = NewFolder(Path)
     Dim File As File
+    Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
     Dim Folder As Object: Set Folder = NewFolder(Path)
     Dim File As Object
+    Dim FSO As Object: Set FSO = NewFileSystemObject()
   #End If
     For Each File In Folder.Files
         On Error Resume Next
-        SelectedProject.ImportComponent File.Path
+        Dim Ext As String: Ext = FSO.GetExtensionName(File.Name)
+        Dim Name As String: Name = FSO.GetFileName(File.Name)
+        Dim CodePage As String: CodePage = Locale.GetAnsiCodePage()
+        Dim LocalePath As String
+        LocalePath = FSO.BuildPath( _
+            FSO.GetParentFolderName(File.Path), _
+            PStrings.FString("{0}{1}.{2}", Name, CodePage, Ext) _
+        )
+        PFileSystem.SaveToFile _
+            LocalePath, _
+            PFileSystem.ReadFile(Path), _
+            PStrings.FString("Windows-{0}", CodePage)
+
+        SelectedProject.ImportComponent LocalePath
         File.Delete Force:=True
+        FileSystem.Kill LocalePath
     Next
 End Sub
 
