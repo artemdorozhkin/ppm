@@ -133,6 +133,12 @@
                 <invalidCheckSum>
                     ERR: invalid check sum
                 </invalidCheckSum>
+                <wrongURL>
+                    ERR: wrong registry url: {0}
+                </wrongURL>
+                <manifestNotFound>
+                    ERR: manifest file not found for package: {0}
+                </manifestNotFound>
                 <installed>
                     successfully installed {0} packages in {1}
                 </installed>

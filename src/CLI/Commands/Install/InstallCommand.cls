@@ -60,7 +60,7 @@ Private Sub ICommand_Exec()
         End If
     End If
     Dim ms As Double: ms = DateTime.Timer
-    Immediate.WriteLine CLI.Lang.GetValue("messages/installling")
+    Immediate.WriteLine CLI.Lang.GetValue("messages/installing")
   #If DEV Then
     Dim Libs As Dictionary: Set Libs = Me.GetFlattedLibs()
   #Else
@@ -224,6 +224,12 @@ Public Function GetLocalLibPack(ByVal LibName As String, ByVal Version As String
     Dim ManifestPath As String
     ManifestPath = FSO.BuildPath(this.Registry, LibName)
     ManifestPath = FSO.BuildPath(ManifestPath, "manifest.json")
+    If Not FSO.FileExists(ManifestPath) Then
+        Information.Err.Raise _
+            76, _
+            Information.TypeName(Me), _
+            PStrings.FString(CLI.Lang.GetValue("messages/manifestNotFound"), LibName)
+    End If
 
     Dim JSONString As String: JSONString = PFileSystem.ReadFile(ManifestPath)
     Dim Manifest As Manifest: Set Manifest = NewManifest(JSONString)
@@ -244,7 +250,9 @@ Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As S
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Response As TResponse
+    On Error GoTo Catch
     Response = HTTP.GetRequest(URL)
+    On Error GoTo 0
     If Response.Code <> HTTPCodes.OK_200 Then
         Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
         Immediate.WriteLine Response.Text
@@ -252,6 +260,18 @@ Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As S
     End If
 
     Set GetLibPackFromServer = NewPack(PJSON.Parse(Response.Text))
+Exit Function
+
+Catch:
+    Const WRONG_URL_ERROR As Long = &H800C0005
+    If Information.Err.Number = WRONG_URL_ERROR Then
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/wrongURL"), URL)
+        End
+    Else
+        With Information.Err
+            .Raise .Number, .Source, .Description
+        End With
+    End If
 End Function
 
 #If DEV Then
