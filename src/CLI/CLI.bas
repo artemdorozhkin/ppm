@@ -103,11 +103,8 @@ End Function
 
 Public Sub InitLang()
     Dim Config As Config: Set Config = NewConfig(Definitions.Items)
-    Dim SelectedLang As Languages
-    Select Case Strings.LCase(Config.GetValue("language"))
-        Case "rus": SelectedLang = Languages.Russian
-        Case "eng": SelectedLang = Languages.English
-    End Select
+    Dim SelectedLang As String
+    SelectedLang = Strings.LCase(Config.GetValue("language"))
 
     Set this.Lang = NewLang(SelectedLang)
 End Sub

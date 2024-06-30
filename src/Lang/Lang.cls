@@ -18,7 +18,7 @@ End Type
 
 Private this As TLang
 
-Public Sub SetLang(ByVal Language As Languages)
+Public Sub SetLang(ByVal Language As String)
     ' Path name is ISO 639 language codes
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
@@ -29,12 +29,7 @@ Public Sub SetLang(ByVal Language As Languages)
     Dim Root As String: Root = FSO.BuildPath(Constants.GlobalPPMPath, "languages")
   #End If
 
-    Select Case Language
-        Case Languages.Russian
-            this.LangPath = FSO.BuildPath(Root, "rus.xml")
-        Case Languages.English
-            this.LangPath = FSO.BuildPath(Root, "eng.xml")
-    End Select
+    this.LangPath = FSO.BuildPath(Root, PStrings.FString("{0}.xml", Language))
 
     Set this.XML = CreateObject("MSXML2.DOMDocument.6.0")
     this.XML.Load this.LangPath
