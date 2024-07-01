@@ -83,8 +83,18 @@ End Function
 #Else
   Public Function ImportComponent(ByVal Path As String) As Object
 #End If
-    If Not IsValidType(Path) Then Information.Err.Raise 13, Information.TypeName(Me), "unsupproted type: '" & GetFileExt(Path) & "'"
-    If IsComponentExists(Path) Then Information.Err.Raise 58, Information.TypeName(Me), "this module already exists: '" & GetFileName(Path) & "'"
+    If Not IsValidType(Path) Then
+        Information.Err.Raise _
+            13, _
+            Information.TypeName(Me), _
+            "unsupproted type: '" & GetFileExt(Path) & "'"
+    End If
+    If IsComponentExists(Path) Then
+        Information.Err.Raise _
+            58, _
+            Information.TypeName(Me), _
+            "this module already exists: '" & GetFileName(Path) & "'"
+    End If
     Set ImportComponent = this.Project.VBComponents.Import(Path)
 End Function
 

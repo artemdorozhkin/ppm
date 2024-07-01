@@ -109,7 +109,10 @@ Private Function ParseValue() As Variant
             ParseValue = ParseLiteral()
 
         Case Else
-            Information.Err.Raise 5, "PJSON", PStrings.FString("Invalid character '{0}' in position {1}", Current, this.Position)
+            Information.Err.Raise _
+                5, _
+                "PJSON", _
+                PStrings.FString("Invalid character '{0}' in position {1}", Current, this.Position)
 
     End Select
 End Function
