@@ -47,9 +47,32 @@ Private Sub ICommand_Exec()
     Dim AfterDialog As Boolean: AfterDialog = this.Config.GetValue("_after-dialog")
     Dim SkipByDefault As Boolean: SkipByDefault = this.Config.GetValue("yes")
 
-    If Not AfterDialog Then InitDialog.SetDefault
-    If this.Tokens.IncludeTokenKind(TokenKind.Identifier) Then
-        InitDialog.SetNameAndDefault this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text
+    Dim Pack As Pack
+    If SelectedProject.IsComponentExists("package") Then
+        Set Pack = NewPack(SelectedProject.GetComponent("package"))
+    End If
+
+    Dim HaveProjectName As Boolean
+    HaveProjectName = this.Tokens.IncludeTokenKind(TokenKind.Identifier)
+    Dim InitialName As String
+    If HaveProjectName Then
+        InitialName = this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text
+    End If
+
+    If IsTrue(Pack) And Not AfterDialog Then
+        If Not HaveProjectName Then
+            InitialName = Pack.Name
+        End If
+        InitDialog.SetDefault _
+            Name:=InitialName, _
+            Version:=Pack.Version, _
+            Description:=Pack.Description, _
+            Author:=Pack.Author, _
+            GitURL:=Pack.Git
+    ElseIf Not AfterDialog Then
+        InitDialog.SetDefault
+    ElseIf HaveProjectName Then
+        InitDialog.SetNameAndDefault InitialName
     ElseIf Not SkipByDefault Then
         InitDialog.SetDefault
     End If
@@ -65,16 +88,17 @@ Private Sub ICommand_Exec()
 End Sub
 
 Public Sub CreatePack()
+  #If DEV Then
+    Dim PackComponent As VBComponent
+  #Else
+    Dim PackComponent As Object
+  #End If
     If SelectedProject.IsComponentExists("package") Then
-        Immediate.WriteLine CLI.Lang.GetValues("exists")
-        Exit Sub
+        Set PackComponent = SelectedProject.GetComponent("package")
+    Else
+        Set PackComponent = SelectedProject.AddComponent("package")
     End If
 
-  #If DEV Then
-    Dim PackComponent As VBComponent: Set PackComponent = SelectedProject.AddComponent("package")
-  #Else
-    Dim PackComponent As Object: Set PackComponent = SelectedProject.AddComponent("package")
-  #End If
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     JB.AddObject _
         "name", PackInfo.Name, _
@@ -82,6 +106,8 @@ Public Sub CreatePack()
         "description", PackInfo.Description, _
         "author", PackInfo.Author, _
         "git", PackInfo.GitURL
+
+    SelectedProject.Rename PackInfo.Name & "Project"
 
     With PackComponent.CodeModule
         .DeleteLines 1, .CountOfLines

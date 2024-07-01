@@ -53,6 +53,10 @@ Public Property Get Folder() As String
     Folder = NewFolder(this.FileName).Path
 End Property
 
+Public Sub Rename(ByVal Name As String)
+    this.Project.Name = Name
+End Sub
+
 #If DEV Then
   Public Property Set Project(ByVal RHS As VBProject)
 #Else
