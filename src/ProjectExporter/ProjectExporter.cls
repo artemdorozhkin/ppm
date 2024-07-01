@@ -270,8 +270,7 @@ Private Function SaveComponents(ByVal Encoding As String) As Variant
             SaveFolderPath = this.Destination
         Else
             Dim DirectoryPath As String
-            DirectoryPath = Strings.Split(ComponentKey, ":")(1)
-            DirectoryPath = Strings.Replace(DirectoryPath, SelectedProject.Name & ".", "", Count:=1)
+            DirectoryPath = Strings.Replace(NewModule(Component).Path, SelectedProject.Name & ".", "", Count:=1)
             DirectoryPath = Strings.Replace(DirectoryPath, SelectedProject.Name, "", Count:=1)
             DirectoryPath = Strings.Replace(DirectoryPath, ".", Application.PathSeparator)
             
