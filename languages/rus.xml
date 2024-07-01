@@ -58,6 +58,9 @@
                 </item>
             </usage>
             <messages>
+                <saveRequired>
+                    ERR: Необходимо сохранить проект перед экспортом.
+                </saveRequired>
                 <exported>
                     экспортировано модулей: {0}, за {2}\\nкорневая папка: {3}\\n
                 </exported>
@@ -185,6 +188,9 @@
                 </item>
             </usage>
             <messages>
+                <saveRequired>
+                    ERR: Проект не сохранялся.
+                </saveRequired>
                 <synchronisation>
                     синхронизация...
                 </synchronisation>

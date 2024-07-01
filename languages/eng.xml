@@ -58,6 +58,9 @@
                 </item>
             </usage>
             <messages>
+                <saveRequired>
+                    ERR: It is required to save the project before exporting.
+                </saveRequired>
                 <exported>
                     exported {0} module{1} in {2}\\nroot folder: {3}\\n
                 </exported>
@@ -185,6 +188,9 @@
                 </item>
             </usage>
             <messages>
+                <saveRequired>
+                    ERR: The project was not saved.
+                </saveRequired>
                 <synchronisation>
                     synchronisation...
                 </synchronisation>

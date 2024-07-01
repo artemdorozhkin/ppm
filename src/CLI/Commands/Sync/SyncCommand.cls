@@ -42,6 +42,11 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    If Not SelectedProject.IsSaved Then
+        Immediate.WriteLine CLI.Lang.GetValue("messages/saveRequired")
+        End
+    End If
+
     Dim ms As Double: ms = DateTime.Timer
 
     Immediate.WriteLine CLI.Lang.GetValue("messages/synchronisation")

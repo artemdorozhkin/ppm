@@ -23,6 +23,7 @@ Private Type TProject
   #Else
     Project As Object
   #End If
+  FileName As String
 End Type
 
 Private this As TProject
@@ -35,16 +36,21 @@ Private this As TProject
     Set Components = this.Project.VBComponents
 End Property
 
+Public Property Get IsSaved() As Boolean
+    On Error Resume Next
+    IsSaved = this.FileName <> ""
+End Property
+
 Public Property Get Name() As String
     Name = this.Project.Name
 End Property
 
 Public Property Get Path() As String
-    Path = this.Project.FileName
+    Path = this.FileName
 End Property
 
 Public Property Get Folder() As String
-    Folder = NewFolder(this.Project.FileName).Path
+    Folder = NewFolder(this.FileName).Path
 End Property
 
 #If DEV Then
@@ -53,6 +59,8 @@ End Property
   Public Property Set Project(ByVal RHS As Object)
 #End If
     Set this.Project = RHS
+    On Error Resume Next
+    this.FileName = this.Project.FileName
 End Property
 
 #If DEV Then

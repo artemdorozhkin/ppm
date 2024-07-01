@@ -16,19 +16,7 @@ Public Property Get LocalRegistryPath() As String
 End Property
 
 Public Property Get ProjectConfigPath() As String
-    On Error GoTo Catch
-    If IsFalse(Constants.ProjectPath) Then Exit Property
     ProjectConfigPath = GetConfigFilePathFromFolder(Constants.ProjectPath)
-    On Error GoTo 0
-Exit Property
-
-Catch:
-    If Information.Err.Number = 76 Then
-        Immediate.WriteLine "ERR: It is required to save the project before exporting."
-        End
-    Else
-        Information.Err.Raise Information.Err.Number, "Constants"
-    End If
 End Property
 
 Public Property Get UserConfigPath() As String
