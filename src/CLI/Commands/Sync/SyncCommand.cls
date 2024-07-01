@@ -55,9 +55,11 @@ Private Sub ICommand_Exec()
     ActivePaneName = Application.VBE.ActiveCodePane.CodeModule.Parent.Name
   #If DEV Then
     Dim SyncPaths As Dictionary: Set SyncPaths = NewDictionary()
+    Dim SyncNames As Dictionary: Set SyncNames = NewDictionary()
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
     Dim SyncPaths As Object: Set SyncPaths = NewDictionary()
+    Dim SyncNames As Object: Set SyncNames = NewDictionary()
     Dim FSO As Object: Set FSO = NewFileSystemObject()
   #End If
     Me.CollectPaths SelectedProject.Folder, SyncPaths
@@ -97,7 +99,21 @@ Private Sub ICommand_Exec()
             SelectedProject.ImportComponent LocalePath
             SelectedProject.RemoveComponent DelName
         End If
+        SyncNames.Add Name, True
         FileSystem.Kill LocalePath
+    Next
+
+  #If DEV Then
+    Dim Component As VBComponent
+    Dim Components As VBComponents: Set Components = SelectedProject.Components
+  #Else
+    Dim Component As Object
+    Dim Components As Object: Set Components = SelectedProject.Components
+  #End If
+    For Each Component In Components
+        If Not SyncNames.Exists(Component.Name) Then
+            Components.Remove Component
+        End If
     Next
 
     ms = DateTime.Timer - ms
@@ -110,11 +126,6 @@ Private Sub ICommand_Exec()
         Utils.ConvertTime(ms) _
     )
 
-  #If DEV Then
-    Dim Components As VBComponents: Set Components = SelectedProject.Components
-  #Else
-    Dim Components As Object: Set Components = SelectedProject.Components
-  #End If
     On Error Resume Next ' if this component was deleted
     Components(ActivePaneName).Activate
     On Error GoTo 0
