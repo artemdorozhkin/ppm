@@ -9,13 +9,6 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '@Folder "PearPMProject.src.Project"
 Option Explicit
-    
-Public Enum ModuleType
-    StdModule = 1
-    ClassModule
-    FormModule
-    DocModule = 100
-End Enum
 
 Private Type TProject
   #If DEV Then
@@ -23,7 +16,7 @@ Private Type TProject
   #Else
     Project As Object
   #End If
-  FileName As String
+    FileName As String
 End Type
 
 Private this As TProject
@@ -105,7 +98,7 @@ End Sub
 #Else
   Public Function ExportComponent(ByVal Folder As String, ByRef Component As Object) As String
 #End If
-    Dim Ext As String: Ext = GetComponentExt(Component)
+    Dim Ext As String: Ext = NewModule(Component).Ext
     Dim Path As String: Path = NewFileSystemObject().BuildPath(Folder, Component.Name & Ext)
     TrimCodeEnd Component
     Component.Export Path
@@ -129,20 +122,6 @@ End Function
 Private Function IsValidType(ByVal Path As String) As Boolean
     Dim Ext As String: Ext = Strings.LCase(GetFileExt(Path))
     IsValidType = Ext = ".bas" Or Ext = ".cls"
-End Function
-
-#If DEV Then
-  Private Function GetComponentExt(ByRef Component As VBComponent) As String
-#Else
-  Private Function GetComponentExt(ByRef Component As Object) As String
-#End If
-    Select Case Component.Type
-    Case ModuleType.StdModule: GetComponentExt = ".bas"
-    Case ModuleType.ClassModule: GetComponentExt = ".cls"
-    Case ModuleType.FormModule: GetComponentExt = ".frm"
-    Case ModuleType.DocModule: GetComponentExt = ".doccls"
-    Case Else: GetComponentExt = ".txt"
-    End Select
 End Function
 
 #If DEV Then

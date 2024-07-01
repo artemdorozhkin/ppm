@@ -49,11 +49,15 @@ Private Sub ICommand_Exec()
         End
     End If
 
+    Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
+    Dim PackRoot As String: PackRoot = Pack.Root
+    Immediate.WriteLine PStrings.FString("{0}@{1}", Pack.Name, Pack.Version)
     Immediate.WriteLine CLI.Lang.GetValue("messages/publishing")
     Dim ms As Double: ms = DateTime.Timer
 
-    MoveProjectToPPM
-    Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
+    PrintFilesList PackRoot
+
+    MoveProjectToPPM PackRoot, Pack.Name
     Pack.RenameComponent Pack.Name & "Package"
     Dim RootFolder As String: RootFolder = CreateExport()
     SelectedProject.ExportComponent RootFolder, Pack.Component
@@ -67,6 +71,8 @@ Private Sub ICommand_Exec()
     Zip.AddFolderContent RootFolder
     FileSystem.Kill RootFolder & "\*"
     FileSystem.RmDir RootFolder
+
+    PrintDetails Zip, Pack
 
     Dim ToLocal As Boolean: ToLocal = this.Config.GetValue("local")
     Dim Registry As String: Registry = this.Config.GetValue("registry")
@@ -86,8 +92,9 @@ Private Sub ICommand_Exec()
                   Response.Code = HTTPCodes.CREATED_201
     End If
 
-    MovePPMToProject
+    MovePPMToProject PackRoot, Pack.Name
 
+    Immediate.WriteLine
     If Success Then
         Immediate.WriteLine PStrings.FString( _
             CLI.Lang.GetValue("messages/published"), Pack.Name, Utils.ConvertTime(DateTime.Timer - ms) _
@@ -98,7 +105,7 @@ Private Sub ICommand_Exec()
     End If
 End Sub
 
-Public Sub MoveProjectToPPM()
+Public Sub MoveProjectToPPM(ByVal ProjectRoot As String, ByVal PackName As String)
   #If DEV Then
     Dim Component As VBComponent
   #Else
@@ -106,13 +113,13 @@ Public Sub MoveProjectToPPM()
   #End If
     For Each Component In SelectedProject.Components
         Dim Module As Module: Set Module = NewModule(Component)
-        If PStrings.StartsWith(Module.Path, SelectedProject.Name) Then
-            Module.Move "ppm-modules." & Strings.Replace(Module.Path, "Project", "", Count:=1)
+        If PStrings.StartsWith(Module.Path, ProjectRoot) Then
+            Module.Move "ppm-modules." & Strings.Replace(Module.Path, ProjectRoot, PackName, Count:=1)
         End If
     Next
 End Sub
 
-Public Sub MovePPMToProject()
+Public Sub MovePPMToProject(ByVal ProjectRoot As String, ByVal PackName As String)
   #If DEV Then
     Dim Component As VBComponent
   #Else
@@ -121,10 +128,8 @@ Public Sub MovePPMToProject()
     For Each Component In SelectedProject.Components
         Dim Module As Module: Set Module = NewModule(Component)
         If PStrings.StartsWith(Module.Path, "ppm-modules") Then
-            Dim PackageName As String
-            PackageName = Strings.Replace(SelectedProject.Name, "Project", "")
             Dim CorrectPath As String
-            CorrectPath = Strings.Replace(Module.Path, PackageName, SelectedProject.Name, Count:=1)
+            CorrectPath = Strings.Replace(Module.Path, PackName, ProjectRoot, Count:=1)
             CorrectPath = Strings.Replace(CorrectPath, "ppm-modules.", "")
             Module.Move CorrectPath
         End If
@@ -235,3 +240,32 @@ End Sub
 
     GetLatest = Latest
 End Function
+
+Public Sub PrintFilesList(ByVal ProjectRoot As String)
+    Immediate.WriteLine
+    Immediate.WriteLine CLI.Lang.GetValue("messages/filesToPublish")
+
+  #If DEV Then
+    Dim Component As VBComponent
+  #Else
+    Dim Component As Object
+  #End If
+    For Each Component In SelectedProject.Components
+        Dim Module As Module: Set Module = NewModule(Component)
+        If PStrings.StartsWith(Module.Path, ProjectRoot) Then
+            Dim Path As String
+            Path = Strings.Replace(Module.Path & "." & Module.Name, ProjectRoot, "")
+            Path = Strings.Replace(Path, ".", Application.PathSeparator)
+            Immediate.WriteLine Path & Module.Ext
+        End If
+    Next
+End Sub
+
+Public Sub PrintDetails(ByRef Zip As PZip, ByRef Pack As Pack)
+    Immediate.WriteLine CLI.Lang.GetValue("messages/packDetails/header")
+    Immediate.WriteLine CLI.Lang.GetValue("messages/packDetails/name") & Pack.Name
+    Immediate.WriteLine CLI.Lang.GetValue("messages/packDetails/version") & Pack.Version
+    Immediate.WriteLine CLI.Lang.GetValue("messages/packDetails/packSize") & Utils.SizeInStr(Zip.Size)
+    Immediate.WriteLine CLI.Lang.GetValue("messages/packDetails/unpackedSize") & Utils.SizeInStr(Zip.UnpackedSize)
+    Immediate.WriteLine CLI.Lang.GetValue("messages/packDetails/totalFiles") & Zip.FilesCount
+End Sub

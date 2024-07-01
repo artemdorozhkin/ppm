@@ -163,6 +163,29 @@
                 </item>
             </usage>
             <messages>
+                <filesToPublish>
+                    === File to publish ===
+                </filesToPublish>
+                <packDetails>
+                    <header>
+                        === Pack details ===
+                    </header>
+                    <name>
+                        name\\t\\t\\t
+                    </name>
+                    <version>
+                        version\\t\\t\\t
+                    </version>
+                    <packSize>
+                        pack size\\t\\t
+                    </packSize>
+                    <unpackedSize>
+                        unpacked size\\t
+                    </unpackedSize>
+                    <totalFiles>
+                        total files\\t\\t
+                    </totalFiles>
+                </packDetails>
                 <packageModuleNotFound>
                     ERR: package module not found\\nbefor publish the package you need to run ppm
                     "init"

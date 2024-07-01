@@ -46,6 +46,10 @@ End Property
     Set Component = this.Component
 End Property
 
+Public Property Get Root() As String
+    Root = NewModule(this.Component).Path
+End Property
+
 Public Property Get Version() As String
     Version = this.Pack("version")
 End Property

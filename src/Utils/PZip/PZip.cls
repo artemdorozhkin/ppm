@@ -19,6 +19,7 @@ Private Type TPZip
     Shell As Object
     Zip As Object
   #End If
+  Path As String
 End Type
 
 Private this As TPZip
@@ -27,11 +28,30 @@ Private Sub Class_Initialize()
     Set this.Shell = NewShell()
 End Sub
 
+Public Property Get Size() As Long
+    Size = FileSystem.FileLen(this.Path)
+End Property
+
+Public Property Get UnpackedSize() As Long
+    Dim Total As Long
+    Dim Item As Shell32.FolderItem
+    For Each Item In this.Zip.Items
+        Total = Total + Item.Size
+    Next
+
+    UnpackedSize = Total
+End Property
+
+Public Property Get FilesCount() As Long
+    FilesCount = this.Zip.Items.Count
+End Property
+
 Public Sub SetZip(ByVal ZipFilePath As String)
-    Set this.Zip = GetFolder(ZipFilePath)
+    this.Path = ZipFilePath
+    Set this.Zip = GetFolder(this.Path)
     If this.Zip Is Nothing Then
-        Me.Create ZipFilePath
-        Set this.Zip = GetFolder(ZipFilePath)
+        Me.Create this.Path
+        Set this.Zip = GetFolder(this.Path)
     End If
 End Sub
 

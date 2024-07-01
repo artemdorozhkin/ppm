@@ -2,6 +2,31 @@ Attribute VB_Name = "Utils"
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
+' R3uK: https://stackoverflow.com/a/39912842/21597893
+Public Function SizeInStr(ByVal Size_Bytes As Double) As String
+    Dim TS()
+    ReDim TS(4)
+    TS(0) = "b"
+    TS(1) = "kb"
+    TS(2) = "Mb"
+    TS(3) = "Gb"
+    TS(4) = "Tb"
+
+    Dim Size_Counter As Integer
+    Size_Counter = 0
+
+    If Size_Bytes <= 1 Then
+        Size_Counter = 1
+    Else
+        While Size_Bytes > 1
+            Size_Bytes = Size_Bytes / 1000
+            Size_Counter = Size_Counter + 1
+        Wend
+    End If
+
+    SizeInStr = Format(Size_Bytes * 1000, "##0.0#") & " " & TS(Size_Counter - 1)
+End Function
+
 Public Function CalculateFileCheckSum(ByVal Path As String) As String
     Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
     CalculateFileCheckSum = CalculateBytesCheckSum(Converter.FileToBytes(Path))

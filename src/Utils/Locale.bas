@@ -1,5 +1,5 @@
 Attribute VB_Name = "Locale"
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 #If VBA7 Then

@@ -163,6 +163,29 @@
                 </item>
             </usage>
             <messages>
+                <filesToPublish>
+                    === Файлы к публикации ===
+                </filesToPublish>
+                <packDetails>
+                    <header>
+                        === Детали пакета ===
+                    </header>
+                    <name>
+                        имя\\t\\t\\t\\t\\t\\t
+                    </name>
+                    <version>
+                        версия\\t\\t\\t\\t\\t
+                    </version>
+                    <packSize>
+                        размер\\t\\t\\t\\t\\t
+                    </packSize>
+                    <unpackedSize>
+                        в распакованном виде\\t
+                    </unpackedSize>
+                    <totalFiles>
+                        количество файлов\\t\\t
+                    </totalFiles>
+                </packDetails>
                 <packageModuleNotFound>
                     ERR: модуль package не найден\\nперед публикацией пакета необходимо запустить
                     ppm "init"

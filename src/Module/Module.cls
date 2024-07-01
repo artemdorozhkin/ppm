@@ -11,6 +11,13 @@ Attribute VB_Exposed = False
 '@Folder "PearPMProject.src.Module"
 Option Explicit
 
+Public Enum ModuleType
+    StdModule = 1
+    ClassModule
+    FormModule
+    DocModule = 100
+End Enum
+
 Private Type TModule
   #If DEV Then
     Item As VBComponent
@@ -23,6 +30,10 @@ Private this As TModule
 
 Public Property Get Path() As String
     Path = GetPath()
+End Property
+
+Public Property Get Ext() As String
+    Ext = GetComponentExt()
 End Property
 
 Public Property Get Name() As String
@@ -97,4 +108,18 @@ Private Function GetFolderAttributeLine() As Long
     Else
         GetFolderAttributeLine = -1
     End If
+End Function
+
+#If DEV Then
+  Private Function GetComponentExt() As String
+#Else
+  Private Function GetComponentExt() As String
+#End If
+    Select Case this.Item.Type
+    Case ModuleType.StdModule: GetComponentExt = ".bas"
+    Case ModuleType.ClassModule: GetComponentExt = ".cls"
+    Case ModuleType.FormModule: GetComponentExt = ".frm"
+    Case ModuleType.DocModule: GetComponentExt = ".doccls"
+    Case Else: GetComponentExt = ".txt"
+    End Select
 End Function
