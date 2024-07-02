@@ -15,6 +15,7 @@ Currently, `ppm` supports a few commands:
 - [`export`](#export): Exports modules to the project root folder.
 - [`sync`](#sync): Synchronises the project modules with the root folder.
 - [`config`](#config): Manages configurations.
+- [`version`](#version): Sets the new version of the package.
 - [`help`](#help): Provides usage assistance and descriptions for commands.
 
 ## Commands
@@ -226,7 +227,7 @@ Opens the config file for editing.
 
 ### version
 
-#### Использование:
+#### Usage:
 ppm "version \<new version | major | minor | patch\>"
 
 Sets the new version of the package.
