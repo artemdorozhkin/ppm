@@ -35,7 +35,7 @@ Creates a 'package' module with basic package information.
 -n|--name Sets the value for the project name.
 
 **Example**:
-```console
+```vb
 ppm "init -y"
 ```
 
@@ -53,7 +53,7 @@ ppm "init -y"
 ```
 
 **Example**:
-```console
+```vb
 ppm "init -n MyPack -y"
 ```
 
@@ -84,7 +84,7 @@ Uploads the project to the server or local registry.
 -r|--registry Specifies the registry path or URL.
 
 **Example**:
-```console
+```vb
 ppm "publish -l"
 ```
 
@@ -92,7 +92,7 @@ ppm "publish -l"
 Publishes the package to the local registry.
 
 **Example**:
-```console
+```vb
 ppm "publish -r http://example.com/registry"
 ```
 
@@ -111,7 +111,7 @@ Installs packages with dependencies into the project.
 -r|--registry Specifies the registry path or URL.
 
 **Example**:
-```console
+```vb
 ppm "install lodash"
 ```
 
@@ -119,7 +119,7 @@ ppm "install lodash"
 Installs the latest version of lodash from the default registry.
 
 **Example**:
-```console
+```vb
 ppm "install lodash@4.17.21 -l"
 ```
 
@@ -133,12 +133,12 @@ ppm "uninstall \[package\]"
 
 Removes packages with dependencies from the project if other packages do not use them.
 
-**Пример**:
-```console
+**Example**:
+```vb
 ppm "uninstall pstrings"
 ```
 
-**Результат**:
+**Result**:
 Removes the pstrings package from the project.
 
 ### export
@@ -158,7 +158,7 @@ Exports modules to the project root folder.
 --no-clear Does not delete files from the last export.
 
 **Example**:
-```console
+```vb
 ppm "export -p ./dist -e UTF-8"
 ```
 
@@ -173,7 +173,7 @@ ppm "sync"
 Synchronises the project modules with the root folder.
 
 #### Example:
-```console
+```vb
 ppm "sync"
 ```
 
@@ -193,7 +193,7 @@ Manages the ppm configuration file.
 -l|--location Specifies config location .
 
 **Example**:
-```console
+```vb
 ppm "config set key=value"
 ```
 
@@ -201,7 +201,7 @@ ppm "config set key=value"
 Sets the config value for the given key.
 
 **Example**:
-```console
+```vb
 ppm "config get key"
 ```
 
@@ -209,7 +209,7 @@ ppm "config get key"
 Gets the config value for the given key.
 
 **Example**:
-```console
+```vb
 ppm "config delete key"
 ```
 
@@ -217,12 +217,99 @@ ppm "config delete key"
 Deletes the config entry for the given key.
 
 **Example**:
-```console
+```vb
 ppm "config edit"
 ```
 
 **Result**:
 Opens the config file for editing.
+
+### version
+
+#### Использование:
+ppm "version \<new version | major | minor | patch\>"
+
+Sets the new version of the package.
+
+**Example**:
+```vb
+ppm "version 1.1.1"
+
+' Output: v1.1.1
+```
+
+**Result**:
+```json
+// package.bas
+'@Folder("PearPMProject")
+'{
+'  "name": "PearPM",
+'  "version": "1.1.1",
+'  "description": "",
+'  "author": "",
+'  "git": ""
+'}
+```
+
+**Example**:
+```vb
+ppm "version patch"
+
+' Output: v1.1.2
+```
+
+**Result**:
+```json
+// package.bas
+'@Folder("PearPMProject")
+'{
+'  "name": "PearPM",
+'  "version": "1.1.2",
+'  "description": "",
+'  "author": "",
+'  "git": ""
+'}
+```
+
+**Example**:
+```vb
+ppm "version minor"
+
+' Output: v1.2.0
+```
+
+**Result**:
+```json
+// package.bas
+'@Folder("PearPMProject")
+'{
+'  "name": "PearPM",
+'  "version": "1.2.0",
+'  "description": "",
+'  "author": "",
+'  "git": ""
+'}
+```
+
+**Example**:
+```vb
+ppm "version major"
+
+' Output: v2.0.0
+```
+
+**Result**:
+```json
+// package.bas
+'@Folder("PearPMProject")
+'{
+'  "name": "PearPM",
+'  "version": "2.0.0",
+'  "description": "",
+'  "author": "",
+'  "git": ""
+'}
+```
 
 ### help
 
@@ -232,7 +319,7 @@ ppm "help \[command\]"
 Provides usage assistance and descriptions for commands.
 
 #### Example:
-```console
+```vb
 ppm "help init"
 ```
 
@@ -240,7 +327,7 @@ ppm "help init"
 Shows information about the `init` command.
 
 **Generic Example**:
-```console
+```vb
 ppm "help"
 ```
 

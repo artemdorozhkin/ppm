@@ -15,6 +15,7 @@
 - [`export`](#export): Экспортирует модули в корневую папку проекта.
 - [`sync`](#sync): Синхронизирует модули проекта с корневой папкой.
 - [`config`](#config): Управляет настройками.
+- [`version`](#version): Устанавливает новую версию пакета.
 - [`help`](#help): Предоставляет справочную информацию и описания команд.
 
 ## Команды
@@ -34,7 +35,7 @@ ppm "init"
 -n|--name Устанавливает значение для названия проекта.
 
 **Пример**:
-```console
+```vb
 ppm "init -y"
 ```
 
@@ -52,14 +53,14 @@ ppm "init -y"
 ```
 
 **Пример**:
-```console
+```vb
 ppm "init -n MyPack -y"
 ```
 
 **Результат**:
 ```json
 // package.bas
-'@Folder("PearPMProject")
+'@Folder("MyPackProject")
 '{
 '  "name": "MyPack",
 '  "version": "1.0.0",
@@ -82,7 +83,7 @@ ppm "publish \[options\]"
 -r|--registry Указывает путь или URL реестра.
 
 **Пример**:
-```console
+```vb
 ppm "publish -l"
 ```
 
@@ -90,7 +91,7 @@ ppm "publish -l"
 Публикует пакет в локальном реестре.
 
 **Пример**:
-```console
+```vb
 ppm "publish -r http://example.com/registry"
 ```
 
@@ -110,7 +111,7 @@ ppm "install \[options\] \[package\[@version\]\]"
 -r|--registry Указывает путь или URL реестра.
 
 **Пример**:
-```console
+```vb
 ppm "install pstrings"
 ```
 
@@ -118,7 +119,7 @@ ppm "install pstrings"
 Устанавливает последнюю версию pstrings из реестра по умолчанию.
 
 **Пример**:
-```console
+```vb
 ppm "install pstrings@4.17.21 -l"
 ```
 
@@ -133,7 +134,7 @@ ppm "uninstall \[package\]"
 Удаляет пакеты с зависимостями из проекта, если они не используются другими пакетами.
 
 **Пример**:
-```console
+```vb
 ppm "uninstall pstrings"
 ```
 
@@ -157,7 +158,7 @@ ppm "export \[options\]"
 -nc|--no-clear Не удаляет файлы из последнего экспорта.
 
 **Пример**:
-```console
+```vb
 ppm "export -p ./dist -e UTF-8"
 ```
 
@@ -172,7 +173,7 @@ ppm "sync \[options\]"
 Синхронизирует модули проекта с корневой папкой.
 
 **Пример**:
-```console
+```vb
 ppm "sync"
 ```
 
@@ -192,7 +193,7 @@ ppm "config \<subcommand\> \[options\]"
 -l|--location Указывает расположение конфигурации.
 
 **Пример**:
-```console
+```vb
 ppm "config set key=value"
 ```
 
@@ -200,7 +201,7 @@ ppm "config set key=value"
 Устанавливает значение конфигурации для указанного ключа.
 
 **Пример**:
-```console
+```vb
 ppm "config get key"
 ```
 
@@ -208,7 +209,7 @@ ppm "config get key"
 Получает значение конфигурации для указанного ключа.
 
 **Пример**:
-```console
+```vb
 ppm "config delete key"
 ```
 
@@ -216,12 +217,99 @@ ppm "config delete key"
 Удаляет запись конфигурации для указанного ключа.
 
 **Пример**:
-```console
+```vb
 ppm "config edit"
 ```
 
 **Результат**:
 Открывает файл конфигурации для редактирования.
+
+### version
+
+#### Использование:
+ppm "version \<new version | major | minor | patch\>"
+
+Устанавливает новую версию пакета.
+
+**Пример**:
+```vb
+ppm "version 1.1.1"
+
+' Вывод: v1.1.1
+```
+
+**Результат**:
+```json
+// package.bas
+'@Folder("PearPMProject")
+'{
+'  "name": "PearPM",
+'  "version": "1.1.1",
+'  "description": "",
+'  "author": "",
+'  "git": ""
+'}
+```
+
+**Пример**:
+```vb
+ppm "version patch"
+
+' Вывод: v1.1.2
+```
+
+**Результат**:
+```json
+// package.bas
+'@Folder("PearPMProject")
+'{
+'  "name": "PearPM",
+'  "version": "1.1.2",
+'  "description": "",
+'  "author": "",
+'  "git": ""
+'}
+```
+
+**Пример**:
+```vb
+ppm "version minor"
+
+' Вывод: v1.2.0
+```
+
+**Результат**:
+```json
+// package.bas
+'@Folder("PearPMProject")
+'{
+'  "name": "PearPM",
+'  "version": "1.2.0",
+'  "description": "",
+'  "author": "",
+'  "git": ""
+'}
+```
+
+**Пример**:
+```vb
+ppm "version major"
+
+' Вывод: v2.0.0
+```
+
+**Результат**:
+```json
+// package.bas
+'@Folder("PearPMProject")
+'{
+'  "name": "PearPM",
+'  "version": "2.0.0",
+'  "description": "",
+'  "author": "",
+'  "git": ""
+'}
+```
 
 ### help
 
@@ -231,7 +319,7 @@ ppm "help \[command\]"
 Предоставляет справочную информацию и описания команд.
 
 #### Пример:
-```console
+```vb
 ppm "help init"
 ```
 
@@ -239,7 +327,7 @@ ppm "help init"
 Показывает информацию о команде `init`.
 
 **Общий пример**:
-```console
+```vb
 ppm "help"
 ```
 

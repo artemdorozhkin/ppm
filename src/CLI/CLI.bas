@@ -21,7 +21,8 @@ Public Property Get Commands() As Variant
         "install", _
         "publish", _
         "sync", _
-        "uninstall" _
+        "uninstall", _
+        "version" _
     )
 End Property
 
@@ -31,7 +32,10 @@ Public Property Get SubCommands() As Variant
         "set", _
         "delete", _
         "list", _
-        "edit" _
+        "edit", _
+        "major", _
+        "minor", _
+        "patch" _
     )
 End Property
 

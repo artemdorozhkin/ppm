@@ -243,6 +243,21 @@
                 </uninstalled>
             </messages>
         </uninstall>
+        <version>
+            <description>
+                Sets the new version of the package.
+            </description>
+            <usage>
+                <item>
+                    &lt;new version| major | minor | patch&gt;
+                </item>
+            </usage>
+            <messages>
+                <incorrectSyntax>
+                    ERR: version must be specified in semantic versioning format (major.minor.patch - 1.2.3)
+                </incorrectSyntax>
+            </messages>
+        </version>
     </ppmCommands>
     <usage>Usage:</usage>
     <commands>Commands:</commands>

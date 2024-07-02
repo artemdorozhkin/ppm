@@ -243,6 +243,21 @@
                 </uninstalled>
             </messages>
         </uninstall>
+        <version>
+            <description>
+                Устанавливает новую версию пакета.
+            </description>
+            <usage>
+                <item>
+                    &lt;новая версия | major | minor | patch&gt;
+                </item>
+            </usage>
+            <messages>
+                <incorrectSyntax>
+                    ERR: версия должна быть указана в формате семантического версионирования (major.minor.patch - 1.2.3) 
+                </incorrectSyntax>
+            </messages>
+        </version>
     </ppmCommands>
     <usage>Использование:</usage>
     <commands>Команды:</commands>
