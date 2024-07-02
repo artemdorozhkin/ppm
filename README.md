@@ -118,19 +118,19 @@ Installs packages with dependencies into the project.
 
 **Example**:
 ```vb
-ppm "install lodash"
+ppm "install pstrings"
 ```
 
 **Result**:
-Installs the latest version of lodash from the default registry.
+Installs the latest version of pstrings from the default registry.
 
 **Example**:
 ```vb
-ppm "install lodash@4.17.21 -l"
+ppm "install pstrings@4.17.21 -l"
 ```
 
 **Result**:
-Installs version 4.17.21 of lodash from the local registry.
+Installs version 4.17.21 of pstrings from the local registry.
 
 ### uninstall
 [`#commands list`](#commands-list)
