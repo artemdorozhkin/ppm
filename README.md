@@ -11,6 +11,7 @@ Currently, `ppm` supports a few commands:
 - [`init`](#init): Initialises the package.
 - [`publish`](#publish): Uploads the project to the server or local registry.
 - [`install`](#install): Installs packages with dependencies into the project.
+- [`uninstall`](#uninstall): Removes packages with dependencies from the project if other packages do not use them..
 - [`export`](#export): Exports modules to the project root folder.
 - [`sync`](#sync): Synchronises the project modules with the root folder.
 - [`config`](#config): Manages configurations.
@@ -124,6 +125,21 @@ ppm "install lodash@4.17.21 -l"
 
 **Result**:
 Installs version 4.17.21 of lodash from the local registry.
+
+### uninstall
+
+#### Usage:
+ppm "uninstall \[package\]"
+
+Removes packages with dependencies from the project if other packages do not use them.
+
+**Пример**:
+```console
+ppm "uninstall pstrings"
+```
+
+**Результат**:
+Removes the pstrings package from the project.
 
 ### export
 

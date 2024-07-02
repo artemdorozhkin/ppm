@@ -222,6 +222,27 @@
                 </synchronised>
             </messages>
         </sync>
+        <uninstall>
+            <description>
+                Удаляет пакеты с зависимостями из проекта, если они не используются другими пакетами.
+            </description>
+            <usage>
+                <item>
+                    [&lt;пакеты&gt;]
+                </item>
+            </usage>
+            <messages>
+                <uninstalling>
+                    удаление...
+                </uninstalling>
+                <cantRemoveUsingDependencies>
+                    ERR: невозможно удалить зависимости, которые используются другими пакетами 
+                </cantRemoveUsingDependencies>
+                <uninstalled>
+                    успешно удалено пакетов: {0}, за {1}
+                </uninstalled>
+            </messages>
+        </uninstall>
     </ppmCommands>
     <usage>Использование:</usage>
     <commands>Команды:</commands>

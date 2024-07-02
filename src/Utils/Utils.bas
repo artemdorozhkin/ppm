@@ -2,6 +2,32 @@ Attribute VB_Name = "Utils"
 '@Folder "PearPMProject.src.Utils"
 Option Explicit
 
+#If DEV Then
+  Public Function ChangeDictionaryCompareMode( _
+      ByRef Dictionary As Dictionary, _
+      ByVal CompareMethod As VbCompareMethod _
+  ) As Dictionary
+#Else
+  Public Function ChangeDictionaryCompareMode( _
+      ByRef Dictionary As Object, _
+      ByVal CompareMethod As VbCompareMethod _
+  ) As Object
+#End If
+  #If DEV Then
+    Dim Buffer As Dictionary: Set Buffer = NewDictionary()
+  #Else
+    Dim Buffer As Object: Set Buffer = NewDictionary()
+  #End If
+    Buffer.CompareMode = CompareMethod
+
+    Dim Key As Variant
+    For Each Key In Dictionary
+        Buffer.Add Key, Dictionary(Key)
+    Next
+
+    Set ChangeDictionaryCompareMode = Buffer
+End Function
+
 ' R3uK: https://stackoverflow.com/a/39912842/21597893
 Public Function SizeInStr(ByVal Size_Bytes As Double) As String
     Dim TS()

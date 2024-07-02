@@ -70,11 +70,17 @@ End Property
 End Function
 
 #If DEV Then
-  Public Function AddComponent(ByVal Name As String) As VBComponent
+  Public Function AddComponent( _
+      ByVal Name As String, _
+      Optional ByVal Kind As ModuleType = ModuleType.StdModule _
+  ) As VBComponent
 #Else
-  Public Function AddComponent(ByVal Name As String) As Object
+  Public Function AddComponent( _
+      ByVal Name As String, _
+      Optional ByVal Kind As ModuleType = ModuleType.StdModule _
+  ) As Object
 #End If
-    Set AddComponent = this.Project.VBComponents.Add(ModuleType.StdModule)
+    Set AddComponent = this.Project.VBComponents.Add(Kind)
     AddComponent.Name = Name
 End Function
 
@@ -131,7 +137,7 @@ End Function
 
 Private Function IsValidType(ByVal Path As String) As Boolean
     Dim Ext As String: Ext = Strings.LCase(GetFileExt(Path))
-    IsValidType = Ext = ".bas" Or Ext = ".cls" Or Ext = ".frm" Or Ext = ".doccls"
+    IsValidType = Ext = ".bas" Or Ext = ".cls" Or Ext = ".frm"
 End Function
 
 #If DEV Then

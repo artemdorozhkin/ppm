@@ -110,6 +110,12 @@ End Property
     Next
     Code = Strings.Join(PCollection.ToArray(Lines), vbNewLine)
     Set this.Pack = PJSON.Parse(Utils.UncommentString(Code))
+    If this.Pack.Exists("dependencies") Then
+        Set this.Pack("dependencies") = Utils.ChangeDictionaryCompareMode( _
+            this.Pack("dependencies"), _
+            VbCompareMethod.vbTextCompare _
+        )
+    End If
     Set Read = Me
 End Function
 

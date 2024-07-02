@@ -59,7 +59,7 @@ Public Sub Unzip(ByVal ToPath As String)
     If this.Zip.Items.Count = 0 Then Exit Sub
 
   #If DEV Then
-    Dim DestinationFolder As Scripting.Folder: Set DestinationFolder = GetFolder(ToPath)
+    Dim DestinationFolder As Shell32.Folder: Set DestinationFolder = GetFolder(ToPath)
   #Else
     Dim DestinationFolder As Object: Set DestinationFolder = GetFolder(ToPath)
   #End If

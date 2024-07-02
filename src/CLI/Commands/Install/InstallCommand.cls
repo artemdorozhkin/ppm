@@ -426,7 +426,7 @@ Public Sub ImportComponents(ByVal Path As String)
     For Each File In Folder.Files
         On Error Resume Next
         Dim Ext As String: Ext = FSO.GetExtensionName(File.Name)
-        Dim Name As String: Name = FSO.GetFileName(File.Name)
+        Dim Name As String: Name = FSO.GetBaseName(File.Name)
         Dim CodePage As String: CodePage = Locale.GetAnsiCodePage()
         Dim LocalePath As String
         LocalePath = FSO.BuildPath( _
@@ -435,7 +435,7 @@ Public Sub ImportComponents(ByVal Path As String)
         )
         PFileSystem.SaveToFile _
             LocalePath, _
-            PFileSystem.ReadFile(Path), _
+            PFileSystem.ReadFile(File.Path), _
             PStrings.FString("Windows-{0}", CodePage)
 
         SelectedProject.ImportComponent LocalePath

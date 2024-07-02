@@ -20,7 +20,8 @@ Public Property Get Commands() As Variant
         "init", _
         "install", _
         "publish", _
-        "sync" _
+        "sync", _
+        "uninstall" _
     )
 End Property
 
@@ -58,7 +59,10 @@ End Property
     Buffer("cfg") = "config"
 
     Buffer("ls") = "list"
-    Buffer("rm") = "delete"
+
+    Buffer("load") = "sync"
+
+    Buffer("rm") = "uninstall"
 
     Set Aliases = Buffer
 End Property

@@ -222,6 +222,27 @@
                 </synchronised>
             </messages>
         </sync>
+        <uninstall>
+            <description>
+                Removes packages with dependencies from the project if other packages do not use them.
+            </description>
+            <usage>
+                <item>
+                    [&lt;some package&gt;]
+                </item>
+            </usage>
+            <messages>
+                <uninstalling>
+                    uninstalling...
+                </uninstalling>
+                <cantRemoveUsingDependencies>
+                    ERR: it is not possible to remove dependencies that are used by other packages 
+                </cantRemoveUsingDependencies>
+                <uninstalled>
+                    successfully uninstalled {0} packages in {1}
+                </uninstalled>
+            </messages>
+        </uninstall>
     </ppmCommands>
     <usage>Usage:</usage>
     <commands>Commands:</commands>
