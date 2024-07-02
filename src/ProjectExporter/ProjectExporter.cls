@@ -170,7 +170,7 @@ End Sub
   #End If
     For Each Component In SelectedProject.Components
         Dim Directory As String
-        Directory = GetDirectory(Component.CodeModule)
+        Directory = NewModule(Component).Path
         If IsExportingFolder(Directory) Then
             Set Components(Component.Name) = Component
         End If
@@ -193,7 +193,7 @@ End Function
   #End If
     For Each Component In SelectedProject.Components
         Dim Directory As String
-        Directory = GetDirectory(Component.CodeModule)
+        Directory = NewModule(Component).Path
         If IsExportingFolder(Directory) Then
             Dim ComponentKey As String
             ComponentKey = PStrings.FString("{0}:{1}", Component.Name, Directory)
@@ -219,37 +219,6 @@ Private Function IsExportingFolder(ByVal Directory As String) As Boolean
     Next
 End Function
 
-#If DEV Then
-  Private Function GetDirectory(ByRef Code As CodeModule) As String
-#Else
-  Private Function GetDirectory(ByRef Code As Object) As String
-#End If
-    If Code.CountOfDeclarationLines = 0 Then Exit Function
-    Dim Lines As Variant: Lines = Strings.Split(Code.Lines(1, Code.CountOfDeclarationLines), vbNewLine)
-
-    Dim Line As Variant
-    For Each Line In Lines
-        Dim i As Long
-        i = PStrings.GetIndexOfChar(Line, "'")
-        If i = -1 Then GoTo Continue
-
-        i = PStrings.GetIndexOfChar(Line, "@", i)
-        If i = -1 Then GoTo Continue
-
-        If Not PStrings.Contains(Strings.Mid(Line, i), "Folder") Then GoTo Continue
-        i = PStrings.GetIndexOfChar(Line, """", i)
-        If i = -1 Then GoTo Continue
-
-        Dim j As Long
-        j = PStrings.GetIndexOfChar(Strings.StrReverse(Line), """")
-        j = Strings.Len(Line) - j + 1
-        If j = i Then GoTo Continue
-
-        GetDirectory = Strings.Mid(Line, i + 1, j - i - 1)
-Continue:
-    Next
-End Function
-
 Private Function SaveComponents(ByVal Encoding As String) As Variant
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
@@ -270,10 +239,10 @@ Private Function SaveComponents(ByVal Encoding As String) As Variant
             SaveFolderPath = this.Destination
         Else
             Dim DirectoryPath As String
-            DirectoryPath = Strings.Replace(NewModule(Component).Path, SelectedProject.Name & ".", "", Count:=1)
+            DirectoryPath = Strings.Replace(ComponentKey, SelectedProject.Name & ".", "", Count:=1)
             DirectoryPath = Strings.Replace(DirectoryPath, SelectedProject.Name, "", Count:=1)
             DirectoryPath = Strings.Replace(DirectoryPath, ".", Application.PathSeparator)
-            
+
             SaveFolderPath = FSO.BuildPath(this.Destination, DirectoryPath)
             If Not FSO.FolderExists(SaveFolderPath) Then PFileSystem.CreateFolder SaveFolderPath, Recoursive:=True
         End If

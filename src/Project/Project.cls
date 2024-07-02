@@ -131,7 +131,7 @@ End Function
 
 Private Function IsValidType(ByVal Path As String) As Boolean
     Dim Ext As String: Ext = Strings.LCase(GetFileExt(Path))
-    IsValidType = Ext = ".bas" Or Ext = ".cls"
+    IsValidType = Ext = ".bas" Or Ext = ".cls" Or Ext = ".frm" Or Ext = ".doccls"
 End Function
 
 #If DEV Then
