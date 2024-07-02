@@ -4,7 +4,7 @@
 
 `ppm` is a package manager developed for VBA and with VBA, providing a command-line interface (CLI-like) through the Immediate Window in the VBA IDE. It's created to help developers manage their VBA projects by organizing code, dependencies, and facilitating common tasks.
 
-## Features
+## Commands list
 
 Currently, `ppm` supports a few commands:
 
@@ -21,6 +21,7 @@ Currently, `ppm` supports a few commands:
 ## Commands
 
 ### init
+[`#commands list`](#commands-list)
 
 #### Usage:
 ppm "init \[options\]"
@@ -73,6 +74,8 @@ ppm "init -n MyPack -y"
 
 
 ### publish
+[`#commands list`](#commands-list)
+
 
 #### Usage:
 ppm "publish \[options\]"
@@ -101,6 +104,8 @@ ppm "publish -r http://example.com/registry"
 Publishes the package to the specified registry URL.
 
 ### install
+[`#commands list`](#commands-list)
+
 
 #### Usage:
 ppm "install \[options\] \[package\[@version\]\]"
@@ -128,6 +133,8 @@ ppm "install lodash@4.17.21 -l"
 Installs version 4.17.21 of lodash from the local registry.
 
 ### uninstall
+[`#commands list`](#commands-list)
+
 
 #### Usage:
 ppm "uninstall \[package\]"
@@ -143,6 +150,8 @@ ppm "uninstall pstrings"
 Removes the pstrings package from the project.
 
 ### export
+[`#commands list`](#commands-list)
+
 
 #### Usage:
 ppm "export \[options\]"
@@ -167,6 +176,8 @@ ppm "export -p ./dist -e UTF-8"
 Exports project files to the './dist' directory with UTF-8 encoding.
 
 ### sync
+[`#commands list`](#commands-list)
+
 
 #### Usage:
 ppm "sync"
@@ -182,6 +193,8 @@ ppm "sync"
 Synchronises all the project modules with files from the root folder.
 
 ### config
+[`#commands list`](#commands-list)
+
 
 #### Usage:
 ppm "config \<subcommand\> \[options\]"
@@ -226,6 +239,8 @@ ppm "config edit"
 Opens the config file for editing.
 
 ### version
+[`#commands list`](#commands-list)
+
 
 #### Usage:
 ppm "version \<new version | major | minor | patch\>"
@@ -313,6 +328,8 @@ ppm "version major"
 ```
 
 ### help
+[`#commands list`](#commands-list)
+
 
 #### Usage:
 ppm "help \[command\]"
