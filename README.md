@@ -2,6 +2,8 @@
 
 \[eng\]\[[rus](README_ru.md)\]
 
+![GitHub-Mark-Light](./assets/white.jpg#gh-light-mode-only)![GitHub-Mark-Dark](./assets/black.jpg#gh-dark-mode-only)
+
 `ppm` is a package manager developed for VBA and with VBA, providing a command-line interface (CLI-like) through the Immediate Window in the VBA IDE. It's created to help developers manage their VBA projects by organizing code, dependencies, and facilitating common tasks.
 
 ## Commands list
