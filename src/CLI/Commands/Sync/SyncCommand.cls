@@ -83,21 +83,25 @@ Private Sub ICommand_Exec()
             PFileSystem.ReadFile(Path), _
             PStrings.FString("Windows-{0}", CodePage)
 
-        If IsFalse(Module) And Not PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
+        If IsFalse(Module.Item) And Not PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
             SelectedProject.ImportComponent LocalePath
-        ElseIf IsFalse(Module) And PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
+        ElseIf IsFalse(Module.Item) And PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
             ' TODO: need logic for creation the sheet and paste the code
             Information.Err.Raise 5, Information.TypeName(Me), "Non implemented"
-        ElseIf IsFalse(Module) Then
+        ElseIf IsFalse(Module.Item) Then
             SelectedProject.ImportComponent LocalePath
-        ElseIf IsTrue(Module) And PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
+        ElseIf IsTrue(Module.Item) And PStrings.IsEqual(Ext, "doccls", vbTextCompare) Then
             Module.Code = Code
         Else
-            Const MAX_NAME_LEN As Integer = 31
-            Dim DelName As String: DelName = Strings.Left("d" & Name, MAX_NAME_LEN)
-            Module.Name = DelName
-            SelectedProject.ImportComponent LocalePath
-            SelectedProject.RemoveComponent DelName
+            If Module.Kind = ModuleType.FormModule Then
+                SelectedProject.RemoveComponent Name
+                SelectedProject.ImportComponent LocalePath
+            Else
+                Dim DelName As String: DelName = Strings.Left("PPMToDelete_" & SyncNames.Count)
+                Module.Name = DelName
+                SelectedProject.ImportComponent LocalePath
+                SelectedProject.RemoveComponent DelName
+            End If
         End If
         SyncNames.Add Name, True
         FileSystem.Kill LocalePath
@@ -111,7 +115,8 @@ Private Sub ICommand_Exec()
     Dim Components As Object: Set Components = SelectedProject.Components
   #End If
     For Each Component In Components
-        If Not SyncNames.Exists(Component.Name) Then
+        If Not SyncNames.Exists(Component.Name) _
+        Or PStrings.StartsWith(Component.Name, "PPMToDelete_") Then
             Components.Remove Component
         End If
     Next
