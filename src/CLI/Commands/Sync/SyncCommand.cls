@@ -97,7 +97,7 @@ Private Sub ICommand_Exec()
                 SelectedProject.RemoveComponent Name
                 SelectedProject.ImportComponent LocalePath
             Else
-                Dim DelName As String: DelName = Strings.Left("PPMToDelete_" & SyncNames.Count)
+                Dim DelName As String: DelName = "PPMToDelete_" & SyncNames.Count
                 Module.Name = DelName
                 SelectedProject.ImportComponent LocalePath
                 SelectedProject.RemoveComponent DelName
