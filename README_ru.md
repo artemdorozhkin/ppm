@@ -4,6 +4,8 @@
 
 ![GitHub-Mark-Light](./assets/white.jpg#gh-light-mode-only)![GitHub-Mark-Dark](./assets/black.jpg#gh-dark-mode-only)
 
+[Подарить мне кофеек](https://donate.stream/donate_668a7791e2948)
+
 `ppm` - это менеджер пакетов, разработанный для VBA и на VBA, предоставляющий CLI-подобный интерфейс через Immediate Window в VBA IDE. Он создан, чтобы помочь разработчикам управлять своими VBA-проектами, упорядочивая код, зависимости и облегчая выполнение общих задач.
 
 ## Список команд
