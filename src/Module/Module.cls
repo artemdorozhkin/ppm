@@ -75,7 +75,10 @@ End Property
 
 Public Sub Move(ByVal ToPath As String)
     Dim FromPath As String: FromPath = GetPath()
-    If Strings.Len(FromPath) = 0 Then Exit Sub
+    If Strings.Len(FromPath) = 0 Then
+        AddPath Path:=ToPath
+        Exit Sub
+    End If
 
     Dim FolderLine As Long: FolderLine = GetFolderAttributeLine()
     If FolderLine = -1 Then Exit Sub
@@ -109,6 +112,13 @@ Private Function GetFolderAttributeLine() As Long
         GetFolderAttributeLine = -1
     End If
 End Function
+
+Private Sub AddPath(ByVal Path As String)
+    Dim FolderPath As String
+    FolderPath = PStrings.FString("'@Folder ""{0}""", Path)
+
+    this.Item.CodeModule.InsertLines Line:=1, String:=FolderPath
+End Sub
 
 #If DEV Then
   Private Function GetComponentExt() As String

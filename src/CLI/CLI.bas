@@ -19,6 +19,7 @@ Public Property Get Commands() As Variant
         "help", _
         "init", _
         "install", _
+        "module", _
         "publish", _
         "sync", _
         "uninstall", _
@@ -28,14 +29,15 @@ End Property
 
 Public Property Get SubCommands() As Variant
     SubCommands = Array( _
-        "get", _
-        "set", _
         "delete", _
-        "list", _
         "edit", _
+        "get", _
+        "list", _
         "major", _
         "minor", _
-        "patch" _
+        "move", _
+        "patch", _
+        "set" _
     )
 End Property
 
@@ -50,8 +52,8 @@ End Property
     Dim Buffer As Object: Set Buffer = NewDictionary(VbCompareMethod.vbTextCompare)
   #End If
 
-    Buffer("i") = "install"
-    Buffer("add") = "install"
+    Buffer("c") = "config"
+    Buffer("cfg") = "config"
 
     Buffer("exp") = "export"
     Buffer("save") = "export"
@@ -59,10 +61,14 @@ End Property
     Buffer("create") = "init"
     Buffer("new") = "init"
 
-    Buffer("c") = "config"
-    Buffer("cfg") = "config"
+    Buffer("i") = "install"
+    Buffer("add") = "install"
 
     Buffer("ls") = "list"
+
+    Buffer("m") = "module"
+    Buffer("bas") = "module"
+    Buffer("mv") = "move"
 
     Buffer("load") = "sync"
 

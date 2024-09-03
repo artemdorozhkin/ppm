@@ -147,6 +147,37 @@
                 </installed>
             </messages>
         </install>
+        <module>
+            <description>
+                Управляет модулями проекта (.bas).
+            </description>
+            <usage>
+                <item>
+                    &lt;путь&gt;
+                    add &lt;путь&gt;
+                </item>
+                <item>
+                    move &lt;путь&gt;
+                </item>
+                <item>
+                    delete &lt;путь&gt;
+                </item>
+            </usage>
+            <messages>
+                <moduleNotExists>
+                    Модуль не существует: {0}
+                </moduleNotExists>
+                <moduleDeleted>
+                    Модуль удален: {0}
+                </moduleDeleted>
+                <moduleMoved>
+                    Модуль перемещен: {0}
+                </moduleMoved>
+                <moduleAdded>
+                    Модуль добавлен: {0}
+                </moduleAdded>
+            </messages>
+        </module>
         <publish>
             <description>
                 Публикует пакет на сервер или локально.
@@ -218,13 +249,14 @@
                     синхронизация...
                 </synchronisation>
                 <synchronised>
-                    успешно синхронизировано модулей: {0}, за {1} 
+                    успешно синхронизировано модулей: {0}, за {1}
                 </synchronised>
             </messages>
         </sync>
         <uninstall>
             <description>
-                Удаляет пакеты с зависимостями из проекта, если они не используются другими пакетами.
+                Удаляет пакеты с зависимостями из проекта, если они не используются другими
+                пакетами.
             </description>
             <usage>
                 <item>
@@ -236,7 +268,7 @@
                     удаление...
                 </uninstalling>
                 <cantRemoveUsingDependencies>
-                    ERR: невозможно удалить зависимости, которые используются другими пакетами 
+                    ERR: невозможно удалить зависимости, которые используются другими пакетами
                 </cantRemoveUsingDependencies>
                 <uninstalled>
                     успешно удалено пакетов: {0}, за {1}
@@ -254,7 +286,8 @@
             </usage>
             <messages>
                 <incorrectSyntax>
-                    ERR: версия должна быть указана в формате семантического версионирования (major.minor.patch - 1.2.3) 
+                    ERR: версия должна быть указана в формате семантического версионирования
+                    (major.minor.patch - 1.2.3)
                 </incorrectSyntax>
             </messages>
         </version>

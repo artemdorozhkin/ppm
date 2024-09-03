@@ -147,6 +147,37 @@
                 </installed>
             </messages>
         </install>
+        <module>
+            <description>
+                Manages the project modules (.bas).
+            </description>
+            <usage>
+                <item>
+                    &lt;path&gt;
+                    add &lt;path&gt;
+                </item>
+                <item>
+                    move &lt;path&gt;
+                </item>
+                <item>
+                    delete &lt;path&gt;
+                </item>
+            </usage>
+            <messages>
+                <moduleNotExists>
+                    Module not exists: {0}
+                </moduleNotExists>
+                <moduleDeleted>
+                    Module deleted: {0}
+                </moduleDeleted>
+                <moduleMoved>
+                    Module moved: {0}
+                </moduleMoved>
+                <moduleAdded>
+                    Module added: {0}
+                </moduleAdded>
+            </messages>
+        </module>
         <publish>
             <description>
                 Publishes the package to the server or locally.
@@ -218,13 +249,14 @@
                     synchronisation...
                 </synchronisation>
                 <synchronised>
-                    successfully synchronised {0} modules in {1} 
+                    successfully synchronised {0} modules in {1}
                 </synchronised>
             </messages>
         </sync>
         <uninstall>
             <description>
-                Removes packages with dependencies from the project if other packages do not use them.
+                Removes packages with dependencies from the project if other packages do not use
+                them.
             </description>
             <usage>
                 <item>
@@ -236,7 +268,7 @@
                     uninstalling...
                 </uninstalling>
                 <cantRemoveUsingDependencies>
-                    ERR: it is not possible to remove dependencies that are used by other packages 
+                    ERR: it is not possible to remove dependencies that are used by other packages
                 </cantRemoveUsingDependencies>
                 <uninstalled>
                     successfully uninstalled {0} packages in {1}
@@ -254,7 +286,8 @@
             </usage>
             <messages>
                 <incorrectSyntax>
-                    ERR: version must be specified in semantic versioning format (major.minor.patch - 1.2.3)
+                    ERR: version must be specified in semantic versioning format (major.minor.patch
+                    - 1.2.3)
                 </incorrectSyntax>
             </messages>
         </version>
@@ -264,6 +297,7 @@
     <options>Options:</options>
     <aliases>Aliases:</aliases>
     <usageExample>
-        ppm "install"\\nppm "install &lt;package&gt;"\\nppm "init"\\nppm "init &lt;package name&gt;"\\n
+        ppm "install"\\nppm "install &lt;package&gt;"\\nppm "init"\\nppm "init &lt;package
+        name&gt;"\\n
     </usageExample>
 </root>
