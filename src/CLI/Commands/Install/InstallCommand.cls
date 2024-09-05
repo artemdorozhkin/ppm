@@ -190,21 +190,21 @@ End Function
 
     If Libs.Exists(LibName) Then
         Dim Newest As String
-        Newest = Utils.GetNewest(Libs(LibName), Version)
+        Newest = Utils.GetNewestVersion(Libs(LibName), Version)
         Libs(LibName) = Newest
     Else
         Libs.Add LibName, Version
     End If
 
     If this.Parents.Exists(LibName) Then
-        this.Parents(LibName) = Utils.GetNewest(this.Parents(LibName), Version)
+        this.Parents(LibName) = Utils.GetNewestVersion(this.Parents(LibName), Version)
     End If
 
     If IsFalse(Dependencies) Then Exit Sub
 
     Dim DepName As Variant
     For Each DepName In Dependencies.Keys()
-        Newest = Utils.GetNewest(Dependencies(DepName), Libs(DepName))
+        Newest = Utils.GetNewestVersion(Dependencies(DepName), Libs(DepName))
         If Not Libs.Exists(DepName) Or Libs(DepName) <> Newest Then
             If this.FromLocal Then
                 AddFromLibPack Me.GetLocalLibPack(DepName, Dependencies(DepName)), Libs

@@ -235,7 +235,7 @@ End Sub
     Dim Latest As String
     Dim Vers As Variant
     For Each Vers In Versions
-        Latest = Utils.GetNewest(Vers, Latest)
+        Latest = Utils.GetNewestVersion(Vers, Latest)
     Next
 
     GetLatest = Latest

@@ -50,7 +50,7 @@ Public Function SizeInStr(ByVal Size_Bytes As Double) As String
         Wend
     End If
 
-    SizeInStr = Format(Size_Bytes * 1000, "##0.0#") & " " & TS(Size_Counter - 1)
+    SizeInStr = Strings.Format(Size_Bytes * 1000, "##0.0#") & " " & TS(Size_Counter - 1)
 End Function
 
 Public Function CalculateFileCheckSum(ByVal Path As String) As String
@@ -69,23 +69,23 @@ Public Function CalculateBytesCheckSum(ByRef Bytes() As Byte) As String
     End With
 End Function
 
-Public Function GetNewest(ByVal Current As String, ByVal Other As String) As String
+Public Function GetNewestVersion(ByVal Current As String, ByVal Other As String) As String
     Const Major As Integer = 0
     Const Minor As Integer = 1
     Const Patch As Integer = 2
 
     If Strings.Len(Other) = 0 Then
-        GetNewest = Current
+        GetNewestVersion = Current
         Exit Function
     End If
 
     If Strings.Len(Current) = 0 Then
-        GetNewest = Other
+        GetNewestVersion = Other
         Exit Function
     End If
 
     If PStrings.IsEqual(Current, "latest") Then
-        GetNewest = Current
+        GetNewestVersion = Current
         Exit Function
     End If
 
@@ -99,19 +99,19 @@ Public Function GetNewest(ByVal Current As String, ByVal Other As String) As Str
     OtherParts(Patch) = Conversion.CInt(OtherParts(Patch))
 
     If CurrentParts(Major) > OtherParts(Major) Then
-        GetNewest = Current
+        GetNewestVersion = Current
     ElseIf CurrentParts(Major) < OtherParts(Major) Then
-        GetNewest = Other
+        GetNewestVersion = Other
     ElseIf CurrentParts(Minor) > OtherParts(Minor) Then
-        GetNewest = Current
+        GetNewestVersion = Current
     ElseIf CurrentParts(Minor) < OtherParts(Minor) Then
-        GetNewest = Other
+        GetNewestVersion = Other
     ElseIf CurrentParts(Patch) > OtherParts(Patch) Then
-        GetNewest = Current
+        GetNewestVersion = Current
     ElseIf CurrentParts(Patch) < OtherParts(Patch) Then
-        GetNewest = Other
+        GetNewestVersion = Other
     Else
-        GetNewest = Current
+        GetNewestVersion = Current
     End If
 End Function
 
