@@ -47,6 +47,11 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    If Not this.Tokens.IncludeTokenKind(TokenKind.Identifier) Then
+        ppm "module --help"
+        Exit Sub
+    End If
+
     this.FullPath = Me.GetFullPath(this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text)
     this.Parts = Strings.Split(this.FullPath, ".")
     this.Name = this.Parts(UBound(this.Parts))
