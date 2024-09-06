@@ -12,22 +12,134 @@
 
 Currently, `ppm` supports a few commands:
 
-- [`init`](#init): Initialises the package.
-- [`publish`](#publish): Uploads the project to the server or local registry.
-- [`install`](#install): Installs packages with dependencies into the project.
-- [`uninstall`](#uninstall): Removes packages with dependencies from the project if other packages do not use them..
-- [`export`](#export): Exports modules to the project root folder.
-- [`sync`](#sync): Synchronises the project modules with the root folder.
 - [`config`](#config): Manages configurations.
-- [`version`](#version): Sets the new version of the package.
+- [`export`](#export): Exports modules to the project root folder.
 - [`help`](#help): Provides usage assistance and descriptions for commands.
+- [`init`](#init): Initialises the package.
+- [`install`](#install): Installs packages with dependencies into the project.
+- [`module`](#module): Manages the project modules (.bas).
+- [`publish`](#publish): Uploads the project to the server or local registry.
+- [`sync`](#sync): Synchronises the project modules with the root folder.
+- [`uninstall`](#uninstall): Removes packages with dependencies from the project if other packages do not use them..
+- [`version`](#version): Sets the new version of the package.
 
 ## Commands
 
-### init
+### config
+
 [`#commands list`](#commands-list)
 
 #### Usage:
+
+ppm "config \<subcommand\> \[options\]"
+
+Manages the ppm configuration file.
+
+#### Flags:
+
+-g|--global Uses global config.
+
+-l|--location Specifies config location .
+
+**Example**:
+
+```vb
+ppm "config set key=value"
+```
+
+**Result**:
+Sets the config value for the given key.
+
+**Example**:
+
+```vb
+ppm "config get key"
+```
+
+**Result**:
+Gets the config value for the given key.
+
+**Example**:
+
+```vb
+ppm "config delete key"
+```
+
+**Result**:
+Deletes the config entry for the given key.
+
+**Example**:
+
+```vb
+ppm "config edit"
+```
+
+**Result**:
+Opens the config file for editing.
+
+### export
+
+[`#commands list`](#commands-list)
+
+#### Usage:
+
+ppm "export \[options\]"
+
+Exports modules to the project root folder.
+
+#### Flags:
+
+-e|--encoding Specifies the encoding for exported files.
+
+-s|--save-struct Saves the RubberDuck structure when exporting a project.
+
+-p|--path Specifies the folder to export to.
+
+--no-clear Does not delete files from the last export.
+
+**Example**:
+
+```vb
+ppm "export -p ./dist -e UTF-8"
+```
+
+**Result**:
+Exports project files to the './dist' directory with UTF-8 encoding.
+
+### help
+
+[`#commands list`](#commands-list)
+
+#### Usage:
+
+ppm "help \[command\]"
+
+Provides usage assistance and descriptions for commands.
+
+#### Example:
+
+```vb
+ppm "help init"
+```
+
+**Result**:
+Shows information about the `init` command.
+
+**Generic Example**:
+
+```vb
+ppm "help"
+```
+
+**Result**:
+Shows general usage information and available commands.
+
+### init
+
+[`#commands list`](#commands-list)
+
+#### Usage:
+
 ppm "init \[options\]"
 
 ppm "init"
@@ -41,11 +153,13 @@ Creates a 'package' module with basic package information.
 -n|--name Sets the value for the project name.
 
 **Example**:
+
 ```vb
 ppm "init -y"
 ```
 
 **Result**:
+
 ```json
 // package.bas
 '@Folder("PearPMProject")
@@ -59,11 +173,13 @@ ppm "init -y"
 ```
 
 **Example**:
+
 ```vb
 ppm "init -n MyPack -y"
 ```
 
 **Result**:
+
 ```json
 // package.bas
 '@Folder("PearPMProject")
@@ -76,51 +192,23 @@ ppm "init -n MyPack -y"
 '}
 ```
 
-
-### publish
-[`#commands list`](#commands-list)
-
-
-#### Usage:
-ppm "publish \[options\]"
-
-Uploads the project to the server or local registry.
-
-#### Flags:
--l|--local Publishes the package to the local registry.
-
--r|--registry Specifies the registry path or URL.
-
-**Example**:
-```vb
-ppm "publish -l"
-```
-
-**Result**:
-Publishes the package to the local registry.
-
-**Example**:
-```vb
-ppm "publish -r http://example.com/registry"
-```
-
-**Result**:
-Publishes the package to the specified registry URL.
-
 ### install
+
 [`#commands list`](#commands-list)
 
-
 #### Usage:
+
 ppm "install \[options\] \[package\[@version\]\]"
 
 Installs packages with dependencies into the project.
 
 #### Flags:
+
 -l|--local Installs packages and dependencies from the local registry.
 -r|--registry Specifies the registry path or URL.
 
 **Example**:
+
 ```vb
 ppm "install pstrings"
 ```
@@ -129,6 +217,7 @@ ppm "install pstrings"
 Installs the latest version of pstrings from the default registry.
 
 **Example**:
+
 ```vb
 ppm "install pstrings@4.17.21 -l"
 ```
@@ -136,59 +225,95 @@ ppm "install pstrings@4.17.21 -l"
 **Result**:
 Installs version 4.17.21 of pstrings from the local registry.
 
-### uninstall
+### module
+
 [`#commands list`](#commands-list)
 
-
 #### Usage:
-ppm "uninstall \[package\]"
 
-Removes packages with dependencies from the project if other packages do not use them.
+ppm "module \[subcommand\] \<path\>"
+
+Manages the project modules (.bas).
 
 **Example**:
+
 ```vb
-ppm "uninstall pstrings"
+ppm "module add NewModule"
+' or just
+ppm "m NewModule"
 ```
 
 **Result**:
-Removes the pstrings package from the project.
+Adds the NewModule module to the project.
 
-### export
+**Example**:
+
+```vb
+ppm "module move /path/SomeModule"
+' or just
+ppm "m mv /path/SomeModule"
+```
+
+**Result**:
+Moves SomeModule to RD directory ‘path’.
+
+**Example**:
+
+```vb
+ppm "module delete /path/SomeModule"
+' or just
+ppm "m delete SomeModule"
+```
+
+**Result**:
+Deletes SomeModule.
+
+### publish
+
 [`#commands list`](#commands-list)
 
-
 #### Usage:
-ppm "export \[options\]"
 
-Exports modules to the project root folder.
+ppm "publish \[options\]"
+
+Uploads the project to the server or local registry.
 
 #### Flags:
--e|--encoding Specifies the encoding for exported files.
 
--s|--save-struct Saves the RubberDuck structure when exporting a project.
+-l|--local Publishes the package to the local registry.
 
--p|--path Specifies the folder to export to.
-
---no-clear Does not delete files from the last export.
+-r|--registry Specifies the registry path or URL.
 
 **Example**:
+
 ```vb
-ppm "export -p ./dist -e UTF-8"
+ppm "publish -l"
 ```
 
 **Result**:
-Exports project files to the './dist' directory with UTF-8 encoding.
+Publishes the package to the local registry.
+
+**Example**:
+
+```vb
+ppm "publish -r http://example.com/registry"
+```
+
+**Result**:
+Publishes the package to the specified registry URL.
 
 ### sync
+
 [`#commands list`](#commands-list)
 
-
 #### Usage:
+
 ppm "sync"
 
 Synchronises the project modules with the root folder.
 
 #### Example:
+
 ```vb
 ppm "sync"
 ```
@@ -196,62 +321,37 @@ ppm "sync"
 **Result**:
 Synchronises all the project modules with files from the root folder.
 
-### config
+### uninstall
+
 [`#commands list`](#commands-list)
 
-
 #### Usage:
-ppm "config \<subcommand\> \[options\]"
 
-Manages the ppm configuration file.
+ppm "uninstall \[package\]"
 
-#### Flags:
--g|--global Uses global config.
-
--l|--location Specifies config location .
+Removes packages with dependencies from the project if other packages do not use them.
 
 **Example**:
+
 ```vb
-ppm "config set key=value"
+ppm "uninstall pstrings"
 ```
 
 **Result**:
-Sets the config value for the given key.
-
-**Example**:
-```vb
-ppm "config get key"
-```
-
-**Result**:
-Gets the config value for the given key.
-
-**Example**:
-```vb
-ppm "config delete key"
-```
-
-**Result**:
-Deletes the config entry for the given key.
-
-**Example**:
-```vb
-ppm "config edit"
-```
-
-**Result**:
-Opens the config file for editing.
+Removes the pstrings package from the project.
 
 ### version
+
 [`#commands list`](#commands-list)
 
-
 #### Usage:
+
 ppm "version \<new version | major | minor | patch\>"
 
 Sets the new version of the package.
 
 **Example**:
+
 ```vb
 ppm "version 1.1.1"
 
@@ -259,6 +359,7 @@ ppm "version 1.1.1"
 ```
 
 **Result**:
+
 ```json
 // package.bas
 '@Folder("PearPMProject")
@@ -272,6 +373,7 @@ ppm "version 1.1.1"
 ```
 
 **Example**:
+
 ```vb
 ppm "version patch"
 
@@ -279,6 +381,7 @@ ppm "version patch"
 ```
 
 **Result**:
+
 ```json
 // package.bas
 '@Folder("PearPMProject")
@@ -292,6 +395,7 @@ ppm "version patch"
 ```
 
 **Example**:
+
 ```vb
 ppm "version minor"
 
@@ -299,6 +403,7 @@ ppm "version minor"
 ```
 
 **Result**:
+
 ```json
 // package.bas
 '@Folder("PearPMProject")
@@ -312,6 +417,7 @@ ppm "version minor"
 ```
 
 **Example**:
+
 ```vb
 ppm "version major"
 
@@ -319,6 +425,7 @@ ppm "version major"
 ```
 
 **Result**:
+
 ```json
 // package.bas
 '@Folder("PearPMProject")
@@ -330,31 +437,6 @@ ppm "version major"
 '  "git": ""
 '}
 ```
-
-### help
-[`#commands list`](#commands-list)
-
-
-#### Usage:
-ppm "help \[command\]"
-
-Provides usage assistance and descriptions for commands.
-
-#### Example:
-```vb
-ppm "help init"
-```
-
-**Result**:
-Shows information about the `init` command.
-
-**Generic Example**:
-```vb
-ppm "help"
-```
-
-**Result**:
-Shows general usage information and available commands.
 
 ## Contribution
 
