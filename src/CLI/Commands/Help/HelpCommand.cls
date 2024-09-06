@@ -26,7 +26,7 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "help"
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
-    this.CommandInfo.Usage = CLI.Lang.GetValues("usage/item")
+    this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)

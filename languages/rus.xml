@@ -218,8 +218,7 @@
                     </totalFiles>
                 </packDetails>
                 <packageModuleNotFound>
-                    ERR: модуль package не найден\\nперед публикацией пакета необходимо запустить
-                    ppm "init"
+                    ERR: модуль package не найден\\nперед публикацией пакета необходимо запустить ppm "init"
                 </packageModuleNotFound>
                 <somethingWentWrong>
                     ERR: что-то пошло не так, повторите попытку позже
@@ -255,8 +254,7 @@
         </sync>
         <uninstall>
             <description>
-                Удаляет пакеты с зависимостями из проекта, если они не используются другими
-                пакетами.
+                Удаляет пакеты с зависимостями из проекта, если они не используются другими пакетами.
             </description>
             <usage>
                 <item>
@@ -286,8 +284,7 @@
             </usage>
             <messages>
                 <incorrectSyntax>
-                    ERR: версия должна быть указана в формате семантического версионирования
-                    (major.minor.patch - 1.2.3)
+                    ERR: версия должна быть указана в формате семантического версионирования (major.minor.patch - 1.2.3)
                 </incorrectSyntax>
             </messages>
         </version>

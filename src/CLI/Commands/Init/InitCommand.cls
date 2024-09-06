@@ -28,7 +28,7 @@ Private Sub Class_Initialize()
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
     this.CommandInfo.Params.Item("name") = CLI.Lang.GetValue("param", "name=name")
     this.CommandInfo.Params.Item("yes") = CLI.Lang.GetValue("param", "name=yes")
-    this.CommandInfo.Usage = CLI.Lang.GetValues("usage/item")
+    this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
 Public Property Set Config(ByVal RHS As Config)

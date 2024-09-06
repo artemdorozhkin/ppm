@@ -154,6 +154,8 @@
             <usage>
                 <item>
                     &lt;path&gt;
+                </item>
+                <item>
                     add &lt;path&gt;
                 </item>
                 <item>
@@ -218,8 +220,7 @@
                     </totalFiles>
                 </packDetails>
                 <packageModuleNotFound>
-                    ERR: package module not found\\nbefor publish the package you need to run ppm
-                    "init"
+                    ERR: package module not found\\nbefor publish the package you need to run ppm "init"
                 </packageModuleNotFound>
                 <somethingWentWrong>
                     ERR: something went wrong, try again later
@@ -255,8 +256,7 @@
         </sync>
         <uninstall>
             <description>
-                Removes packages with dependencies from the project if other packages do not use
-                them.
+                Removes packages with dependencies from the project if other packages do not use them.
             </description>
             <usage>
                 <item>
@@ -297,7 +297,6 @@
     <options>Options:</options>
     <aliases>Aliases:</aliases>
     <usageExample>
-        ppm "install"\\nppm "install &lt;package&gt;"\\nppm "init"\\nppm "init &lt;package
-        name&gt;"\\n
+        ppm "install"\\nppm "install &lt;package&gt;"\\nppm "init"\\nppm "init &lt;package name&gt;"\\n
     </usageExample>
 </root>

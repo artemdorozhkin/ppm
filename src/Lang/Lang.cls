@@ -54,7 +54,7 @@ Public Function GetValues(ByVal Block As String, Optional ByVal Attr As String) 
 
     Dim Items As Collection: Set Items = New Collection
     Dim Child As IXMLDOMElement
-    For Each Child In Nodes
+    For Each Child In Nodes(0).ChildNodes
         Items.Add Child.Text
     Next
     GetValues = PCollection.ToArray(Items)

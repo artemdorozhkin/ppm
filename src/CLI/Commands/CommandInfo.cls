@@ -30,6 +30,7 @@ Public Function GetUsage() As String
     Usage = PStrings.FString("{0}\\n\\n{1}", Me.Description, CLI.Lang.GetValue("usage"))
     Dim UseCase As Variant
     For Each UseCase In Me.Usage
+        UseCase = Strings.Trim(UseCase)
         Usage = Usage & PStrings.FString("\\nppm ""{0} {1}""", Me.Name, UseCase)
     Next
 
