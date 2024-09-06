@@ -27,7 +27,7 @@ Currently, `ppm` supports a few commands:
 
 ### config
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -79,7 +79,7 @@ Opens the config file for editing.
 
 ### export
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -108,7 +108,7 @@ Exports project files to the './dist' directory with UTF-8 encoding.
 
 ### help
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -136,7 +136,7 @@ Shows general usage information and available commands.
 
 ### init
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -194,7 +194,7 @@ ppm "init -n MyPack -y"
 
 ### install
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -227,7 +227,7 @@ Installs version 4.17.21 of pstrings from the local registry.
 
 ### module
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -270,7 +270,7 @@ Deletes SomeModule.
 
 ### publish
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -304,7 +304,7 @@ Publishes the package to the specified registry URL.
 
 ### sync
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -323,7 +323,7 @@ Synchronises all the project modules with files from the root folder.
 
 ### uninstall
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
@@ -342,7 +342,7 @@ Removes the pstrings package from the project.
 
 ### version
 
-[`#commands list`](#commands-list)
+[`⤴️commands list`](#commands-list)
 
 #### Usage:
 
