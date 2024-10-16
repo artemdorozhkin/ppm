@@ -12,8 +12,13 @@ Option Explicit
 
 Private Type TLang
     LangPath As String
+  #If DEV Then
     XML As DOMDocument60
     Current As IXMLDOMNode
+  #Else
+    XML As Object
+    Current As Object
+  #End If
 End Type
 
 Private this As TLang
@@ -43,7 +48,11 @@ End Function
 Public Function GetValues(ByVal Block As String, Optional ByVal Attr As String) As Variant
     If IsFalse(this.Current) Then Exit Function
 
+  #If DEV Then
     Dim Nodes As IXMLDOMNodeList: Set Nodes = this.Current.SelectNodes(Block)
+  #Else
+    Dim Nodes As Object: Set Nodes = this.Current.SelectNodes(Block)
+  #End If
     If Strings.Len(Attr) > 0 Then
         Dim Name As String: Name = Strings.Split(Attr, "=")(0)
         Dim Value As String: Value = Strings.Split(Attr, "=")(1)
@@ -53,7 +62,11 @@ Public Function GetValues(ByVal Block As String, Optional ByVal Attr As String) 
     If Nodes.Length = 0 Then Exit Function
 
     Dim Items As Collection: Set Items = New Collection
+  #If DEV Then
     Dim Child As IXMLDOMElement
+  #Else
+    Dim Child As Object
+  #End If
     For Each Child In Nodes(0).ChildNodes
         Items.Add Child.Text
     Next
@@ -63,7 +76,11 @@ End Function
 Public Function GetValue(ByVal Block As String, Optional ByVal Attr As String) As Variant
     If IsFalse(this.Current) Then Exit Function
 
+  #If DEV Then
     Dim Nodes As IXMLDOMNodeList: Set Nodes = this.Current.SelectNodes(Block)
+  #Else
+    Dim Nodes As Object: Set Nodes = this.Current.SelectNodes(Block)
+  #End If
     If Strings.Len(Attr) > 0 Then
         Dim Name As String: Name = Strings.Split(Attr, "=")(0)
         Dim Value As String: Value = Strings.Split(Attr, "=")(1)
