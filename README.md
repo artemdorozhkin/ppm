@@ -20,6 +20,7 @@ To add the Excel add-in to your project:
 
 Currently, `ppm` supports a few commands:
 
+- [`class`](#class): Manages the project classes (.cls).
 - [`config`](#config): Manages configurations.
 - [`export`](#export): Exports modules to the project root folder.
 - [`help`](#help): Provides usage assistance and descriptions for commands.
@@ -33,6 +34,65 @@ Currently, `ppm` supports a few commands:
 - [`version`](#version): Sets the new version of the package.
 
 ## Commands
+
+### class
+
+[`⤴️commands list`](#commands-list)
+
+#### Usage:
+
+ppm "class \[subcommand\] \<path\> \[options\]"
+
+Manages the project classes (.cls).
+
+#### Flags:
+
+-c|--create-constructor Create module constructor for the class.
+
+**Example**:
+
+```vb
+ppm "class add NewClass"
+' or just
+ppm "cls NewClass"
+```
+
+**Result**:
+Adds the NewClass class to the project.
+
+**Example**:
+
+```vb
+ppm "class add NewClass --create-constructor"
+' or just
+ppm "cls NewClass -c"
+```
+
+**Result**:
+Adds the NewClass class and module constructor to the project.
+If class already exists, adds only module constructor.
+
+**Example**:
+
+```vb
+ppm "class move /path/Someclass"
+' or just
+ppm "cls mv /path/Someclass"
+```
+
+**Result**:
+Moves Someclass and module constructor to RD directory ‘path’.
+
+**Example**:
+
+```vb
+ppm "class delete /path/Someclass"
+' or just
+ppm "cls delete Someclass"
+```
+
+**Result**:
+Deletes Someclass and module constructor.
 
 ### config
 

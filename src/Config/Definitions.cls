@@ -46,6 +46,13 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
+        Key:="create-constructor", _
+        Short:="c", _
+        Default:=False _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
         Key:="dev-dep", _
         Short:="d", _
         Default:=False _
