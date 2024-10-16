@@ -176,6 +176,9 @@
                 <moduleAdded>
                     Модуль добавлен: {0}
                 </moduleAdded>
+                <moduleAlreadyExists>
+                    Модуль уже существует: {0}
+                </moduleAlreadyExists>
             </messages>
         </module>
         <publish>

@@ -178,6 +178,9 @@
                 <moduleAdded>
                     Module added: {0}
                 </moduleAdded>
+                <moduleAlreadyExists>
+                    Module already exists: {0}
+                </moduleAlreadyExists>
             </messages>
         </module>
         <publish>

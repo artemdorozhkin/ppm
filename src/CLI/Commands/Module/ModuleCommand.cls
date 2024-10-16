@@ -122,6 +122,11 @@ Public Function GetFullPath(ByVal RawPath As String) As String
 End Function
 
 Public Sub AddModule()
+    If SelectedProject.IsComponentExists(this.Name) Then
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/moduleAlreadyExists"), this.Name)
+        Exit Sub
+    End If
+
   #If DEV Then
     Dim Component As VBComponent
   #Else
