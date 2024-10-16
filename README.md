@@ -8,6 +8,14 @@
 
 `ppm` is a package manager developed for VBA and with VBA, providing a command-line interface (CLI-like) through the Immediate Window in the VBA IDE. It's created to help developers manage their VBA projects by organizing code, dependencies, and facilitating common tasks.
 
+## Add to project
+
+To add the Excel add-in to your project:
+
+1. **Ensure Excel is open and active** (not the Visual Basic for Applications editor).
+
+1. Press `Ctrl + Shift + A` to enable `ppm` for your project.
+
 ## Commands list
 
 Currently, `ppm` supports a few commands:
@@ -19,6 +27,7 @@ Currently, `ppm` supports a few commands:
 - [`install`](#install): Installs packages with dependencies into the project.
 - [`module`](#module): Manages the project modules (.bas).
 - [`publish`](#publish): Uploads the project to the server or local registry.
+- [`search`](#search): Search for the package on the server or locally.
 - [`sync`](#sync): Synchronises the project modules with the root folder.
 - [`uninstall`](#uninstall): Removes packages with dependencies from the project if other packages do not use them..
 - [`version`](#version): Sets the new version of the package.
@@ -301,6 +310,36 @@ ppm "publish -r http://example.com/registry"
 
 **Result**:
 Publishes the package to the specified registry URL.
+
+### search
+
+[`⤴️commands list`](#commands-list)
+
+#### Usage:
+
+ppm "search \<package name\>"
+
+Search for the package on the server or locally.
+
+#### Flags:
+
+-l|--local Search for the package in the local registry.
+
+-r|--registry Specifies the registry path or URL.
+
+#### Example:
+
+```vb
+ppm "search array --local"
+```
+
+**Result**:
+
+```vb
+NAME      | VERSION | AUTHOR         | DESCRIPTION          |
+ArrayList | 0.5.0   | artemdorozhkin | ppm is a package ... |
+PArrays   | 2.0.0   |                |                      |
+```
 
 ### sync
 

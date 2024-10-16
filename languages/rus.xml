@@ -231,6 +231,30 @@
                 </published>
             </messages>
         </publish>
+        <search>
+            <description>
+                Поиск пакета на сервере или локально.
+            </description>
+            <param name="local">
+                \\tИскать пакет в локальном реестре.
+            </param>
+            <param name="registry">
+                \\tИскать пакет по указанному пути или url.
+            </param>
+            <usage>
+                <item>
+                    &lt;имя пакета&gt;
+                </item>
+            </usage>
+            <messages>
+                <nameMissing>
+                    ERR: имя пакета обязательный параметр
+                </nameMissing>
+                <noMatchesFor>
+                    Нет совпадений для '{0}'
+                </noMatchesFor>
+            </messages>
+        </search>
         <sync>
             <description>
                 Синхронизирует модули проекта с файлами из root папки.

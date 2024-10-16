@@ -21,6 +21,7 @@ Public Property Get Commands() As Variant
         "install", _
         "module", _
         "publish", _
+        "search", _
         "sync", _
         "uninstall", _
         "version" _
@@ -69,6 +70,9 @@ End Property
     Buffer("m") = "module"
     Buffer("bas") = "module"
     Buffer("mv") = "move"
+
+    Buffer("find") = "search"
+    Buffer("s") = "search"
 
     Buffer("load") = "sync"
 

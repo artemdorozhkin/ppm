@@ -233,6 +233,30 @@
                 </published>
             </messages>
         </publish>
+        <search>
+            <description>
+                Search for the package on the server or locally
+            </description>
+            <param name="local">
+                \\tSearch the package in the local registry.
+            </param>
+            <param name="registry">
+                \\tSpecific registry path or url.
+            </param>
+            <usage>
+                <item>
+                    &lt;package&gt;
+                </item>
+            </usage>
+            <messages>
+                <nameMissing>
+                    ERR: package name is a required parameter
+                </nameMissing>
+                <noMatchesFor>
+                    No mathes for '{0}'
+                </noMatchesFor>
+            </messages>
+        </search>
         <sync>
             <description>
                 Synchronises project modules with files from the root folder.
