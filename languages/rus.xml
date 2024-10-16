@@ -1,5 +1,56 @@
 <root>
     <ppmCommands>
+        <class>
+            <description>
+                Управляет классами проекта (.cls).
+            </description>
+            <param name="create-constructor">
+                \\tСоздать модуль конструктор для класса.
+            </param>
+            <usage>
+                <item>
+                    &lt;path&gt;
+                </item>
+                <item>
+                    add &lt;path&gt;
+                </item>
+                <item>
+                    move &lt;path&gt;
+                </item>
+                <item>
+                    delete &lt;path&gt;
+                </item>
+            </usage>
+            <messages>
+                <classNotExists>
+                    Класс не существует: {0}
+                </classNotExists>
+                <classDeleted>
+                    Класс удален: {0}
+                </classDeleted>
+                <classMoved>
+                    Класс перемещен: {0}
+                </classMoved>
+                <classAdded>
+                    Класс добавлен: {0}
+                </classAdded>
+                <classAlreadyExists>
+                    Класс уже существует: {0}
+                </classAlreadyExists>
+                <cstrDeleted>
+                    Конструктор для класса {0} удален
+                </cstrDeleted>
+                <cstrMoved>
+                    Конструктор для класса {0} перемещен
+                </cstrMoved>
+                <cstrAdded>
+                    Конструктор для класса {0} добавлен
+                </cstrAdded>
+                <cstrAlreadyExists>
+                    Конструктор для класса {0} уже существует
+                </cstrAlreadyExists>
+            </messages>
+        </class>
         <config>
             <description>
                 Управляет конфигурационным файлом ppm.

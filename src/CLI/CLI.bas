@@ -14,6 +14,7 @@ End Property
 
 Public Property Get Commands() As Variant
     Commands = Array( _
+        "class", _
         "config", _
         "export", _
         "help", _
@@ -52,6 +53,8 @@ End Property
   #Else
     Dim Buffer As Object: Set Buffer = NewDictionary(VbCompareMethod.vbTextCompare)
   #End If
+
+    Buffer("cls") = "class"
 
     Buffer("c") = "config"
     Buffer("cfg") = "config"

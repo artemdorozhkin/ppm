@@ -1,5 +1,56 @@
 <root>
     <ppmCommands>
+        <class>
+            <description>
+                Manages the project classes (.cls).
+            </description>
+            <param name="create-constructor">
+                \\tCreate constructor module for class.
+            </param>
+            <usage>
+                <item>
+                    &lt;path&gt;
+                </item>
+                <item>
+                    add &lt;path&gt;
+                </item>
+                <item>
+                    move &lt;path&gt;
+                </item>
+                <item>
+                    delete &lt;path&gt;
+                </item>
+            </usage>
+            <messages>
+                <classNotExists>
+                    Class not exists: {0}
+                </classNotExists>
+                <classDeleted>
+                    Class deleted: {0}
+                </classDeleted>
+                <classMoved>
+                    Class moved: {0}
+                </classMoved>
+                <classAdded>
+                    Class added: {0}
+                </classAdded>
+                <classAlreadyExists>
+                    Class already exists: {0}
+                </classAlreadyExists>
+                <cstrDeleted>
+                    Constructor for class {0} deleted
+                </cstrDeleted>
+                <cstrMoved>
+                    Constructor for class {0} moved
+                </cstrMoved>
+                <cstrAdded>
+                    Constructor for class {0} added
+                </cstrAdded>
+                <cstrAlreadyExists>
+                    Constructor for class {0} already exists
+                </cstrAlreadyExists>
+            </messages>
+        </class>
         <config>
             <description>
                 Manages the ppm configuration file.
