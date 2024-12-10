@@ -21,7 +21,7 @@ End Sub
 Public Function ReadFile(ByVal Path As String, Optional ByVal Encoding As String = "UTF-8") As String
     With NewStream()
         .Charset = Encoding
-        .Type = adTypeText
+        .Type = 2 'adTypeText
         .Open
         .LoadFromFile Path
         ReadFile = .ReadText()

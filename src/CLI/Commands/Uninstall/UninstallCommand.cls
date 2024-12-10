@@ -126,7 +126,7 @@ End Sub
   #If DEV Then
     Dim RmLibs As Dictionary: Set RmLibs = NewDictionary(VbCompareMethod.vbTextCompare)
   #Else
-    Dim RmLibs As Dictionary: Set RmLibs = NewDictionary(VbCompareMethod.vbTextCompare)
+    Dim RmLibs As Object: Set RmLibs = NewDictionary(VbCompareMethod.vbTextCompare)
   #End If
 
     Dim LibName As Variant

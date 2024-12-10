@@ -3,14 +3,22 @@ Attribute VB_Name = "AddinInstaller"
 Option Explicit
 
 Public Sub SwitchAddin()
+  #If DEV Then
     Dim VBProject As VBProject: Set VBProject = Application.VBE.ActiveVBProject
+  #Else
+    Dim VBProject As Object: Set VBProject = Application.VBE.ActiveVBProject
+  #End If
     If VBProject.Name = "PearPMProject" Then
         Interaction.MsgBox "ppm can't enabled for itself", VbMsgBoxStyle.vbExclamation, "ppm project selected"
         Exit Sub
     End If
 
     Dim ppmEnabled As Boolean
+  #If DEV Then
     Dim Ref As Reference
+  #Else
+    Dim Ref As Object
+  #End If
     For Each Ref In VBProject.References
         ppmEnabled = Ref.Name = "PearPMProject"
         If ppmEnabled Then Exit For
