@@ -44,8 +44,10 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
-    Dim AfterDialog As Boolean: AfterDialog = this.Config.GetValue("_after-dialog")
-    Dim SkipByDefault As Boolean: SkipByDefault = this.Config.GetValue("yes")
+    Dim AfterDialog As Boolean
+    AfterDialog = GetFirstValueFrom("_after-dialog", this.Tokens, this.Config)
+    Dim SkipByDefault As Boolean
+    SkipByDefault = GetFirstValueFrom("yes", this.Tokens, this.Config)
 
     Dim Pack As Pack
     If SelectedProject.IsComponentExists("package") Then

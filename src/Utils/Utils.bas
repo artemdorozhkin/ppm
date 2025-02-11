@@ -204,24 +204,70 @@ Public Function IsFalse(ByVal Value As Variant) As Boolean
             IsEmptyArray = UBound(Value) = -1
             IsFalse = IsEmptyArray Or Information.Err.Number > 0
         End If
-    ElseIf (ValueType And vbObject) = vbObject Then
+    ElseIf ValueType = vbObject Then
         IsFalse = Value Is Nothing
-    ElseIf (ValueType And vbString) = vbString Then
+    ElseIf ValueType = vbString Then
         IsFalse = Strings.Len(Value) = 0
-    ElseIf (ValueType And vbBoolean) = vbBoolean Then
-        IsFalse = Value
-    ElseIf (ValueType And vbVariant) = vbVariant Then
+    ElseIf ValueType = vbBoolean Then
+        IsFalse = Not Value
+    ElseIf ValueType = vbVariant Then
         IsFalse = Information.IsEmpty(Value)
-    ElseIf (ValueType And vbByte) = vbByte Or _
-           (ValueType And vbCurrency) = vbCurrency Or _
-           (ValueType And vbDecimal) = vbDecimal Or _
-           (ValueType And vbInteger) = vbInteger Or _
-           (ValueType And vbLong) = vbLong Or _
-           (ValueType And vbLongLong) = vbLongLong Then
+    ElseIf ValueType = vbByte Or _
+           ValueType = vbCurrency Or _
+           ValueType = vbDecimal Or _
+           ValueType = vbInteger Or _
+           ValueType = vbLong Or _
+           ValueType = vbLongLong Then
         IsFalse = Value = 0
-    ElseIf (ValueType And vbNull) = vbNull Then
+    ElseIf ValueType = vbNull Then
+        IsFalse = True
+    ElseIf ValueType = vbEmpty Then
         IsFalse = True
     Else
         Information.Err.Raise 13, "IsFalse", "Cannot detect the type of Value"
+    End If
+End Function
+
+Public Function GetFirstTrue(ParamArray Values() As Variant) As Variant
+    Dim Value As Variant
+    For Each Value In Values
+        If IsTrue(Value) Then
+            If Information.IsObject(Value) Then
+                Set GetFirstTrue = Value
+            Else
+                GetFirstTrue = Value
+            End If
+            Exit Function
+        End If
+    Next
+
+    GetFirstTrue = Null
+End Function
+
+Public Function GetFirstValueFrom(ByVal DefName As String, ByRef Tokens As Tokens, ByRef Config As Config) As Variant
+    If Not Definitions.Items().Exists(DefName) Then
+        Err.Raise 9, "Utils", "Can't find definition: " & DefName
+    End If
+
+    Dim Def As Definition
+    Set Def = Definitions(DefName)
+
+    If Tokens.IncludeDefinition(Def) Then
+        Dim Token As SyntaxToken
+        Set Token = Tokens.GetTokenByDefinition(Def)
+        If IsFalse(Token) Then
+            GetFirstValueFrom = True
+        Else
+            GetFirstValueFrom = ConvertToType(Token.Text, Def.DataType)
+        End If
+    Else
+        Dim Value As Variant
+        Value = GetFirstTrue( _
+            Config.GetValue(DefName), _
+            Def.Default _
+        )
+        If Not Information.IsNull(Value) Then
+            GetFirstValueFrom = ConvertToType(Value, Def.DataType)
+        End If
     End If
 End Function

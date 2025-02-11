@@ -80,7 +80,8 @@ Public Function GetCommandName() As String
         Exit Function
     End If
 
-    Dim HasHelpOption As Boolean: HasHelpOption = this.Config.GetValue("help")
+    Dim HasHelpOption As Boolean
+    HasHelpOption = GetFirstValueFrom("help", this.Tokens, this.Config)
     Dim CommandIndex As Long
     CommandIndex = IIf(HasHelpOption, 0, 1)
 
