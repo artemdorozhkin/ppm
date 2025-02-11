@@ -85,11 +85,11 @@ End Property
 End Property
 
 Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
-    Dim Config As Config: Set Config = NewConfig(Definitions.Items, Tokens)
+    Dim Config As Config: Set Config = NewConfig(ConfigScopes.DefaultScope)
     If Tokens.Count = 0 Then
         Set ParseCommand = NewHelpCommand()
         Exit Function
-    ElseIf Config.GetValue("help") Then
+    ElseIf Tokens.IncludeDefinition(Definitions("help")) Then
         Set ParseCommand = NewHelpCommand(Config, Tokens)
         Exit Function
     ElseIf Tokens.Count = 1 And Tokens.IncludeDefinition(Definitions("version")) Then
@@ -123,9 +123,12 @@ Public Function FindCommand(ByVal Name As String) As String
 End Function
 
 Public Sub InitLang()
-    Dim Config As Config: Set Config = NewConfig(Definitions.Items)
+    Dim Config As Config: Set Config = NewConfig(ConfigScopes.UserScope)
     Dim SelectedLang As String
-    SelectedLang = Strings.LCase(Config.GetValue("language"))
+    SelectedLang = Strings.LCase(GetFirstTrue( _
+        Config.GetValue("language"), _
+        Definitions("language").Default _
+    ))
 
     Set this.Lang = NewLang(SelectedLang)
 End Sub

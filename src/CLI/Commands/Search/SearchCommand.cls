@@ -54,9 +54,10 @@ Private Sub ICommand_Exec()
     Dim PackageName As String
     PackageName = PackageToken.Text
 
-    Dim Registry As String: Registry = this.Config.GetValue("registry")
+    Dim Registry As String
+    Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
 
-    If this.Config.GetValue("local") Then
+    If GetFirstValueFrom("local", this.Tokens, this.Config) Then
         LookupLocal Registry, PackageName
     Else
         LookupOnServer Registry, PackageName
