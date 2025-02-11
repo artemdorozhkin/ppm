@@ -74,11 +74,13 @@ Private Sub ICommand_Exec()
 
     PrintDetails Zip, Pack
 
-    Dim ToLocal As Boolean: ToLocal = this.Config.GetValue("local")
-    Dim Registry As String: Registry = this.Config.GetValue("registry")
+    Dim ToLocal As Boolean
+    ToLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
+    Dim Registry As String
+    Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
     If ToLocal Then
         If Not NewFileSystemObject().FolderExists(Registry) Then
-            Registry = Constants.LocalRegistryPath
+            PFileSystem.CreateFolder Registry, Recoursive:=True
         End If
     End If
 

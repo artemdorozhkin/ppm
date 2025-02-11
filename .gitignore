@@ -11,3 +11,6 @@ issues.csv
 ppmbuild.ps1
 assets/*
 !assets/[black|white].jpg
+
+#other
+.ppm

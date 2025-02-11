@@ -52,13 +52,13 @@ End Property
 
 Private Sub ICommand_Exec()
     Set this.Parents = NewDictionary(vbTextCompare)
-    this.Registry = this.Config.GetValue("registry")
-    this.FromLocal = this.Config.GetValue("local")
-    If this.FromLocal Then
-        If Not NewFileSystemObject().FolderExists(this.Registry) Then
-            this.Registry = Constants.LocalRegistryPath
+    this.Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
+    this.FromLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
+    With NewFileSystemObject()
+        If this.FromLocal And Not .FolderExists(this.Registry) Then
+            PFileSystem.CreateFolder this.Registry, Recoursive:=True
         End If
-    End If
+    End With
     Dim ms As Double: ms = DateTime.Timer
     Immediate.WriteLine CLI.Lang.GetValue("messages/installing")
   #If DEV Then
@@ -280,13 +280,8 @@ End Function
   Public Function GetLocalLibs(ByRef Libs As Object) As Variant
 #End If
     Dim Paths As Collection: Set Paths = New Collection
-  #If DEV Then
-    Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
-  #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
-  #End If
     Dim CacheFolder As String
-    CacheFolder = FSO.BuildPath(Constants.LocalPPMPath, "cache")
+    CacheFolder = PFileSystem.BuildPath(Interaction.Environ("APPDATA"), "ppm", "cache")
     PFileSystem.CreateFolder CacheFolder, Recoursive:=True
 
     ' TODO: use manifest packUrl (don't forget replace escaped \\ in path)
@@ -297,11 +292,10 @@ End Function
         Dim FileName As String
         FileName = PStrings.FString("{0}-{1}.zip", Name, Version)
         Dim Path As String
-        Path = FSO.BuildPath(this.Registry, Name)
-        Path = FSO.BuildPath(Path, FileName)
+        Path = PFileSystem.BuildPath(this.Registry, Name, FileName)
 
         Dim SavePath As String
-        SavePath = FSO.BuildPath(CacheFolder, FileName)
+        SavePath = PFileSystem.BuildPath(CacheFolder, FileName)
         On Error Resume Next
         FileSystem.FileCopy Path, SavePath
         Paths.Add SavePath
@@ -324,13 +318,8 @@ End Function
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
     Dim Paths As Collection: Set Paths = New Collection
-  #If DEV Then
-    Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
-  #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
-  #End If
     Dim CacheFolder As String
-    CacheFolder = FSO.BuildPath(Constants.LocalPPMPath, "cache")
+    CacheFolder = PFileSystem.BuildPath(Interaction.Environ("APPDATA"), "ppm", "cache")
     PFileSystem.CreateFolder CacheFolder, Recoursive:=True
 
     Dim Name As Variant
@@ -381,9 +370,9 @@ End Function
         Dim FileName As String
         FileName = Parts(UBound(Parts))
         Dim SavePath As String
-        SavePath = FSO.BuildPath(CacheFolder, FileName)
+        SavePath = PFileSystem.BuildPath(CacheFolder, FileName)
 
-        If Not FSO.FileExists(SavePath) Then
+        If Not NewFileSystemObject().FileExists(SavePath) Then
             Converter.ToFile Response.Body, SavePath
         End If
         Paths.Add SavePath

@@ -12,85 +12,102 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TConfig
-  #If DEV Then
-    Definitions As Dictionary
-  #Else
-    Definitions As Object
-  #End If
-    Tokens As Tokens
-
-    GlobalConfig As ConfigIO
-    UserConfig As ConfigIO
-    ProjectConfig As ConfigIO
+    File As ConfigIO
 End Type
 
 Private this As TConfig
 
-Private Sub Class_Initialize()
-    Set this.GlobalConfig = Configs.GetGlobalConfig()
-    Set this.UserConfig = Configs.GetUserConfig()
-    Set this.ProjectConfig = Configs.GetProjectConfig()
+Public Property Get File() As ConfigIO
+    Set File = this.File
+End Property
+
+Public Sub SetScope(ByVal Scope As ConfigScopes)
+    If Scope = ConfigScopes.DefaultScope Then
+        Set this.File = GetDefaultConfig()
+        Exit Sub
+    End If
+
+  #If DEV Then
+    Dim FSO As FileSystemObject
+  #Else
+    Dim FSO As Object
+  #End If
+    Set FSO = NewFileSystemObject()
+
+    Dim Folder As String
+    Select Case Scope
+        Case ConfigScopes.ProjectScope
+            Folder = FSO.BuildPath(SelectedProject.Folder, ".ppm")
+        Case ConfigScopes.UserScope
+            Folder = FSO.BuildPath(Interaction.Environ("APPDATA"), "ppm")
+        Case ConfigScopes.GlobalScode
+            Folder = FSO.BuildPath(Interaction.Environ("PROGRAMDATA"), "ppm")
+        Case Else
+            Information.Err.Raise _
+                9, _
+                Information.TypeName(Me), _
+                PStrings.FString(CLI.Lang.GetValue("messages/unknownConfigType"), Scope)
+
+    End Select
+
+    If Not FSO.FolderExists(Folder) Then
+        FSO.CreateFolder Folder
+    End If
+
+    Dim FilePath As String
+    FilePath = FSO.BuildPath(Folder, ".ppmrc")
+    Set this.File = NewConfigIO(FilePath)
 End Sub
 
-#If DEV Then
-  Public Property Set Definitions(ByVal RHS As Dictionary)
-#Else
-  Public Property Set Definitions(ByVal RHS As Object)
-#End If
-    Set this.Definitions = RHS
-End Property
-
-Public Property Set Tokens(ByVal RHS As Tokens)
-    Set this.Tokens = RHS
-End Property
-
-Public Function GetValue(ByVal DefinitionName As String) As Variant
-    If Not this.Definitions.Exists(DefinitionName) Then
-        Err.Raise 9, Information.TypeName(Me), "Can't find definition: " & DefinitionName
+Public Function GetValue(ByVal Key As String) As Variant
+    If Not Definitions.Items().Exists(Key) Then
+        Err.Raise 9, Information.TypeName(Me), "Can't find definition: " & Key
     End If
 
-    Dim Definition As Definition: Set Definition = this.Definitions(DefinitionName)
-    If IsTrue(this.Tokens) Then
-        If this.Tokens.IncludeDefinition(Definition) Then
-            GetValue = GetValueFromDefinition(Definition)
-            Exit Function
-        End If
-    End If
+    Dim Definition As Definition
+    Set Definition = Definitions(Key)
+
   #If DEV Then
     Dim Data As Dictionary
   #Else
     Dim Data As Object
   #End If
-    Set Data = this.ProjectConfig.Read()
+    Set Data = this.File.Read()
     If Data.Exists(Definition.Key) Then
         GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
-        Exit Function
-    End If
-
-    Set Data = this.UserConfig.Read()
-    If Data.Exists(Definition.Key) Then
-        GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
-        Exit Function
-    End If
-
-    Set Data = this.GlobalConfig.Read()
-    If Data.Exists(Definition.Key) Then
-        GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
-        Exit Function
-    End If
-
-    If Not Information.IsMissing(Definition.Default) Then
-        GetValue = Utils.ConvertToType(Definition.Default, Definition.DataType)
         Exit Function
     End If
 End Function
 
-Private Function GetValueFromDefinition(ByRef Definition As Definition) As Variant
-    If Definition.DataType = vbBoolean Then
-        GetValueFromDefinition = True
-    Else
-        GetValueFromDefinition = Utils.ConvertToType( _
-            this.Tokens.GetTokenByDefinition(Definition).Text, Definition.DataType _
-        )
+Private Function GetDefaultConfig() As ConfigIO
+  #If DEV Then
+    Dim FSO As FileSystemObject
+  #Else
+    Dim FSO As Object
+  #End If
+    Set FSO = NewFileSystemObject()
+
+    Dim Folder As String
+    Dim FilePath As String
+    Folder = PFileSystem.BuildPath(SelectedProject.Folder, ".ppm", ".ppmrc")
+    If FSO.FileExists(FilePath) Then
+        Set GetDefaultConfig = NewConfigIO(FilePath)
+        Exit Function
     End If
+
+    FilePath = PFileSystem.BuildPath(Interaction.Environ("APPDATA"), "ppm", ".ppmrc")
+    If FSO.FileExists(FilePath) Then
+        Set GetDefaultConfig = NewConfigIO(FilePath)
+        Exit Function
+    End If
+
+    FilePath = PFileSystem.BuildPath(Interaction.Environ("PROGRAMDATA"), "ppm", ".ppmrc")
+    If FSO.FileExists(FilePath) Then
+        Set GetDefaultConfig = NewConfigIO(FilePath)
+        Exit Function
+    End If
+
+    ' otherwise set user config as default
+    FilePath = PFileSystem.BuildPath(Interaction.Environ("APPDATA"), "ppm", ".ppmrc")
+    Set GetDefaultConfig = NewConfigIO(FilePath)
 End Function

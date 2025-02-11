@@ -21,6 +21,12 @@ Public Property Get ConfigPath() As String
 End Property
 Public Property Let ConfigPath(ByVal RHS As String)
     this.ConfigPath = RHS
+    With NewFileSystemObject()
+        PFileSystem.CreateFolder .GetParentFolderName(RHS), Recoursive:=True
+        If Not .FileExists(RHS) Then
+            .CreateTextFile RHS
+        End If
+    End With
 End Property
 
 Public Property Get Text() As String
@@ -138,5 +144,5 @@ End Function
             Content = PStrings.FString("{0}\\n{1}", Content, Pair)
         End If
     Next
-    SaveToFile this.ConfigPath, Content
+    PFileSystem.SaveToFile this.ConfigPath, Content
 End Sub
