@@ -89,6 +89,16 @@ End Property
 End Property
 
 #If DEV Then
+  Public Property Get References() As Dictionary
+#Else
+  Public Property Get References() As Object
+#End If
+    If this.Pack.Exists("references") Then
+        Set References = this.Pack("references")
+    End If
+End Property
+
+#If DEV Then
   Public Function Read(ByRef Component As VBComponent) As Pack
 #Else
   Public Function Read(ByRef Component As Object) As Pack
@@ -116,6 +126,19 @@ End Property
             VbCompareMethod.vbTextCompare _
         )
     End If
+    If this.Pack.Exists("devDependencies") Then
+        Set this.Pack("devDependencies") = Utils.ChangeDictionaryCompareMode( _
+            this.Pack("devDependencies"), _
+            VbCompareMethod.vbTextCompare _
+        )
+    End If
+    If this.Pack.Exists("references") Then
+        Set this.Pack("references") = Utils.ChangeDictionaryCompareMode( _
+            this.Pack("references"), _
+            VbCompareMethod.vbTextCompare _
+        )
+    End If
+
     Set Read = Me
 End Function
 
@@ -131,7 +154,8 @@ Public Function Update( _
     Optional ByVal Author As Variant, _
     Optional ByVal Git As Variant, _
     Optional ByVal Dependencies As Variant, _
-    Optional ByVal DevDependencies As Variant _
+    Optional ByVal DevDependencies As Variant, _
+    Optional ByVal References As Variant _
 ) As Pack
     If Not Information.IsMissing(Name) Then this.Pack("name") = Name
     If Not Information.IsMissing(Version) Then this.Pack("version") = Version
@@ -159,6 +183,10 @@ Public Function Update( _
         Else
             Set this.Pack("devDependencies") = DevDependencies
         End If
+    End If
+
+    If Not Information.IsMissing(References) Then
+        Set this.Pack("references") = References
     End If
 
     Dim JSON As String: JSON = PJSON.Stringify(this.Pack, 2)
