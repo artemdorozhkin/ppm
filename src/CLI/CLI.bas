@@ -22,6 +22,7 @@ Public Property Get Commands() As Variant
         "install", _
         "module", _
         "publish", _
+        "ref", _
         "search", _
         "sync", _
         "uninstall", _
@@ -39,7 +40,8 @@ Public Property Get SubCommands() As Variant
         "minor", _
         "move", _
         "patch", _
-        "set" _
+        "set", _
+        "update" _
     )
 End Property
 
@@ -74,12 +76,17 @@ End Property
     Buffer("bas") = "module"
     Buffer("mv") = "move"
 
+    Buffer("r") = "ref"
+    Buffer("references") = "ref"
+
     Buffer("find") = "search"
     Buffer("s") = "search"
 
     Buffer("load") = "sync"
 
     Buffer("rm") = "uninstall"
+
+    Buffer("upd") = "update"
 
     Set Aliases = Buffer
 End Property

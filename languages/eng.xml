@@ -287,6 +287,39 @@
                 </published>
             </messages>
         </publish>
+        <ref>
+            <description>
+                Manages the project references.
+            </description>
+            <usage>
+                <item>
+                    add &lt;name, path or guid&gt;
+                </item>
+                <item>
+                    delete &lt;name, path or guid&gt;
+                </item>
+                <item>
+                    update
+                </item>
+                <item>
+                    list
+                </item>
+            </usage>
+            <messages>
+                <refsUpdated>
+                    package references updated
+                </refsUpdated>
+                <refDeleted>
+                    reference successfully deleted: {0} 
+                </refDeleted>
+                <refAdded>
+                    reference successfully added: {0}  
+                </refAdded>
+                <cantFindRef>
+                    ERR: can't find reference: {0}
+                </cantFindRef>
+            </messages>
+        </ref>
         <search>
             <description>
                 Search for the package on the server or locally

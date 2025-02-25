@@ -9,11 +9,7 @@ End Type
 
 Private this As TPJSON
 
-#If DEV Then
-  Public Function Parse(ByVal JSONString As String) As Dictionary
-#Else
-  Public Function Parse(ByVal JSONString As String) As Object
-#End If
+Public Function Parse(ByVal JSONString As String) As Object
     this.JSON = JSONString
     this.Position = 1
     Set Parse = ParseValue()
@@ -92,6 +88,8 @@ Private Sub NextChar()
 End Sub
 
 Private Function ParseValue() As Variant
+    If this.Position >= Strings.Len(this.JSON) Then Exit Function
+
     Select Case Current
         Case "{"
             Set ParseValue = ParseObject()
@@ -120,8 +118,8 @@ End Function
 Private Sub SkipWhitespaces()
     If this.Position >= Strings.Len(this.JSON) Then Exit Sub
     Do While PStrings.IsWhiteSpace(Current)
-        this.Position = this.Position + 1
-        If this.Position >= Strings.Len(this.JSON) Then Exit Do
+        NextChar
+        If this.Position >= Strings.Len(this.JSON) Then Exit Sub
     Loop
 End Sub
 

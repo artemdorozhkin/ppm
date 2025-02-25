@@ -162,7 +162,7 @@ Public Function ConvertToType(ByVal Value As Variant, ByVal DataType As VbVarTyp
     Else
         Select Case DataType
             Case VbVarType.vbString: ConvertToType = Conversion.CStr(Value)
-            Case VbVarType.vbBoolean: ConvertToType = Conversion.CBool(Value)
+            Case VbVarType.vbBoolean: ConvertToType = IsTrue(Value)
             Case Else: Information.Err.Raise 9, "ConvertToType", "Type not defined: " & DataType
         End Select
     End If
@@ -268,6 +268,8 @@ Public Function GetFirstValueFrom(ByVal DefName As String, ByRef Tokens As Token
         )
         If Not Information.IsNull(Value) Then
             GetFirstValueFrom = ConvertToType(Value, Def.DataType)
+        Else
+            GetFirstValueFrom = ConvertToType(Def.Default, Def.DataType)
         End If
     End If
 End Function

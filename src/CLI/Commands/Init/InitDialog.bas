@@ -70,7 +70,13 @@ Public Function GetOrDefault(ByVal Value As String, ByVal ConfigKey As String) A
 
     Dim Config As Config
     Set Config = NewConfig(ConfigScopes.DefaultScope)
-    GetOrDefault = GetFirstTrue(Config.GetValue(ConfigKey), Definitions(ConfigKey).Default)
+    If IsTrue(Config.GetValue(ConfigKey)) Then
+        GetOrDefault = Config.GetValue(ConfigKey)
+    Else
+        If Not Information.IsMissing(Definitions(ConfigKey).Default) Then
+            GetOrDefault = Definitions(ConfigKey).Default
+        End If
+    End If
 End Function
 
 Private Function GetFirstTrue(ByVal Value1 As String, ByVal Value2 As String) As String

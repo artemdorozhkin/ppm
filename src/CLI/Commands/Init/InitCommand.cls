@@ -107,7 +107,8 @@ Public Sub CreatePack()
         "version", PackInfo.Version, _
         "description", PackInfo.Description, _
         "author", PackInfo.Author, _
-        "git", PackInfo.GitURL
+        "git", PackInfo.GitURL, _
+        "references", Me.GetReferences()
 
     SelectedProject.Rename PackInfo.Name & "Project"
 
@@ -117,3 +118,15 @@ Public Sub CreatePack()
         .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
     End With
 End Sub
+
+Public Function GetReferences() As Object
+    Dim References As Object
+    Set References = NewDictionary()
+
+    Dim r As Object
+    For Each r In ThisWorkbook.VBProject.References
+        References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+    Next
+
+    Set GetReferences = References
+End Function
