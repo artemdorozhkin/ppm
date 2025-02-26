@@ -55,7 +55,14 @@ Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional By
     EncodingStream.CopyTo BinaryStream
     EncodingStream.Close
 
-    BinaryStream.SaveToFile Path, 2 'adSaveCreateOverWrite
+    With NewFileSystemObject()
+        If Not .FileExists(Path) Then
+            PFileSystem.CreateFolder .GetParentFolderName(Path), Recoursive:=True
+            BinaryStream.SaveToFile Path, 1 'adSaveCreateNotExist
+        Else
+            BinaryStream.SaveToFile Path, 2 'adSaveCreateOverWrite
+        End If
+    End With
     BinaryStream.Close
 End Sub
 
