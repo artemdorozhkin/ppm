@@ -44,6 +44,15 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    Dim Config As Config
+    Set Config = NewConfig(ConfigScopes.UserScope)
+
+    Dim Credentials As Object
+    Set Credentials = NewDictionary()
+
+    Credentials("email") = Config.GetValue("email")
+    Credentials("api_key") = Config.GetValue("api_key")
+
     If Not SelectedProject.IsComponentExists("package") Then
         Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/packageModuleNotFound"))
         End
@@ -89,7 +98,7 @@ Private Sub ICommand_Exec()
         Success = PublishOnLocal(Registry, ZipPath, Pack)
     Else
         Dim Response As TResponse
-        Response = PublishOnServer(Registry, ZipPath, Pack)
+        Response = PublishOnServer(Registry, ZipPath, Pack, Credentials)
         Success = Response.Code = HTTPCodes.OK_200 Or _
                   Response.Code = HTTPCodes.CREATED_201
     End If
@@ -177,7 +186,7 @@ Public Function PublishOnLocal(ByVal Registry As String, ByVal ZipPath As String
     PublishOnLocal = True
 End Function
 
-Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack) As TResponse
+Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack, ByRef Credentials As Object) As TResponse
     Dim FormData As FormData: Set FormData = New FormData
 
   #If DEV Then
@@ -199,6 +208,8 @@ Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As Strin
     Dim Headers As Object: Set Headers = NewDictionary()
   #End If
     Headers("Content-Type") = "multipart/form-data; boundary=" & FormData.Boundary
+    Headers("email") = Credentials("email")
+    Headers("api-key") = Credentials("api_key")
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     PublishOnServer = HTTP.PostRequest( _

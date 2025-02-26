@@ -14,7 +14,6 @@ Option Explicit
 #If DEV Then
   '@DefaultMember
   Public Property Get Items() As Dictionary
-Attribute Items.VB_UserMemId = 0
 #Else
   '@DefaultMember
   Public Property Get Items() As Object

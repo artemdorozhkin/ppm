@@ -60,19 +60,21 @@ Public Sub SetScope(ByVal Scope As ConfigScopes)
 End Sub
 
 Public Function GetValue(ByVal Key As String) As Variant
-    If Not Definitions.Items().Exists(Key) Then
-        Err.Raise 9, Information.TypeName(Me), "Can't find definition: " & Key
-    End If
-
-    Dim Definition As Definition
-    Set Definition = Definitions(Key)
-
   #If DEV Then
     Dim Data As Dictionary
   #Else
     Dim Data As Object
   #End If
     Set Data = this.File.Read()
+
+    If Not Definitions.Items().Exists(Key) Then
+        GetValue = Data(Key)
+        Exit Function
+    End If
+
+    Dim Definition As Definition
+    Set Definition = Definitions(Key)
+
     If Data.Exists(Definition.Key) Then
         GetValue = Utils.ConvertToType(Data(Definition.Key), Definition.DataType)
         Exit Function

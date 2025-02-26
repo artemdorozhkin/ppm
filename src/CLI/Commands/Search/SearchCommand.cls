@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder("PearPMProject.src.CLI.Commands.Search")
+'@Folder "PearPMProject.src.CLI.Commands.Search"
 Option Explicit
 
 Implements ICommand

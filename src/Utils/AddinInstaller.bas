@@ -1,5 +1,5 @@
 Attribute VB_Name = "AddinInstaller"
-'@Folder("PearPMProject.src.Utils")
+'@Folder "PearPMProject.src.Utils"
 Option Explicit
 
 Public Sub SwitchAddin()

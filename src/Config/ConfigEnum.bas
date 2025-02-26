@@ -1,5 +1,5 @@
 Attribute VB_Name = "ConfigEnum"
-'@Folder("PearPMProject.src.Config")
+'@Folder "PearPMProject.src.Config"
 Option Explicit
 
 Public Enum ConfigScopes
