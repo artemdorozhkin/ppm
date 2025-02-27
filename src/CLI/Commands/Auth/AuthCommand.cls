@@ -75,7 +75,7 @@ Private Sub ICommand_Exec()
         Immediate.WriteLine Error("error")
         Exit Sub
     ElseIf Response.Code <> HTTPCodes.CREATED_201 Then
-        Immediate.WriteLine "ERR!"
+        Immediate.WriteLine "internal server error!"
         Exit Sub
     End If
 
