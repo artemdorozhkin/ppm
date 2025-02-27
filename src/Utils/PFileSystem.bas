@@ -21,7 +21,7 @@ End Sub
 Public Function ReadFile(ByVal Path As String, Optional ByVal Encoding As String = "UTF-8") As String
     With NewStream()
         .Charset = Encoding
-        .Type = adTypeText
+        .Type = 2 'adTypeText
         .Open
         .LoadFromFile Path
         ReadFile = .ReadText()
@@ -55,7 +55,14 @@ Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional By
     EncodingStream.CopyTo BinaryStream
     EncodingStream.Close
 
-    BinaryStream.SaveToFile Path, 2 'adSaveCreateOverWrite
+    With NewFileSystemObject()
+        If Not .FileExists(Path) Then
+            PFileSystem.CreateFolder .GetParentFolderName(Path), Recoursive:=True
+            BinaryStream.SaveToFile Path, 1 'adSaveCreateNotExist
+        Else
+            BinaryStream.SaveToFile Path, 2 'adSaveCreateOverWrite
+        End If
+    End With
     BinaryStream.Close
 End Sub
 
@@ -101,4 +108,21 @@ Public Function GetFileExt(ByVal Path As String) As String
     Dim DotPosition As Long: DotPosition = Strings.InStrRev(FileName, ".")
     If DotPosition = 0 Then Exit Function
     GetFileExt = Strings.Mid(FileName, DotPosition)
+End Function
+
+Public Function BuildPath(ParamArray Parts() As Variant)
+  #If DEV Then
+    Dim FSO As FileSystemObject
+  #Else
+    Dim FSO As Object
+  #End If
+    Set FSO = NewFileSystemObject()
+
+    Dim FullPath As String
+    Dim Part As Variant
+    For Each Part In Parts
+        FullPath = FSO.BuildPath(FullPath, Part)
+    Next
+
+    BuildPath = FullPath
 End Function

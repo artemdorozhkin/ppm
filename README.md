@@ -8,14 +8,6 @@
 
 `ppm` is a package manager developed for VBA and with VBA, providing a command-line interface (CLI-like) through the Immediate Window in the VBA IDE. It's created to help developers manage their VBA projects by organizing code, dependencies, and facilitating common tasks.
 
-## Add to project
-
-To add the Excel add-in to your project:
-
-1. **Ensure Excel is open and active** (not the Visual Basic for Applications editor).
-
-1. Press `Ctrl + Shift + A` to enable `ppm` for your project.
-
 ## Commands list
 
 Currently, `ppm` supports a few commands:
@@ -27,6 +19,7 @@ Currently, `ppm` supports a few commands:
 - [`init`](#init): Initialises the package.
 - [`install`](#install): Installs packages with dependencies into the project.
 - [`module`](#module): Manages the project modules (.bas).
+- [`ref`](#ref): Manages the project references.
 - [`publish`](#publish): Uploads the project to the server or local registry.
 - [`search`](#search): Search for the package on the server or locally.
 - [`sync`](#sync): Synchronises the project modules with the root folder.

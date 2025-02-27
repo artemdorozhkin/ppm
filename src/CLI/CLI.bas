@@ -22,6 +22,7 @@ Public Property Get Commands() As Variant
         "install", _
         "module", _
         "publish", _
+        "ref", _
         "search", _
         "sync", _
         "uninstall", _
@@ -39,7 +40,8 @@ Public Property Get SubCommands() As Variant
         "minor", _
         "move", _
         "patch", _
-        "set" _
+        "set", _
+        "update" _
     )
 End Property
 
@@ -74,6 +76,9 @@ End Property
     Buffer("bas") = "module"
     Buffer("mv") = "move"
 
+    Buffer("r") = "ref"
+    Buffer("references") = "ref"
+
     Buffer("find") = "search"
     Buffer("s") = "search"
 
@@ -81,15 +86,17 @@ End Property
 
     Buffer("rm") = "uninstall"
 
+    Buffer("upd") = "update"
+
     Set Aliases = Buffer
 End Property
 
 Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
-    Dim Config As Config: Set Config = NewConfig(Definitions.Items, Tokens)
+    Dim Config As Config: Set Config = NewConfig(ConfigScopes.DefaultScope)
     If Tokens.Count = 0 Then
         Set ParseCommand = NewHelpCommand()
         Exit Function
-    ElseIf Config.GetValue("help") Then
+    ElseIf Tokens.IncludeDefinition(Definitions("help")) Then
         Set ParseCommand = NewHelpCommand(Config, Tokens)
         Exit Function
     ElseIf Tokens.Count = 1 And Tokens.IncludeDefinition(Definitions("version")) Then
@@ -123,9 +130,12 @@ Public Function FindCommand(ByVal Name As String) As String
 End Function
 
 Public Sub InitLang()
-    Dim Config As Config: Set Config = NewConfig(Definitions.Items)
+    Dim Config As Config: Set Config = NewConfig(ConfigScopes.UserScope)
     Dim SelectedLang As String
-    SelectedLang = Strings.LCase(Config.GetValue("language"))
+    SelectedLang = Strings.LCase(GetFirstTrue( _
+        Config.GetValue("language"), _
+        Definitions("language").Default _
+    ))
 
     Set this.Lang = NewLang(SelectedLang)
 End Sub

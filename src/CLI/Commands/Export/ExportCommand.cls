@@ -52,20 +52,23 @@ Private Sub ICommand_Exec()
     End If
 
     Dim ms As Double: ms = DateTime.Timer
-    Dim Encoding As String: Encoding = Me.GetEncoding()
+    Dim Encoding As String
+    Encoding = GetFirstValueFrom("encoding", this.Tokens, this.Config)
 
     Dim SaveStruct As Boolean
-    SaveStruct = this.Config.GetValue("save-struct")
+    SaveStruct = GetFirstValueFrom("save-struct", this.Tokens, this.Config)
 
     Dim Folder As String
     Folder = SelectedProject.Folder
+
     Dim UserFolder As String
-    UserFolder = this.Config.GetValue("path")
+    UserFolder = GetFirstValueFrom("path", this.Tokens, this.Config)
     If Strings.Len(UserFolder) > 0 Then
         Folder = UserFolder
     End If
 
-    Dim NoClear As Boolean: NoClear = this.Config.GetValue("no-clear")
+    Dim NoClear As Boolean
+    NoClear = GetFirstValueFrom("no-clear", this.Tokens, this.Config)
 
     Dim Exporter As ProjectExporter
     Set Exporter = NewProjectExporter( _
@@ -84,12 +87,3 @@ Private Sub ICommand_Exec()
         SelectedProject.Folder _
     )
 End Sub
-
-Public Function GetEncoding() As Variant
-    Dim EncodingDef As Definition: Set EncodingDef = Definitions("encoding")
-    If this.Tokens.IncludeDefinition(EncodingDef) Then
-        GetEncoding = this.Tokens.GetTokenByDefinition(EncodingDef).Text
-    Else
-        GetEncoding = EncodingDef.Default
-    End If
-End Function

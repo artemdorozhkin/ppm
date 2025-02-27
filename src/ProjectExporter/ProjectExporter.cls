@@ -106,20 +106,25 @@ Public Sub ExportFolders(ByVal Encoding As String, ParamArray Folders() As Varia
 End Sub
 
 Private Function GetLastExport() As Variant
-    Dim ConfigIO As ConfigIO
-    Set ConfigIO = NewConfigIO(GetLastExportPath())
-    Dim LastExportList As String: LastExportList = ConfigIO.Read()("LastExportList")
-    GetLastExport = Strings.Split(LastExportList, ";")
+    Dim Converter As BinaryConverter
+    Set Converter = New BinaryConverter
+    On Error Resume Next
+    Dim Decoded As String
+    Decoded = Strings.StrConv(PFileSystem.ReadFile(GetLastExportPath()), vbUnicode)
+    GetLastExport = Strings.Split(Decoded, vbNewLine)
+    If Err Then
+        GetLastExport = Array()
+    End If
 End Function
 
 Private Sub SaveLastExport()
-    Dim ConfigIO As ConfigIO
-    Set ConfigIO = NewConfigIO(GetLastExportPath())
-    ConfigIO.CreateOrWrite "LastExportList", Strings.Join(this.LastExport, ";")
+    Dim Encoded As String
+    Encoded = Strings.StrConv(Strings.Join(this.LastExport, vbNewLine), vbFromUnicode)
+    PFileSystem.SaveToFile GetLastExportPath(), Encoded
 End Sub
 
 Private Function GetLastExportPath() As String
-    GetLastExportPath = NewFileSystemObject().BuildPath(Constants.ProjectPath, ".lel")
+    GetLastExportPath = PFileSystem.BuildPath(SelectedProject.Folder, ".ppm", ".lel")
 End Function
 
 Private Sub DeleteLastExport()

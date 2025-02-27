@@ -12,37 +12,37 @@ Public Type TPackageInfo
 End Type
 
 Public InitPack As TPackageInfo
-Public PackInfo As TPackageInfo
+Public ResultPack As TPackageInfo
 
 Public Sub Start()
     Immediate.ReadLine PStrings.FString("project name ({0}):", InitPack.Name), "InitDialog.Step2"
 End Sub
 
 Public Sub Step2(Optional ByVal ProjectName As String)
-    PackInfo.Name = GetFirstTrue(ProjectName, InitPack.Name)
+    ResultPack.Name = GetFirstTrue(ProjectName, InitPack.Name)
     Immediate.ReadLine PStrings.FString("version ({0}):", InitPack.Version), "InitDialog.Step3"
 End Sub
 
 Public Sub Step3(Optional ByVal Version As String)
-    PackInfo.Version = GetFirstTrue(Version, InitPack.Version)
+    ResultPack.Version = GetFirstTrue(Version, InitPack.Version)
     Immediate.ReadLine PStrings.FString("description ({0}):", InitPack.Description), "InitDialog.Step4"
 End Sub
 
 Public Sub Step4(Optional ByVal Description As String)
-    PackInfo.Description = GetFirstTrue(Description, InitPack.Description)
+    ResultPack.Description = GetFirstTrue(Description, InitPack.Description)
     Immediate.ReadLine PStrings.FString("author ({0}):", InitPack.Author), "InitDialog.Step5"
 End Sub
 
 Public Sub Step5(Optional ByVal Author As String)
-    PackInfo.Author = GetFirstTrue(Author, InitPack.Author)
+    ResultPack.Author = GetFirstTrue(Author, InitPack.Author)
     Immediate.ReadLine PStrings.FString("git repository ({0}):", InitPack.Author), "InitDialog.Step6"
 End Sub
 
 Public Sub Step6(Optional ByVal GitURL As String)
-    PackInfo.GitURL = GetFirstTrue(GitURL, InitPack.GitURL)
+    ResultPack.GitURL = GetFirstTrue(GitURL, InitPack.GitURL)
 
     Immediate.WriteLine
-    With PackInfo
+    With ResultPack
         Dim Info As String
         Info = PStrings.FString( _
             "name: {0}\\nversion: {1}\\ndescription: {2}\\nauthor: {3}\\ngit: {4}\\n", _
@@ -69,18 +69,18 @@ Public Function GetOrDefault(ByVal Value As String, ByVal ConfigKey As String) A
     End If
 
     Dim Config As Config
-    Set Config = NewConfig(Definitions.Items)
-    GetOrDefault = Config.GetValue(ConfigKey)
+    Set Config = NewConfig(ConfigScopes.DefaultScope)
+    If IsTrue(Config.GetValue(ConfigKey)) Then
+        GetOrDefault = Config.GetValue(ConfigKey)
+    Else
+        If Not Information.IsMissing(Definitions(ConfigKey).Default) Then
+            GetOrDefault = Definitions(ConfigKey).Default
+        End If
+    End If
 End Function
 
 Private Function GetFirstTrue(ByVal Value1 As String, ByVal Value2 As String) As String
     GetFirstTrue = Interaction.IIf(IsTrue(Value1), Value1, Value2)
-End Function
-
-Public Function SetNameAndDefault(ByVal Name As String) As TPackageInfo
-    PackInfo = SetDefault()
-    PackInfo.Name = GetOrDefault(Name, "name")
-    SetNameAndDefault = PackInfo
 End Function
 
 Public Function SetDefault( _
@@ -90,7 +90,7 @@ Public Function SetDefault( _
     Optional ByVal Author As Variant, _
     Optional ByVal GitURL As Variant _
 ) As TPackageInfo
-    With InitPack
+    With SetDefault
         If Information.IsMissing(Name) Then
             .Name = GetOrDefault("", "name")
         Else
@@ -121,6 +121,4 @@ Public Function SetDefault( _
             .GitURL = GitURL
         End If
     End With
-
-    SetDefault = PackInfo
 End Function
