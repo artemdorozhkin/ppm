@@ -76,13 +76,21 @@ Private Sub ICommand_Exec()
     End If
 
     If Not AfterDialog And SkipByDefault Then
-        PackInfo = InitPack
+        ResultPack = InitPack
     End If
 
     If SkipByDefault Then
         Dim ms As Double: ms = DateTime.Timer
-        Me.CreatePack
-        PackInfo = InitDialog.SetDefault( _
+        Dim PackComponent As Object
+        Set PackComponent = Me.CreatePackComponent()
+
+        If IsTrue(Pack) Then
+            Dim CurrentPack As Pack
+            Set CurrentPack = NewPack(PackComponent)
+            CurrentPack.Update Dependencies:=Pack.Dependencies, DevDependencies:=Pack.DevDependencies
+        End If
+
+        ResultPack = InitDialog.SetDefault( _
             Name:="", _
             Version:="", _
             Description:="", _
@@ -96,7 +104,7 @@ Private Sub ICommand_Exec()
     End If
 End Sub
 
-Public Sub CreatePack()
+Public Sub CreatePackComponent()
   #If DEV Then
     Dim PackComponent As VBComponent
   #Else
@@ -110,14 +118,14 @@ Public Sub CreatePack()
 
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     JB.AddObject _
-        "name", PackInfo.Name, _
-        "version", PackInfo.Version, _
-        "description", PackInfo.Description, _
-        "author", PackInfo.Author, _
-        "git", PackInfo.GitURL, _
+        "name", ResultPack.Name, _
+        "version", ResultPack.Version, _
+        "description", ResultPack.Description, _
+        "author", ResultPack.Author, _
+        "git", ResultPack.GitURL, _
         "references", Me.GetReferences()
 
-    SelectedProject.Rename PackInfo.Name & "Project"
+    SelectedProject.Rename ResultPack.Name & "Project"
 
     With PackComponent.CodeModule
         .DeleteLines 1, .CountOfLines
