@@ -87,24 +87,26 @@ Private Function GetDefaultConfig() As ConfigIO
   #End If
     Set FSO = NewFileSystemObject()
 
-    Dim Folder As String
-    Dim FilePath As String
-    Folder = PFileSystem.BuildPath(SelectedProject.Folder, ".ppm", ".ppmrc")
-    If FSO.FileExists(FilePath) Then
-        Set GetDefaultConfig = NewConfigIO(FilePath)
-        Exit Function
-    End If
+    If SelectedProject.IsSaved Then
+        Dim Folder As String
+        Dim FilePath As String
+        Folder = PFileSystem.BuildPath(SelectedProject.Folder, ".ppm", ".ppmrc")
+        If FSO.FileExists(FilePath) Then
+            Set GetDefaultConfig = NewConfigIO(FilePath)
+            Exit Function
+        End If
+    Else
+        FilePath = PFileSystem.BuildPath(Interaction.Environ("APPDATA"), "ppm", ".ppmrc")
+        If FSO.FileExists(FilePath) Then
+            Set GetDefaultConfig = NewConfigIO(FilePath)
+            Exit Function
+        End If
 
-    FilePath = PFileSystem.BuildPath(Interaction.Environ("APPDATA"), "ppm", ".ppmrc")
-    If FSO.FileExists(FilePath) Then
-        Set GetDefaultConfig = NewConfigIO(FilePath)
-        Exit Function
-    End If
-
-    FilePath = PFileSystem.BuildPath(Interaction.Environ("PROGRAMDATA"), "ppm", ".ppmrc")
-    If FSO.FileExists(FilePath) Then
-        Set GetDefaultConfig = NewConfigIO(FilePath)
-        Exit Function
+        FilePath = PFileSystem.BuildPath(Interaction.Environ("PROGRAMDATA"), "ppm", ".ppmrc")
+        If FSO.FileExists(FilePath) Then
+            Set GetDefaultConfig = NewConfigIO(FilePath)
+            Exit Function
+        End If
     End If
 
     ' otherwise set user config as default
