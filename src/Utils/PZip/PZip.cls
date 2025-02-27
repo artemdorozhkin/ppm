@@ -34,7 +34,11 @@ End Property
 
 Public Property Get UnpackedSize() As Long
     Dim Total As Long
+  #If DEV Then
     Dim Item As Shell32.FolderItem
+  #Else
+    Dim Item As Object
+  #End If
     For Each Item In this.Zip.Items
         Total = Total + Item.Size
     Next

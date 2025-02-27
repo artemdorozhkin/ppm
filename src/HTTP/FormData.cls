@@ -11,8 +11,13 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TFormData
+  #If DEV Then
     Stream As Stream
     Converter As BinaryConverter
+  #Else
+    Stream As Object
+    Converter As Object
+  #End If
     Boundary As String
     ContentDisposition As String
 End Type

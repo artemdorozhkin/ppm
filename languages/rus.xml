@@ -285,6 +285,39 @@
                 </published>
             </messages>
         </publish>
+        <ref>
+            <description>
+                Управляет референсами проекта.
+            </description>
+            <usage>
+                <item>
+                    add &lt;имя, путь или guid&gt;
+                </item>
+                <item>
+                    delete &lt;имя, путь или guid&gt;
+                </item>
+                <item>
+                    update
+                </item>
+                <item>
+                    list
+                </item>
+            </usage>
+            <messages>
+                <refsUpdated>
+                    референсы пакета обновлены
+                </refsUpdated>
+                <refDeleted>
+                    успешно удален референс: {0} 
+                </refDeleted>
+                <refAdded>
+                    успешно добавлен референс: {0}  
+                </refAdded>
+                <cantFindRef>
+                    ERR: не удалось найти референс: {0}
+                </cantFindRef>
+            </messages>
+        </ref>
         <search>
             <description>
                 Поиск пакета на сервере или локально.

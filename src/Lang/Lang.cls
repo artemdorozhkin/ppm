@@ -31,7 +31,7 @@ Public Sub SetLang(ByVal Language As String)
     Root = FSO.BuildPath(FSO.GetParentFolderName(Application.VBE.ActiveVBProject.FileName), "languages")
   #Else
     Dim FSO As Object: Set FSO = NewFileSystemObject()
-    Dim Root As String: Root = FSO.BuildPath(Constants.GlobalPPMPath, "languages")
+    Dim Root As String: Root = PFileSystem.BuildPath(Interaction.Environ("APPDATA"), "ppm", "languages")
   #End If
 
     this.LangPath = FSO.BuildPath(Root, PStrings.FString("{0}.xml", Language))

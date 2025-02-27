@@ -44,8 +44,10 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
-    Dim AfterDialog As Boolean: AfterDialog = this.Config.GetValue("_after-dialog")
-    Dim SkipByDefault As Boolean: SkipByDefault = this.Config.GetValue("yes")
+    Dim AfterDialog As Boolean
+    AfterDialog = GetFirstValueFrom("_after-dialog", this.Tokens, this.Config)
+    Dim SkipByDefault As Boolean
+    SkipByDefault = GetFirstValueFrom("yes", this.Tokens, this.Config)
 
     Dim Pack As Pack
     If SelectedProject.IsComponentExists("package") Then
@@ -60,26 +62,41 @@ Private Sub ICommand_Exec()
     End If
 
     If IsTrue(Pack) And Not AfterDialog Then
-        If Not HaveProjectName Then
-            InitialName = Pack.Name
-        End If
-        InitDialog.SetDefault _
-            Name:=InitialName, _
+        InitPack = InitDialog.SetDefault( _
+            Name:=GetFirstTrue(InitialName, Pack.Name), _
             Version:=Pack.Version, _
             Description:=Pack.Description, _
             Author:=Pack.Author, _
-            GitURL:=Pack.Git
-    ElseIf Not AfterDialog Then
-        InitDialog.SetDefault
+            GitURL:=Pack.Git _
+        )
     ElseIf HaveProjectName Then
-        InitDialog.SetNameAndDefault InitialName
-    ElseIf Not SkipByDefault Then
-        InitDialog.SetDefault
+        InitPack = InitDialog.SetDefault(Name:=InitialName)
+    Else
+        InitPack = InitDialog.SetDefault(Name:=SelectedProject.Name)
+    End If
+
+    If Not AfterDialog And SkipByDefault Then
+        ResultPack = InitPack
     End If
 
     If SkipByDefault Then
         Dim ms As Double: ms = DateTime.Timer
-        Me.CreatePack
+        Dim PackComponent As Object
+        Set PackComponent = Me.CreatePackComponent()
+
+        If IsTrue(Pack) Then
+            Dim CurrentPack As Pack
+            Set CurrentPack = NewPack(PackComponent)
+            CurrentPack.Update Dependencies:=Pack.Dependencies, DevDependencies:=Pack.DevDependencies
+        End If
+
+        ResultPack = InitDialog.SetDefault( _
+            Name:="", _
+            Version:="", _
+            Description:="", _
+            Author:="", _
+            GitURL:="" _
+        )
         ms = DateTime.Timer - ms
         Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/initialized"), ConvertTime(ms))
     Else
@@ -87,7 +104,7 @@ Private Sub ICommand_Exec()
     End If
 End Sub
 
-Public Sub CreatePack()
+Public Sub CreatePackComponent()
   #If DEV Then
     Dim PackComponent As VBComponent
   #Else
@@ -101,13 +118,14 @@ Public Sub CreatePack()
 
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     JB.AddObject _
-        "name", PackInfo.Name, _
-        "version", PackInfo.Version, _
-        "description", PackInfo.Description, _
-        "author", PackInfo.Author, _
-        "git", PackInfo.GitURL
+        "name", ResultPack.Name, _
+        "version", ResultPack.Version, _
+        "description", ResultPack.Description, _
+        "author", ResultPack.Author, _
+        "git", ResultPack.GitURL, _
+        "references", Me.GetReferences()
 
-    SelectedProject.Rename PackInfo.Name & "Project"
+    SelectedProject.Rename ResultPack.Name & "Project"
 
     With PackComponent.CodeModule
         .DeleteLines 1, .CountOfLines
@@ -115,3 +133,15 @@ Public Sub CreatePack()
         .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
     End With
 End Sub
+
+Public Function GetReferences() As Object
+    Dim References As Object
+    Set References = NewDictionary()
+
+    Dim r As Object
+    For Each r In ThisWorkbook.VBProject.References
+        References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+    Next
+
+    Set GetReferences = References
+End Function
