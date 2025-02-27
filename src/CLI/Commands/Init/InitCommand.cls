@@ -62,26 +62,33 @@ Private Sub ICommand_Exec()
     End If
 
     If IsTrue(Pack) And Not AfterDialog Then
-        If Not HaveProjectName Then
-            InitialName = Pack.Name
-        End If
-        InitDialog.SetDefault _
-            Name:=InitialName, _
+        InitPack = InitDialog.SetDefault( _
+            Name:=GetFirstTrue(InitialName, Pack.Name), _
             Version:=Pack.Version, _
             Description:=Pack.Description, _
             Author:=Pack.Author, _
-            GitURL:=Pack.Git
-    ElseIf Not AfterDialog Then
-        InitDialog.SetDefault
+            GitURL:=Pack.Git _
+        )
     ElseIf HaveProjectName Then
-        InitDialog.SetNameAndDefault InitialName
-    ElseIf Not SkipByDefault Then
-        InitDialog.SetDefault
+        InitPack = InitDialog.SetDefault(Name:=InitialName)
+    Else
+        InitPack = InitDialog.SetDefault(Name:=SelectedProject.Name)
+    End If
+
+    If Not AfterDialog And SkipByDefault Then
+        PackInfo = InitPack
     End If
 
     If SkipByDefault Then
         Dim ms As Double: ms = DateTime.Timer
         Me.CreatePack
+        PackInfo = InitDialog.SetDefault( _
+            Name:="", _
+            Version:="", _
+            Description:="", _
+            Author:="", _
+            GitURL:="" _
+        )
         ms = DateTime.Timer - ms
         Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/initialized"), ConvertTime(ms))
     Else
