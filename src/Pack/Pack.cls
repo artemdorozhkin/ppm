@@ -170,7 +170,7 @@ Public Function Update( _
             For Each DepName In Dependencies
                 this.Pack("dependencies")(DepName) = Dependencies(DepName)
             Next
-        Else
+        ElseIf Not Dependencies Is Nothing Then
             Set this.Pack("dependencies") = Dependencies
         End If
     End If
@@ -180,13 +180,15 @@ Public Function Update( _
             For Each DepName In DevDependencies
                 this.Pack("devDependencies")(DepName) = DevDependencies(DepName)
             Next
-        Else
+        ElseIf Not DevDependencies Is Nothing Then
             Set this.Pack("devDependencies") = DevDependencies
         End If
     End If
 
     If Not Information.IsMissing(References) Then
-        Set this.Pack("references") = References
+        If Not References Is Nothing Then
+            Set this.Pack("references") = References
+        End If
     End If
 
     Dim JSON As String: JSON = PJSON.Stringify(this.Pack, 2)
