@@ -83,12 +83,6 @@ Private Function GetFirstTrue(ByVal Value1 As String, ByVal Value2 As String) As
     GetFirstTrue = Interaction.IIf(IsTrue(Value1), Value1, Value2)
 End Function
 
-Public Function SetNameAndDefault(ByVal Name As String) As TPackageInfo
-    PackInfo = SetDefault()
-    PackInfo.Name = GetOrDefault(Name, "name")
-    SetNameAndDefault = PackInfo
-End Function
-
 Public Function SetDefault( _
     Optional ByVal Name As Variant, _
     Optional ByVal Version As Variant, _
@@ -96,7 +90,7 @@ Public Function SetDefault( _
     Optional ByVal Author As Variant, _
     Optional ByVal GitURL As Variant _
 ) As TPackageInfo
-    With InitPack
+    With SetDefault
         If Information.IsMissing(Name) Then
             .Name = GetOrDefault("", "name")
         Else
@@ -127,6 +121,4 @@ Public Function SetDefault( _
             .GitURL = GitURL
         End If
     End With
-
-    SetDefault = PackInfo
 End Function
