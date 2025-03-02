@@ -87,6 +87,7 @@ Private Sub ICommand_Exec()
     ToLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
     Dim Registry As String
     Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
+    Registry = Utils.ResolveUrl(Registry)
     If ToLocal Then
         If Not NewFileSystemObject().FolderExists(Registry) Then
             PFileSystem.CreateFolder Registry, Recoursive:=True

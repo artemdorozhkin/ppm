@@ -45,13 +45,13 @@ Private Sub ICommand_Exec()
     Dim NewVers As String
 
     Dim SubCommand As SyntaxToken
-    Set SubCommand = this.Tokens.GetFirstTokenKind(TokenKind.SubCommand)
+    Set SubCommand = this.Tokens.PopFirstTokenKind(TokenKind.SubCommand)
     Dim SubCommandName As String
     If IsTrue(SubCommand) Then
         SubCommandName = SubCommand.Text
     Else
         Dim NewVersToken As SyntaxToken
-        Set NewVersToken = this.Tokens.GetFirstTokenKind(TokenKind.Identifier)
+        Set NewVersToken = this.Tokens.PopFirstTokenKind(TokenKind.Identifier)
         If IsFalse(NewVersToken) Then
             Immediate.WriteLine PStrings.FString("v{0}", Pack.Version)
             Exit Sub

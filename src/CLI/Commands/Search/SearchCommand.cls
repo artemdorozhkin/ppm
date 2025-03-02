@@ -44,8 +44,14 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    Dim Registry As String
+    Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
+
+    Dim IsLocal As Boolean
+    IsLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
+
     Dim PackageToken As SyntaxToken
-    Set PackageToken = this.Tokens.GetFirstTokenKind(TokenKind.Identifier)
+    Set PackageToken = this.Tokens.PopFirstTokenKind(TokenKind.Identifier)
     If IsFalse(PackageToken) Then
         Immediate.WriteLine CLI.Lang.GetValue("messages/nameMissing")
         Exit Sub
@@ -54,10 +60,7 @@ Private Sub ICommand_Exec()
     Dim PackageName As String
     PackageName = PackageToken.Text
 
-    Dim Registry As String
-    Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
-
-    If GetFirstValueFrom("local", this.Tokens, this.Config) Then
+    If IsLocal Then
         LookupLocal Registry, PackageName
     Else
         LookupOnServer Registry, PackageName
@@ -66,11 +69,7 @@ End Sub
 
 Public Sub LookupOnServer(ByVal Registry As String, ByVal PackageName As String)
     Dim URL As String
-    If Strings.Right(Registry, 1) <> "/" Then
-        URL = Registry & PStrings.FString("/search/{0}", PackageName)
-    Else
-        URL = Registry & PStrings.FString("search/{0}", PackageName)
-    End If
+    URL = Utils.ResolveUrl(Registry, PStrings.FString("/-/search/{0}", PackageName))
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Response As TResponse

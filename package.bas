@@ -1,5 +1,5 @@
 Attribute VB_Name = "package"
-'@Folder("PearPMProject")
+'@Folder "PearPMProject"
 '{
 '  "name": "PearPM",
 '  "version": "1.0.0",

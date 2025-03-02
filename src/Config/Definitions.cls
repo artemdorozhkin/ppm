@@ -79,25 +79,6 @@ Attribute Items.VB_UserMemId = 0
     )
     Set Buffer(Definition.Key) = Definition
 
-    With NewFileSystemObject()
-        Dim PpmFolder As String
-        PpmFolder = .BuildPath(Interaction.Environ("APPDATA"), "ppm")
-        Dim RegistryPath As String
-        RegistryPath = .BuildPath(PpmFolder, "registry")
-        If Not .FolderExists(PpmFolder) Then
-            .CreateFolder PpmFolder
-        End If
-        If Not .FolderExists(RegistryPath) Then
-            .CreateFolder RegistryPath
-        End If
-    End With
-
-    Set Definition = NewDefinition( _
-        Key:="registry", _
-        Default:=RegistryPath _
-    )
-    Set Buffer(Definition.Key) = Definition
-
     Set Definition = NewDefinition( _
         Key:="language", _
         Default:="eng" _
@@ -133,6 +114,12 @@ Attribute Items.VB_UserMemId = 0
         Key:="path", _
         Short:="p", _
         Default:="" _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
+        Key:="registry", _
+        Default:="https://registry.ppmvba.com/" _
     )
     Set Buffer(Definition.Key) = Definition
 
