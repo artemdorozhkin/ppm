@@ -12,7 +12,7 @@ Option Explicit
 
 Implements ICommand
 
-Private Type TConfigCommand
+Private Type TModuleCommand
     CommandInfo As CommandInfo
     Config As Config
     Tokens As Tokens
@@ -23,7 +23,7 @@ Private Type TConfigCommand
     Parts As Variant
 End Type
 
-Private this As TConfigCommand
+Private this As TModuleCommand
 
 Private Sub Class_Initialize()
     CLI.Lang.SetBlock "/root/ppmCommands/module"

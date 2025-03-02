@@ -18,7 +18,7 @@ Private Enum NameTypes
     TypePath
 End Enum
 
-Private Type TConfigCommand
+Private Type TRefCommand
     CommandInfo As CommandInfo
     Config As Config
     Tokens As Tokens
@@ -27,7 +27,7 @@ Private Type TConfigCommand
     NameType As NameTypes
 End Type
 
-Private this As TConfigCommand
+Private this As TRefCommand
 
 Private Sub Class_Initialize()
     CLI.Lang.SetBlock "/root/ppmCommands/ref"

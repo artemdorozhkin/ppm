@@ -11,13 +11,13 @@ Attribute VB_Exposed = False
 
 Implements ICommand
 
-Private Type TExportCommand
+Private Type TVersionCommand
     CommandInfo As CommandInfo
     Config As Config
     Tokens As Tokens
 End Type
 
-Private this As TExportCommand
+Private this As TVersionCommand
 
 Private Sub Class_Initialize()
     CLI.Lang.SetBlock "/root/ppmCommands/version"

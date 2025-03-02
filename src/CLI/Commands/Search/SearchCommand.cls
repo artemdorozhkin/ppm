@@ -12,13 +12,13 @@ Option Explicit
 
 Implements ICommand
 
-Private Type TExportCommand
+Private Type TSearchCommand
     CommandInfo As CommandInfo
     Config As Config
     Tokens As Tokens
 End Type
 
-Private this As TExportCommand
+Private this As TSearchCommand
 
 Private Sub Class_Initialize()
     CLI.Lang.SetBlock "/root/ppmCommands/search"
