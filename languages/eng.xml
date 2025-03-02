@@ -86,9 +86,6 @@
             <description>
                 Manages the ppm configuration file.
             </description>
-            <param name="global">
-                \\tUse global config.
-            </param>
             <param name="location">
                 \\tUse config from specify location &lt;global|user|project&gt;.
             </param>
@@ -104,6 +101,9 @@
                 </item>
                 <item>
                     edit
+                </item>
+                <item>
+                    list
                 </item>
             </usage>
             <messages>

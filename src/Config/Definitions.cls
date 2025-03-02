@@ -66,13 +66,6 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
-        Key:="global", _
-        Short:="g", _
-        Default:=False _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
         Key:="help", _
         Short:="h", _
         Default:=False _

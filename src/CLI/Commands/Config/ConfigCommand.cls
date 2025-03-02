@@ -26,7 +26,6 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "config"
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
-    this.CommandInfo.Params.Item("global") = CLI.Lang.GetValue("param", "name=global")
     this.CommandInfo.Params.Item("location") = CLI.Lang.GetValue("param", "name=location")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
@@ -80,13 +79,6 @@ Private Sub ICommand_Exec()
 End Sub
 
 Public Function GetConfig() As Config
-    Dim GlobalDef As Definition
-    Set GlobalDef = Definitions("global")
-    If this.Tokens.IncludeDefinition(GlobalDef) Then
-        Set GetConfig = NewConfig(ConfigScopes.GlobalScode)
-        Exit Function
-    End If
-
     Dim LocationDef As Definition
     Set LocationDef = Definitions("location")
 

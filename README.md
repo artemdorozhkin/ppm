@@ -99,8 +99,6 @@ Manages the ppm configuration file.
 
 #### Flags:
 
--g|--global Uses global config.
-
 -l|--location Specifies config location .
 
 **Example**:
@@ -138,6 +136,15 @@ ppm "config edit"
 
 **Result**:
 Opens the config file for editing.
+
+**Example**:
+
+```vb
+ppm "config list"
+```
+
+**Result**:
+Prints all keys and values from the config file.
 
 ### export
 

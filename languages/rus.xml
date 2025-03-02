@@ -86,9 +86,6 @@
             <description>
                 Управляет конфигурационным файлом ppm.
             </description>
-            <param name="global">
-                \\tИспользовать глобальный конфиг.
-            </param>
             <param name="location">
                 \\tИспользовать указанный конфиг &lt;global|user|project&gt;.
             </param>
@@ -104,6 +101,9 @@
                 </item>
                 <item>
                     edit
+                </item>
+                <item>
+                    list
                 </item>
             </usage>
             <messages>
