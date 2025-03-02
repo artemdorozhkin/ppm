@@ -76,7 +76,7 @@ End Sub
 Public Function GetCommandName() As String
     Dim Commands As Variant: Commands = this.Tokens.GetTokensKind(TokenKind.Command)
     If UBound(Commands) = -1 Then
-        GetCommandName = this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text
+        GetCommandName = this.Tokens.PopFirstTokenKind(TokenKind.Identifier).Text
         Exit Function
     End If
 

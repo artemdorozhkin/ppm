@@ -1,5 +1,5 @@
 Attribute VB_Name = "VersionCommandCstr"
-'@Folder("PearPMProject.src.CLI.Commands.Version")
+'@Folder "PearPMProject.src.CLI.Commands.Version"
 Option Explicit
 
 Public Function NewVersionCommand(ByRef Config As Config, ByRef Tokens As Tokens) As VersionCommand

@@ -254,7 +254,7 @@ Public Function GetFirstValueFrom(ByVal DefName As String, ByRef Tokens As Token
 
     If Tokens.IncludeDefinition(Def) Then
         Dim Token As SyntaxToken
-        Set Token = Tokens.GetTokenByDefinition(Def)
+        Set Token = Tokens.PopTokenByDefinition(Def)
         If IsFalse(Token) Then
             GetFirstValueFrom = True
         Else
@@ -272,4 +272,29 @@ Public Function GetFirstValueFrom(ByVal DefName As String, ByRef Tokens As Token
             GetFirstValueFrom = ConvertToType(Def.Default, Def.DataType)
         End If
     End If
+End Function
+
+Public Function ResolveUrl(ByVal URL As String, Optional ByVal EndPoint As String) As String
+    If Not PStrings.StartsWith(URL, "http") Then
+        URL = "http://" & URL
+    End If
+
+    If Not PStrings.EndsWith(URL, "/") Then
+        URL = URL & "/"
+    End If
+
+    If Strings.Len(EndPoint) = 0 Then
+        ResolveUrl = URL
+        Exit Function
+    End If
+
+    If PStrings.StartsWith(EndPoint, "/") Then
+        EndPoint = Strings.Right(EndPoint, Strings.Len(EndPoint) - 1)
+    End If
+
+    If PStrings.EndsWith(EndPoint, "/") Then
+        EndPoint = Strings.Left(EndPoint, Strings.Len(EndPoint) - 1)
+    End If
+
+    ResolveUrl = URL & EndPoint
 End Function

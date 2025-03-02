@@ -242,11 +242,7 @@ End Function
 
 Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As String) As Pack
     Dim URL As String
-    If Strings.Right(this.Registry, 1) <> "/" Then
-        URL = this.Registry & PStrings.FString("/{0}/{1}", LibName, Version)
-    Else
-        URL = this.Registry & PStrings.FString("{0}/{1}", LibName, Version)
-    End If
+    URL = Utils.ResolveUrl(this.Registry, PStrings.FString("/{0}/{1}", LibName, Version))
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Response As TResponse
@@ -254,8 +250,13 @@ Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As S
     Response = HTTP.GetRequest(URL)
     On Error GoTo 0
     If Response.Code <> HTTPCodes.OK_200 Then
-        Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
-        Immediate.WriteLine Response.Text
+        Dim JSONResponse As Object
+        Set JSONResponse = PJSON.Parse(Response.Text)
+        If Err.Number = 0 Then
+            Immediate.WriteLine "ERR:", JSONResponse("error")
+        Else
+            Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
+        End If
         End
     End If
 
@@ -310,11 +311,6 @@ End Function
 #Else
   Public Function DownloadLibs(ByRef Libs As Object) As Variant
 #End If
-    Dim Registry As String
-    If Strings.Right(this.Registry, 1) <> "/" Then
-        Registry = this.Registry & "/"
-    End If
-
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
     Dim Paths As Collection: Set Paths = New Collection
@@ -326,7 +322,7 @@ End Function
     For Each Name In Libs
         Dim Version As String: Version = Libs(Name)
         Dim URL As String
-        URL = PStrings.FString("{0}{1}/{2}", Registry, Name, Version)
+        URL = Utils.ResolveUrl(this.Registry, PStrings.FString("/{0}/{1}", Name, Version))
         Dim Response As TResponse
         Response = HTTP.GetRequest(URL)
         If Response.Code <> HTTPCodes.OK_200 Then
