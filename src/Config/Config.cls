@@ -90,9 +90,8 @@ Private Function GetDefaultConfig() As ConfigIO
     Set FSO = NewFileSystemObject()
 
     If SelectedProject.IsSaved Then
-        Dim Folder As String
         Dim FilePath As String
-        Folder = PFileSystem.BuildPath(SelectedProject.Folder, ".ppm", ".ppmrc")
+        FilePath = PFileSystem.BuildPath(SelectedProject.Folder, ".ppmrc")
         If FSO.FileExists(FilePath) Then
             Set GetDefaultConfig = NewConfigIO(FilePath)
             Exit Function
