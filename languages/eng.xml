@@ -1,5 +1,36 @@
 <root>
     <ppmCommands>
+        <auth>
+            <description>
+                Registers the email in the registry and returns an api_token\\nto enable package publishing.
+            </description>
+            <param name="email">
+                \\tUser email.
+            </param>
+            <param name="registry">
+                \\tSpecific registry url.
+            </param>
+            <usage>
+                <item>
+                    &lt;email&gt; [--registry URL]
+                </item>
+            </usage>
+            <messages>
+                <waitingAnswer>
+                    Waiting answer from server...
+                </waitingAnswer>
+                <errorOccurred>
+                    ERR: {0}
+                </errorOccurred>
+                <somethingWentWrong>
+                    ERR: something went wrong
+                </somethingWentWrong>
+                <success>
+                    Your api-key for email '{0}': {1}
+                    Api-key is written to the config file.
+                </success>
+            </messages>
+        </auth>
         <class>
             <description>
                 Manages the project classes (.cls).

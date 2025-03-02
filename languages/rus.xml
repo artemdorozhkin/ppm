@@ -1,5 +1,36 @@
 <root>
     <ppmCommands>
+        <auth>
+            <description>
+                Регистрирует email в реестре и возвращает токен для\\nвозможности публикации пакетов.
+            </description>
+            <param name="email">
+                \\tEmail пользователя.
+            </param>
+            <param name="registry">
+                \\tИспользовать указанный url реестра.
+            </param>
+            <usage>
+                <item>
+                    &lt;email&gt; [--registry URL]
+                </item>
+            </usage>
+            <messages>
+                <waitingAnswer>
+                    Жду ответ от сервера...
+                </waitingAnswer>
+                <errorOccurred>
+                    ERR: {0}
+                </errorOccurred>
+                <somethingWentWrong>
+                    ERR: что-то пошло не так
+                </somethingWentWrong>
+                <success>
+                    Ваш api-key для email '{0}': {1}
+                    Api-key записан в конфиг файл.
+                </success>
+            </messages>
+        </auth>
         <class>
             <description>
                 Управляет классами проекта (.cls).

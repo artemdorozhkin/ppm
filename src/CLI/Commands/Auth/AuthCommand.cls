@@ -63,12 +63,12 @@ Private Sub ICommand_Exec()
     Headers("Content-Type") = "application/json"
     Headers("Content-Length") = Strings.Len(JSONBody)
 
-    Immediate.WriteLine "Waiting answer from server..."
+    Immediate.WriteLine CLI.Lang.GetValue("messages/waitingAnswer")
 
     Dim Request As HTTP
     Set Request = New HTTP
     Dim RegistryURL As String
-    RegistryURL = GetFirstValueFrom("registry", this.Tokens, this.Config)
+    RegistryURL = Utils.GetFirstValueFrom("registry", this.Tokens, this.Config)
     If Strings.Len(RegistryURL) = 0 Then
         RegistryURL = Definitions("registry").Default
     End If
@@ -81,10 +81,10 @@ Private Sub ICommand_Exec()
     If Response.Code = 400 Then
         Dim Error As Object
         Set Error = PJSON.Parse(Response.Text)
-        Immediate.WriteLine Error("error")
+        Immediate.WriteLine CLI.Lang.GetValue("messages/errorOccurred", Error("error"))
         Exit Sub
     ElseIf Response.Code <> HTTPCodes.CREATED_201 Then
-        Immediate.WriteLine "internal server error!"
+        Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
         Exit Sub
     End If
 
@@ -96,35 +96,7 @@ Private Sub ICommand_Exec()
     Config.File.CreateOrWrite "email", Email
     Config.File.CreateOrWrite "api_key", JSON("api_key")
 
-    Immediate.WriteLine FString("Your api-key for email '{0}': {1}", Email, JSON("api_key"))
+    Immediate.WriteLine PStrings.FString( _
+        CLI.Lang.GetValue("messages/success"), Email, JSON("api_key") _
+    )
 End Sub
-
-Public Function GetFirstValueFrom(ByVal DefName As String, ByRef Tokens As Tokens, ByRef Config As Config) As Variant
-    If Not Definitions.Items().Exists(DefName) Then
-        Err.Raise 9, "Utils", "Can't find definition: " & DefName
-    End If
-
-    Dim Def As Definition
-    Set Def = Definitions(DefName)
-
-    If Tokens.IncludeDefinition(Def) Then
-        Dim Token As SyntaxToken
-        Set Token = Tokens.PopTokenByDefinition(Def)
-        If IsFalse(Token) Then
-            GetFirstValueFrom = True
-        Else
-            GetFirstValueFrom = ConvertToType(Token.Text, Def.DataType)
-        End If
-    Else
-        Dim Value As Variant
-        Value = GetFirstTrue( _
-            Config.GetValue(DefName), _
-            Def.Default _
-        )
-        If Not Information.IsNull(Value) Then
-            GetFirstValueFrom = ConvertToType(Value, Def.DataType)
-        Else
-            GetFirstValueFrom = ConvertToType(Def.Default, Def.DataType)
-        End If
-    End If
-End Function
