@@ -52,7 +52,7 @@ Public Function Lex() As Tokens
         Dim Length As Long: Length = this.Position - this.Start
         Dim Text As String
         Text = Strings.Mid(this.Text, this.Start, Length)
-        this.Tokens.Add NewSyntaxToken(this.Kind, Text)
+        this.Tokens.Push NewSyntaxToken(this.Kind, Text)
         If Current = """" Or Current = "'" Then this.Position = this.Position + 1
 Continue:
     Loop

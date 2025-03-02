@@ -14,6 +14,7 @@ End Property
 
 Public Property Get Commands() As Variant
     Commands = Array( _
+        "auth", _
         "class", _
         "config", _
         "export", _

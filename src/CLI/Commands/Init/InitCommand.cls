@@ -58,7 +58,7 @@ Private Sub ICommand_Exec()
     HaveProjectName = this.Tokens.IncludeTokenKind(TokenKind.Identifier)
     Dim InitialName As String
     If HaveProjectName Then
-        InitialName = this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text
+        InitialName = this.Tokens.PopFirstTokenKind(TokenKind.Identifier).Text
     End If
 
     If IsTrue(Pack) And Not AfterDialog Then
@@ -104,7 +104,7 @@ Private Sub ICommand_Exec()
     End If
 End Sub
 
-Public Sub CreatePackComponent()
+Public Function CreatePackComponent() As Object
   #If DEV Then
     Dim PackComponent As VBComponent
   #Else
@@ -132,7 +132,9 @@ Public Sub CreatePackComponent()
         .AddFromString Utils.CommentString(JB.ToString())
         .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
     End With
-End Sub
+
+    Set CreatePackComponent = PackComponent
+End Function
 
 Public Function GetReferences() As Object
     Dim References As Object

@@ -52,7 +52,7 @@ End Property
 
 Private Sub ICommand_Exec()
     Dim SubCommand As SyntaxToken
-    Set SubCommand = this.Tokens.GetFirstTokenKind(TokenKind.SubCommand)
+    Set SubCommand = this.Tokens.PopFirstTokenKind(TokenKind.SubCommand)
     Dim SubCommandName As String
     If IsTrue(SubCommand) Then
         SubCommandName = SubCommand.Text
@@ -63,7 +63,7 @@ Private Sub ICommand_Exec()
     End If
 
     If this.Tokens.IncludeTokenKind(TokenKind.Identifier) Then
-        this.Name = this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text
+        this.Name = this.Tokens.PopFirstTokenKind(TokenKind.Identifier).Text
         If PStrings.StartsWith(this.Name, "{") Then
             this.NameType = NameTypes.TypeGUID
         ElseIf NewFileSystemObject().FileExists(this.Name) Then

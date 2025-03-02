@@ -39,15 +39,19 @@ Attribute NewEnum.VB_UserMemId = -4
     Set NewEnum = this.CurrentEnum
 End Property
 
-Public Sub Add(ByRef Token As SyntaxToken)
+Public Sub Push(ByRef Token As SyntaxToken)
     this.Tokens.Add Token
 End Sub
 
-Public Function GetToken(ByVal Text As String, ByVal Kind As TokenKind) As SyntaxToken
+Public Function PopToken(ByVal Text As String, ByVal Kind As TokenKind) As SyntaxToken
     Dim Token As SyntaxToken
+    Dim i As Long
+    i = 0
     For Each Token In this.Tokens
+        i = i + 1
         If Token.Kind = Kind And IsEqual(Token.Text, Text) Then
-            Set GetToken = Token
+            Set PopToken = Token
+            this.Tokens.Remove i
             Exit Function
         End If
     Next
@@ -66,18 +70,23 @@ Public Function GetTokenIndex(ByVal Text As String, ByVal Kind As TokenKind) As 
     GetTokenIndex = -1
 End Function
 
-Public Function GetNextTokenAfter(ByVal Text As String, ByVal Kind As TokenKind) As SyntaxToken
+Public Function PopNextTokenAfter(ByVal Text As String, ByVal Kind As TokenKind) As SyntaxToken
     Dim i As Long: i = Me.GetTokenIndex(Text, Kind)
     If i = -1 Then Exit Function
     If i + 1 > this.Tokens.Count Then Exit Function
-    Set GetNextTokenAfter = this.Tokens(i + 1)
+    Set PopNextTokenAfter = this.Tokens(i + 1)
+    this.Tokens.Remove i + 1
 End Function
 
-Public Function GetFirstTokenKind(ByVal Kind As TokenKind) As SyntaxToken
+Public Function PopFirstTokenKind(ByVal Kind As TokenKind) As SyntaxToken
     Dim Token As SyntaxToken
+    Dim i As Long
+    i = 0
     For Each Token In this.Tokens
+        i = i + 1
         If Token.Kind = Kind Then
-            Set GetFirstTokenKind = Token
+            Set PopFirstTokenKind = Token
+            this.Tokens.Remove i
             Exit Function
         End If
     Next
@@ -101,11 +110,11 @@ Public Function IncludeDefinition(ByRef Definition As Definition) As Boolean
                         Me.IncludeToken(Definition.Short, TokenKind.ShortOptionItem)
 End Function
 
-Public Function GetTokenByDefinition(ByRef Definition As Definition) As SyntaxToken
+Public Function PopTokenByDefinition(ByRef Definition As Definition) As SyntaxToken
     If Me.IncludeToken(Definition.Key, TokenKind.OptionItem) Then
-        Set GetTokenByDefinition = Me.GetNextTokenAfter(Definition.Key, TokenKind.OptionItem)
+        Set PopTokenByDefinition = Me.PopNextTokenAfter(Definition.Key, TokenKind.OptionItem)
     ElseIf Me.IncludeToken(Definition.Short, TokenKind.ShortOptionItem) Then
-        Set GetTokenByDefinition = Me.GetNextTokenAfter(Definition.Short, TokenKind.ShortOptionItem)
+        Set PopTokenByDefinition = Me.PopNextTokenAfter(Definition.Short, TokenKind.ShortOptionItem)
     End If
 End Function
 

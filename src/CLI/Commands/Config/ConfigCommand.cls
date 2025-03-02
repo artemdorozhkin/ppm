@@ -47,7 +47,7 @@ Private Sub ICommand_Exec()
     Dim Config As Config: Set Config = GetConfig()
 
     Dim SubCommand As SyntaxToken
-    Set SubCommand = this.Tokens.GetFirstTokenKind(TokenKind.SubCommand)
+    Set SubCommand = this.Tokens.PopFirstTokenKind(TokenKind.SubCommand)
 
     Dim SubCommandName As String
     If IsTrue(SubCommand) Then
@@ -92,7 +92,7 @@ Public Function GetConfig() As Config
 
     Dim Location As String
     If this.Tokens.IncludeDefinition(LocationDef) Then
-        Location = this.Tokens.GetTokenByDefinition(LocationDef).Text
+        Location = this.Tokens.PopTokenByDefinition(LocationDef).Text
     Else
         Set GetConfig = NewConfig(ConfigScopes.ProjectScope)
         Exit Function

@@ -54,7 +54,7 @@ Private Sub ICommand_Exec()
         Exit Sub
     End If
 
-    this.FullPath = Me.GetFullPath(this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text)
+    this.FullPath = Me.GetFullPath(this.Tokens.PopFirstTokenKind(TokenKind.Identifier).Text)
     this.Parts = Strings.Split(this.FullPath, ".")
     this.Name = this.Parts(UBound(this.Parts))
     this.CstrName = this.Name & "Cstr"
@@ -71,7 +71,7 @@ Private Sub ICommand_Exec()
     End If
 
     Dim SubCommand As SyntaxToken
-    Set SubCommand = this.Tokens.GetFirstTokenKind(TokenKind.SubCommand)
+    Set SubCommand = this.Tokens.PopFirstTokenKind(TokenKind.SubCommand)
     Dim SubCommandName As String
     If IsTrue(SubCommand) Then
         SubCommandName = SubCommand.Text
