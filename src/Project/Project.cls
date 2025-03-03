@@ -29,6 +29,14 @@ Private this As TProject
     Set Components = this.Project.VBComponents
 End Property
 
+#If DEV Then
+  Public Property Get References() As References
+#Else
+  Public Property Get References() As Object
+#End If
+    Set Components = this.Project.References
+End Property
+
 Public Property Get IsSaved() As Boolean
     On Error Resume Next
     IsSaved = this.FileName <> ""

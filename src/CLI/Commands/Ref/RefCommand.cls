@@ -123,14 +123,14 @@ Public Sub AddReference()
 
     Dim Ref As Object
     If this.NameType = NameTypes.TypeGUID Then
-        Set Ref = ThisWorkbook.VBProject.References.AddFromGuid(this.Name, Major:=0, Minor:=0)
+        Set Ref = SelectedProject.References.AddFromGuid(this.Name, Major:=0, Minor:=0)
     ElseIf this.NameType = NameTypes.TypePath Then
-        Set Ref = ThisWorkbook.VBProject.References.AddFromFile(this.Name)
+        Set Ref = SelectedProject.References.AddFromFile(this.Name)
     ElseIf this.NameType = NameTypes.TypeName Then
         Dim r As Object
         For Each r In Refs
             If Strings.LCase(r("name")) = Strings.LCase(this.Name) Then
-                Set Ref = ThisWorkbook.VBProject.References.AddFromGuid(r("guid"), Major:=0, Minor:=0)
+                Set Ref = SelectedProject.References.AddFromGuid(r("guid"), Major:=0, Minor:=0)
                 Exit For
             End If
         Next
@@ -146,14 +146,14 @@ Public Sub RmReference()
     Dim r As Object
     If this.NameType = NameTypes.TypeName Then
         On Error Resume Next
-        Set r = ThisWorkbook.VBProject.References(this.Name)
-        ThisWorkbook.VBProject.References.Remove r
+        Set r = SelectedProject.References(this.Name)
+        SelectedProject.References.Remove r
     ElseIf this.NameType = NameTypes.TypeGUID Then
-        For Each r In ThisWorkbook.VBProject.References
+        For Each r In SelectedProject.References
             If Strings.LCase(r.Guid) = this.Name Then Exit For
         Next
     ElseIf this.NameType = NameTypes.TypePath Then
-        For Each r In ThisWorkbook.VBProject.References
+        For Each r In SelectedProject.References
             If Strings.LCase(r.FullPath) = this.Name Then Exit For
         Next
     End If
@@ -169,7 +169,7 @@ Public Sub UpdateReferences()
     Set References = NewDictionary()
 
     Dim r As Object
-    For Each r In ThisWorkbook.VBProject.References
+    For Each r In SelectedProject.References
         References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
     Next
 
@@ -182,10 +182,10 @@ End Sub
 Public Sub PrintList()
     Dim Header As Variant: Header = Array("NAME", "VERSION")
     Dim Data() As Variant
-    ReDim Data(0 To ThisWorkbook.VBProject.References.Count - 1, 0 To UBound(Header))
+    ReDim Data(0 To SelectedProject.References.Count - 1, 0 To UBound(Header))
 
     Dim r As Object
-    For Each r In ThisWorkbook.VBProject.References
+    For Each r In SelectedProject.References
         Dim i As Long
         On Error Resume Next
         Data(i, 0) = r.Name
