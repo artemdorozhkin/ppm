@@ -35,6 +35,7 @@ Public Property Get SubCommands() As Variant
     SubCommands = Array( _
         "delete", _
         "edit", _
+        "generate", _
         "get", _
         "list", _
         "major", _
