@@ -37,7 +37,7 @@ Public Sub SetScope(ByVal Scope As ConfigScopes)
     Dim Folder As String
     Select Case Scope
         Case ConfigScopes.ProjectScope
-            Folder = FSO.BuildPath(SelectedProject.Folder, ".ppm")
+            Folder = SelectedProject.Folder
         Case ConfigScopes.UserScope
             Folder = FSO.BuildPath(Interaction.Environ("APPDATA"), "ppm")
         Case ConfigScopes.GlobalScode
