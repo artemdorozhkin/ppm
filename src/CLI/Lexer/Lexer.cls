@@ -98,7 +98,6 @@ End Sub
 
 Private Sub ReadIdentifier()
     Do While Not PStrings.IsWhiteSpace(Current) And _
-             Not Current = "-" And _
              Not Current = "="
         this.Position = this.Position + 1
         If Information.IsNull(Current) Then Exit Do

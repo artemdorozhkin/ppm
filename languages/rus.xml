@@ -116,6 +116,12 @@
                 <deleted>
                     ключ '{0}' удален
                 </deleted>
+                <needSaveProject>
+                    Необходимо сохранить проект перед созданием файла конфигурации.
+                </needSaveProject>
+                <fileGenerated>
+                    Создан файл конфигурации: {0}
+                </fileGenerated>
             </messages>
         </config>
         <export>

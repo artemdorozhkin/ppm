@@ -55,6 +55,19 @@ Private Sub ICommand_Exec()
         ppm "config --help"
     End If
 
+    If SubCommandName = "generate" Then
+        If Not SelectedProject.IsSaved Then
+            CLI.Lang.GetValue ("messages/needSaveProject")
+            Exit Sub
+        End If
+
+        GenerateDeafultConfig
+        Immediate.WriteLine PStrings.FString( _
+            CLI.Lang.GetValue("messages/fileGenerated"), PFileSystem.BuildPath(SelectedProject.Folder, ".ppmrc") _
+        )
+        Exit Sub
+    End If
+
     If CLI.Aliases.Exists(SubCommandName) Then
         SubCommandName = CLI.Aliases(SubCommandName)
     End If
@@ -76,6 +89,39 @@ Private Sub ICommand_Exec()
             ConfigList Config
 
     End Select
+End Sub
+
+Public Sub GenerateDeafultConfig()
+    Dim Config As Config
+    Set Config = NewConfig(ConfigScopes.ProjectScope)
+
+    Dim SkipableKeys As Variant
+    SkipableKeys = Array( _
+        "author-name", _
+        "author-url", _
+        "dev-dep", _
+        "help", _
+        "location", _
+        "name", _
+        "path", _
+        "version", _
+        "yes" _
+    )
+
+    Dim Definition As Variant
+    For Each Definition In Definitions.Items.Items
+        If PArray.IncludesAny(SkipableKeys, Definition.Key) Then GoTo Continue
+        If PStrings.StartsWith(Definition.Key, "_") Then GoTo Continue
+
+        Dim Value As String
+        If Information.IsMissing(Definition.Default) Then
+            Value = ""
+        Else
+            Value = Conversion.CStr(Definition.Default)
+        End If
+        Config.File.CreateOrWrite Definition.Key, Value
+Continue:
+    Next
 End Sub
 
 Public Function GetConfig() As Config

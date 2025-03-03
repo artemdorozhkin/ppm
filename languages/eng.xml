@@ -116,6 +116,12 @@
                 <deleted>
                     key '{0}' deleted
                 </deleted>
+                <needSaveProject>
+                    Need save project before generate config file.
+                </needSaveProject>
+                <fileGenerated>
+                    Generated config file: {0}
+                </fileGenerated>
             </messages>
         </config>
         <export>
