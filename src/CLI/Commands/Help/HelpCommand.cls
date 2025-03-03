@@ -15,7 +15,6 @@ Implements ICommand
 Private Type THelpCommand
     CommandInfo As CommandInfo
     Tokens As Tokens
-    Config As Config
 End Type
 
 Private this As THelpCommand
@@ -28,10 +27,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -64,7 +59,7 @@ Private Sub ICommand_Exec()
     If Strings.Len(CommandName) = 0 Then Information.Err.Raise 0
 
     Dim Command As ICommand
-    Set Command = Application.Run(PStrings.FString("New{0}Command", CommandName), this.Config, this.Tokens)
+    Set Command = Application.Run(PStrings.FString("New{0}Command", CommandName), this.Tokens)
     Immediate.WriteLine Command.CommandInfo.GetUsage()
 Exit Sub
 
@@ -81,7 +76,7 @@ Public Function GetCommandName() As String
     End If
 
     Dim HasHelpOption As Boolean
-    HasHelpOption = GetFirstValueFrom("help", this.Tokens, this.Config)
+    HasHelpOption = Utils.GetTokenOrConfigValue("help", this.Tokens, CastTo:=VbVarType.vbBoolean)
     Dim CommandIndex As Long
     CommandIndex = IIf(HasHelpOption, 0, 1)
 

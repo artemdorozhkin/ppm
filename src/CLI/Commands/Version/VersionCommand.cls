@@ -13,7 +13,6 @@ Implements ICommand
 
 Private Type TVersionCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
@@ -27,10 +26,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS

@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TPublishCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
@@ -31,10 +30,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
-
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
 End Property
@@ -44,15 +39,6 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
-    Dim Config As Config
-    Set Config = NewConfig(ConfigScopes.UserScope)
-
-    Dim Credentials As Object
-    Set Credentials = NewDictionary()
-
-    Credentials("email") = Config.GetValue("email")
-    Credentials("api_key") = Config.GetValue("api_key")
-
     If Not SelectedProject.IsComponentExists("package") Then
         Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/packageModuleNotFound"))
         End
@@ -84,10 +70,9 @@ Private Sub ICommand_Exec()
     PrintDetails Zip, Pack
 
     Dim ToLocal As Boolean
-    ToLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
+    ToLocal = Utils.GetTokenOrConfigValue("local", this.Tokens, CastTo:=VbVarType.vbBoolean)
     Dim Registry As String
-    Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
-    Registry = Utils.ResolveUrl(Registry)
+    Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
     If ToLocal Then
         If Not NewFileSystemObject().FolderExists(Registry) Then
             PFileSystem.CreateFolder Registry, Recoursive:=True
@@ -98,8 +83,9 @@ Private Sub ICommand_Exec()
     If ToLocal Then
         Success = PublishOnLocal(Registry, ZipPath, Pack)
     Else
+        Registry = Utils.ResolveUrl(Registry)
         Dim Response As TResponse
-        Response = PublishOnServer(Registry, ZipPath, Pack, Credentials)
+        Response = PublishOnServer(Registry, ZipPath, Pack)
         Success = Response.Code = HTTPCodes.OK_200 Or _
                   Response.Code = HTTPCodes.CREATED_201
     End If
@@ -187,7 +173,7 @@ Public Function PublishOnLocal(ByVal Registry As String, ByVal ZipPath As String
     PublishOnLocal = True
 End Function
 
-Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack, ByRef Credentials As Object) As TResponse
+Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack) As TResponse
     Dim FormData As FormData: Set FormData = New FormData
 
   #If DEV Then
@@ -208,9 +194,10 @@ Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As Strin
   #Else
     Dim Headers As Object: Set Headers = NewDictionary()
   #End If
+    Config.ReadScope ConfigScopes.UserScope
     Headers("Content-Type") = "multipart/form-data; boundary=" & FormData.Boundary
-    Headers("email") = Credentials("email")
-    Headers("api-key") = Credentials("api_key")
+    Headers("email") = Config.GetValue("email")
+    Headers("api-key") = Config.GetValue("api_key")
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     PublishOnServer = HTTP.PostRequest( _

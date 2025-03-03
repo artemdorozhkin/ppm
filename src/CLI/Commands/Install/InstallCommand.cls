@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TInstallCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
     Registry As String
     FromLocal As Boolean
@@ -38,10 +37,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
-
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
 End Property
@@ -52,8 +47,8 @@ End Property
 
 Private Sub ICommand_Exec()
     Set this.Parents = NewDictionary(vbTextCompare)
-    this.Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
-    this.FromLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
+    this.Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
+    this.FromLocal = Utils.GetTokenOrConfigValue("local", this.Tokens, CastTo:=VbVarType.vbBoolean)
     With NewFileSystemObject()
         If this.FromLocal And Not .FolderExists(this.Registry) Then
             PFileSystem.CreateFolder this.Registry, Recoursive:=True
@@ -222,8 +217,7 @@ Public Function GetLocalLibPack(ByVal LibName As String, ByVal Version As String
     Dim FSO As Object: Set FSO = NewFileSystemObject()
   #End If
     Dim ManifestPath As String
-    ManifestPath = FSO.BuildPath(this.Registry, LibName)
-    ManifestPath = FSO.BuildPath(ManifestPath, "manifest.json")
+    ManifestPath = PFileSystem.BuildPath(this.Registry, LibName, "manifest.json")
     If Not FSO.FileExists(ManifestPath) Then
         Information.Err.Raise _
             76, _

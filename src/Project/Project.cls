@@ -34,7 +34,7 @@ End Property
 #Else
   Public Property Get References() As Object
 #End If
-    Set Components = this.Project.References
+    Set References = this.Project.References
 End Property
 
 Public Property Get IsSaved() As Boolean

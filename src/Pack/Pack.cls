@@ -85,7 +85,9 @@ End Property
 #Else
   Public Property Get DevDependencies() As Object
 #End If
-    Set DevDependencies = this.Pack("devDependencies")
+    If this.Pack.Exists("devDependencies") Then
+        Set DevDependencies = this.Pack("devDependencies")
+    End If
 End Property
 
 #If DEV Then
