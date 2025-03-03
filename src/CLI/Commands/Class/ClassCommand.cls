@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TClassCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 
     Name As String
@@ -35,10 +34,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Params.Item("create-constructor") = CLI.Lang.GetValue("param", "name=create-constructor")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS

@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TSearchCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
@@ -31,10 +30,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
-
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
 End Property
@@ -45,10 +40,10 @@ End Property
 
 Private Sub ICommand_Exec()
     Dim Registry As String
-    Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
+    Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
 
     Dim IsLocal As Boolean
-    IsLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
+    IsLocal = Utils.GetTokenOrConfigValue("local", this.Tokens, CastTo:=VbVarType.vbBoolean)
 
     Dim PackageToken As SyntaxToken
     Set PackageToken = this.Tokens.PopFirstTokenKind(TokenKind.Identifier)

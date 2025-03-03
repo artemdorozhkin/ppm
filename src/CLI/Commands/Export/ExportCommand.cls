@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TExportCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
@@ -33,10 +32,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
-
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
 End Property
@@ -53,22 +48,22 @@ Private Sub ICommand_Exec()
 
     Dim ms As Double: ms = DateTime.Timer
     Dim Encoding As String
-    Encoding = GetFirstValueFrom("encoding", this.Tokens, this.Config)
+    Encoding = Utils.GetTokenOrConfigValue("encoding", this.Tokens)
 
     Dim SaveStruct As Boolean
-    SaveStruct = GetFirstValueFrom("save-struct", this.Tokens, this.Config)
+    SaveStruct = Utils.GetTokenOrConfigValue("save-struct", this.Tokens, CastTo:=VbVarType.vbBoolean)
 
     Dim Folder As String
     Folder = SelectedProject.Folder
 
     Dim UserFolder As String
-    UserFolder = GetFirstValueFrom("path", this.Tokens, this.Config)
+    UserFolder = Utils.GetTokenOrConfigValue("path", this.Tokens)
     If Strings.Len(UserFolder) > 0 Then
         Folder = UserFolder
     End If
 
     Dim NoClear As Boolean
-    NoClear = GetFirstValueFrom("no-clear", this.Tokens, this.Config)
+    NoClear = Utils.GetTokenOrConfigValue("no-clear", this.Tokens, CastTo:=VbVarType.vbBoolean)
 
     Dim Exporter As ProjectExporter
     Set Exporter = NewProjectExporter( _
