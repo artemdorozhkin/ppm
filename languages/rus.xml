@@ -122,6 +122,9 @@
                 <fileGenerated>
                     Создан файл конфигурации: {0}
                 </fileGenerated>
+                <unknownKey>
+                    Неизвестный ключ '{0}'
+                </unknownKey>
             </messages>
         </config>
         <export>

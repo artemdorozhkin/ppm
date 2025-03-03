@@ -21,6 +21,16 @@ Public Sub ppm(Optional ByVal StringArgs As String)
     On Error GoTo Catch
     Set this.SelectedProject = NewProject(Application.VBE.ActiveVBProject)
 
+    If Config.IsMissing(ConfigScopes.GlobalScode) Then
+        Config.GenerateDefault ConfigScopes.GlobalScode
+    End If
+
+    If Config.IsMissing(ConfigScopes.UserScope) Then
+        Config.GenerateDefault ConfigScopes.UserScope
+    End If
+
+    Config.ReadScope
+
     Dim Project As Project
   #If DEV Then
     Dim VBProject As VBProject

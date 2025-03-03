@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TAuthCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
@@ -29,10 +28,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Params.Item("registry") = CLI.Lang.GetValue("param", "name=registry")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -67,13 +62,13 @@ Private Sub ICommand_Exec()
 
     Dim Request As HTTP
     Set Request = New HTTP
-    Dim RegistryURL As String
-    RegistryURL = Utils.GetFirstValueFrom("registry", this.Tokens, this.Config)
-    If Strings.Len(RegistryURL) = 0 Then
-        RegistryURL = Definitions("registry").Default
+    Dim Registry As String
+    Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
+    If Strings.Len(Registry) = 0 Then
+        Registry = Definitions("registry").Default
     End If
     Dim AuthURL As String
-    AuthURL = Utils.ResolveUrl(RegistryURL, "/auth")
+    AuthURL = Utils.ResolveUrl(Registry, "/auth")
 
     Dim Response As TResponse
     Response = Request.PostRequest(AuthURL, Headers, "{""email"": """ & Email & """}")
@@ -91,10 +86,10 @@ Private Sub ICommand_Exec()
     Dim JSON As Object
     Set JSON = PJSON.Parse(Response.Text)
 
-    Dim Config As Config
-    Set Config = NewConfig(ConfigScopes.UserScope)
-    Config.File.CreateOrWrite "email", Email
-    Config.File.CreateOrWrite "api_key", JSON("api_key")
+    Config.ReadScope ConfigScopes.UserScope
+    Config.SetValue "email", Email
+    Config.SetValue "api_key", JSON("api_key")
+    Config.Save ConfigScopes.UserScope
 
     Immediate.WriteLine PStrings.FString( _
         CLI.Lang.GetValue("messages/success"), Email, JSON("api_key") _

@@ -122,6 +122,9 @@
                 <fileGenerated>
                     Generated config file: {0}
                 </fileGenerated>
+                <unknownKey>
+                    Unknown key '{0}'
+                </unknownKey>
             </messages>
         </config>
         <export>

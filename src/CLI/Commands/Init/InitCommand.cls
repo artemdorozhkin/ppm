@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TInitCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
@@ -31,10 +30,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
-
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
 End Property
@@ -45,9 +40,9 @@ End Property
 
 Private Sub ICommand_Exec()
     Dim AfterDialog As Boolean
-    AfterDialog = GetFirstValueFrom("_after-dialog", this.Tokens, this.Config)
+    AfterDialog = this.Tokens.IncludeDefinition(Definitions("_after-dialog"))
     Dim SkipByDefault As Boolean
-    SkipByDefault = GetFirstValueFrom("yes", this.Tokens, this.Config)
+    SkipByDefault = this.Tokens.IncludeDefinition(Definitions("yes"))
 
     Dim Pack As Pack
     If SelectedProject.IsComponentExists("package") Then
@@ -141,7 +136,7 @@ Public Function GetReferences() As Object
     Set References = NewDictionary()
 
     Dim r As Object
-    For Each r In ThisWorkbook.VBProject.References
+    For Each r In SelectedProject.References
         References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
     Next
 

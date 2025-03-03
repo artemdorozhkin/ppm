@@ -162,7 +162,12 @@ Public Function ConvertToType(ByVal Value As Variant, ByVal DataType As VbVarTyp
     Else
         Select Case DataType
             Case VbVarType.vbString: ConvertToType = Conversion.CStr(Value)
-            Case VbVarType.vbBoolean: ConvertToType = IsTrue(Value)
+            Case VbVarType.vbBoolean
+                If Strings.Len(Value) = 0 Then
+                    ConvertToType = False
+                Else
+                    ConvertToType = Conversion.CBool(Value)
+                End If
             Case Else: Information.Err.Raise 9, "ConvertToType", "Type not defined: " & DataType
         End Select
     End If
@@ -244,33 +249,44 @@ Public Function GetFirstTrue(ParamArray Values() As Variant) As Variant
     GetFirstTrue = Null
 End Function
 
-Public Function GetFirstValueFrom(ByVal DefName As String, ByRef Tokens As Tokens, ByRef Config As Config) As Variant
-    If Not Definitions.Items().Exists(DefName) Then
-        Err.Raise 9, "Utils", "Can't find definition: " & DefName
+Public Function GetFirstTrueOrDefault(ByVal Default As Variant, ParamArray Values() As Variant) As Variant
+    Dim Value As Variant
+    For Each Value In Values
+        If IsTrue(Value) Then
+            If Information.IsObject(Value) Then
+                Set GetFirstTrueOrDefault = Value
+            Else
+                GetFirstTrueOrDefault = Value
+            End If
+            Exit Function
+        End If
+    Next
+
+    If Information.IsObject(Default) Then
+        Set GetFirstTrueOrDefault = Default
+    Else
+        GetFirstTrueOrDefault = Default
+    End If
+End Function
+
+Public Function GetTokenOrConfigValue(ByVal Key As String, ByRef Tokens As Tokens, Optional ByVal CastTo As VbVarType = VbVarType.vbString) As Variant
+    If Not Definitions.Items().Exists(Key) Then
+        Err.Raise 9, "Utils", "Can't find definition: " & Key
     End If
 
     Dim Def As Definition
-    Set Def = Definitions(DefName)
+    Set Def = Definitions(Key)
 
     If Tokens.IncludeDefinition(Def) Then
         Dim Token As SyntaxToken
         Set Token = Tokens.PopTokenByDefinition(Def)
-        If IsFalse(Token) Then
-            GetFirstValueFrom = True
+        If IsTrue(Token) Then
+            GetTokenOrConfigValue = ConvertToType(Token.Text, CastTo)
         Else
-            GetFirstValueFrom = ConvertToType(Token.Text, Def.DataType)
+            GetTokenOrConfigValue = True
         End If
     Else
-        Dim Value As Variant
-        Value = GetFirstTrue( _
-            Config.GetValue(DefName), _
-            Def.Default _
-        )
-        If Not Information.IsNull(Value) Then
-            GetFirstValueFrom = ConvertToType(Value, Def.DataType)
-        Else
-            GetFirstValueFrom = ConvertToType(Def.Default, Def.DataType)
-        End If
+        GetTokenOrConfigValue = Config.GetValue(Key:=Key, CastTo:=CastTo)
     End If
 End Function
 
