@@ -50,6 +50,18 @@ Private Sub ICommand_Exec()
     Dim Libs As Object: Set Libs = GetAllInstalledLibs()
     Dim RmDepenpencies As Object: Set RmDepenpencies = GetRmDependencies()
   #End If
+    If Libs.Count = 0 Then
+        Immediate.WriteLine CLI.Lang.GetValue("messages/noInstalledLibs")
+        Exit Sub
+    End If
+
+    If RmDepenpencies.Count = 0 And this.Tokens.Count = 1 Then
+        Set RmDepenpencies = Libs
+    Else
+        Immediate.WriteLine CLI.Lang.GetValue("messages/nothingToRemove")
+        Exit Sub
+    End If
+
     Dim NotUsed As Collection: Set NotUsed = New Collection
 
     If IsTrue(Libs) And IsTrue(RmDepenpencies) Then
@@ -129,6 +141,8 @@ End Sub
         If this.Pack.Dependencies.Exists(LibName.Text) Then
             RmLibs(LibName.Text) = RmLibs(LibName.Text) + 1
             CollectAndCountDependencies LibName.Text & "Package", RmLibs
+        Else
+            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/cantFindDep"), LibName.Text)
         End If
     Next
 
