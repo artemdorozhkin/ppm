@@ -63,7 +63,7 @@ Private Sub ICommand_Exec()
 
     If this.Tokens.IncludeDefinition(Definitions("location")) Then
         this.SelectedScope = Me.GetScopeByLocation()
-        If this.SelectedScope = ConfigScopes.ProjecScope And _
+        If this.SelectedScope = ConfigScopes.ProjectScope And _
         Not HasProjectConfig Then
             PFileSystem.SaveToFile ProjectConfigPath, ""
         End If
