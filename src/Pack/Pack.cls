@@ -121,6 +121,12 @@ End Property
         End If
     Next
     Code = Strings.Join(PCollection.ToArray(Lines), vbNewLine)
+    If Code = "" Then
+        Set this.Pack = NewDictionary()
+        Set Read = Me
+        Exit Function
+    End If
+
     Set this.Pack = PJSON.Parse(Utils.UncommentString(Code))
     If this.Pack.Exists("dependencies") Then
         Set this.Pack("dependencies") = Utils.ChangeDictionaryCompareMode( _
