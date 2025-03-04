@@ -421,6 +421,15 @@
                 <cantRemoveUsingDependencies>
                     ERR: it is not possible to remove dependencies that are used by other packages
                 </cantRemoveUsingDependencies>
+                <noInstalledLibs>
+                    ERR: there are no packages installed in the project 
+                </noInstalledLibs>
+                <nothingToRemove>
+                    nothing to uninstall 
+                </nothingToRemove>
+                <cantFindDep>
+                    ERR: can't find dependency '{0}' 
+                </cantFindDep>
                 <uninstalled>
                     successfully uninstalled {0} packages in {1}
                 </uninstalled>

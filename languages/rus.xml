@@ -419,6 +419,15 @@
                 <cantRemoveUsingDependencies>
                     ERR: невозможно удалить зависимости, которые используются другими пакетами
                 </cantRemoveUsingDependencies>
+                <noInstalledLibs>
+                    ERR: в проекте нет установленных пакетов 
+                </noInstalledLibs>
+                <nothingToRemove>
+                   нечего удалять 
+                </nothingToRemove>
+                <cantFindDep>
+                    ERR: не удалось найти пакет '{0}' 
+                </cantFindDep>
                 <uninstalled>
                     успешно удалено пакетов: {0}, за {1}
                 </uninstalled>
