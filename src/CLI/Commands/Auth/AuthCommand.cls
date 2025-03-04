@@ -79,7 +79,7 @@ Private Sub ICommand_Exec()
     If Response.Code = 400 Then
         Dim Error As Object
         Set Error = PJSON.Parse(Response.Text)
-        Immediate.WriteLine CLI.Lang.GetValue("messages/errorOccurred", Error("error"))
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/errorOccurred"), Error("error"))
         Exit Sub
     ElseIf Response.Code <> HTTPCodes.CREATED_201 And Response.Code <> HTTPCodes.OK_200 Then
         Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
