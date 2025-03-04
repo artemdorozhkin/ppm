@@ -424,5 +424,8 @@ Public Sub ImportComponents(ByVal Path As String)
 End Sub
 
 Public Sub UpdatePack()
+    If Not SelectedProject.IsComponentExists("package") Then
+        SelectedProject.AddComponent "package"
+    End If
     NewPack(SelectedProject.GetComponent("package")).Update Dependencies:=this.Parents
 End Sub
