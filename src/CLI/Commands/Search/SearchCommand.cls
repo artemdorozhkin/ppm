@@ -72,11 +72,10 @@ Public Sub LookupOnServer(ByVal Registry As String, ByVal PackageName As String)
 
     If Response.Code = HTTPCodes.OK_200 Then
         Dim JSON As Object: Set JSON = PJSON.Parse(Response.Text)
-        Dim Result As Collection: Set Result = JSON("result")
-        If Result.Count = 0 Then
+        If Information.IsObject(JSON("result")) Then
+            PrintResult JSON("result")
+        ElseIf Information.IsNull(JSON("result")) Then
             Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/noMatchesFor"), PackageName)
-        Else
-            PrintResult Result
         End If
     End If
 End Sub

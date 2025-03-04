@@ -208,7 +208,7 @@
             </param>
             <usage>
                 <item>
-                    [&lt;пакет&gt;@&lt;версия&gt;] [&lt;опции&gt;]
+                    [&lt;пакет&gt;[@&lt;версия&gt;]] [&lt;опции&gt;]
                 </item>
             </usage>
             <messages>
