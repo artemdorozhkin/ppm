@@ -84,28 +84,23 @@ Private Sub ICommand_Exec()
     If Not this.Tokens.IncludeTokenKind(TokenKind.Identifier) And IsTrue(SubCommandName) Then
         If SubCommandName = "list" Then
             Me.PrintList
-            Exit Sub
         ElseIf SubCommandName = "update" Then
             Me.UpdateReferences
             Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refsUpdated"), this.Name)
-            Exit Sub
+        ElseIf SubCommandName = "delete" Then
+            Me.RmReference
+            Me.UpdateReferences
+            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refDeleted"), this.Name)
         Else
             ppm "ref --help"
         End If
-        Exit Sub
-    End If
-
-    If IsTrue(SubCommandName) And SubCommandName = "delete" Then
-        Me.RmReference
-        Me.UpdateReferences
-        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refDeleted"), this.Name)
     Else
         ppm "ref -- help"
     End If
 End Sub
 
 Public Function ReadReferences() As Collection
-    FileSystem.ChDir SelectedProject.Folder
+    FileSystem.ChDir PFileSystem.BuildPath(Interaction.Environ("APPDATA"), "ppm")
     Dim RefsString As String
     RefsString = PFileSystem.ReadFile("./references/references.json")
 
@@ -131,7 +126,7 @@ Public Sub AddReference()
         Next
     End If
 
-    If Not Ref Is Nothing Then
+    If Ref Is Nothing Then
         Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/cantFindRef"), this.Name)
         End
     End If
@@ -168,6 +163,9 @@ Public Sub UpdateReferences()
         References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
     Next
 
+    If Not SelectedProject.IsComponentExists("package") Then
+        SelectedProject.AddComponent "package"
+    End If
     Dim Pack As Pack
     Set Pack = NewPack(SelectedProject.GetComponent("package"))
 
