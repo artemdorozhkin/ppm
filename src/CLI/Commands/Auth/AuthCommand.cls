@@ -26,6 +26,7 @@ Private Sub Class_Initialize()
     this.CommandInfo.Name = "auth"
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
     this.CommandInfo.Params.Item("registry") = CLI.Lang.GetValue("param", "name=registry")
+    this.CommandInfo.Params.Item("recreate-token") = CLI.Lang.GetValue("param", "name=recreate-token")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
@@ -64,12 +65,14 @@ Private Sub ICommand_Exec()
     Set Request = New HTTP
     Dim Registry As String
     Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
-    If Strings.Len(Registry) = 0 Then
-        Registry = Definitions("registry").Default
-    End If
     Dim AuthURL As String
-    AuthURL = Utils.ResolveUrl(Registry, "/auth")
-
+    Dim IsCreation As Boolean
+    If this.Tokens.IncludeDefinition(Definitions("recreate-token")) Then
+        AuthURL = Utils.ResolveUrl(Registry, "/receiveToken")
+    Else
+        AuthURL = Utils.ResolveUrl(Registry, "/auth")
+        IsCreation = True
+    End If
     Dim Response As TResponse
     Response = Request.PostRequest(AuthURL, Headers, "{""email"": """ & Email & """}")
 
@@ -78,7 +81,7 @@ Private Sub ICommand_Exec()
         Set Error = PJSON.Parse(Response.Text)
         Immediate.WriteLine CLI.Lang.GetValue("messages/errorOccurred", Error("error"))
         Exit Sub
-    ElseIf Response.Code <> HTTPCodes.CREATED_201 Then
+    ElseIf Response.Code <> HTTPCodes.CREATED_201 And Response.Code <> HTTPCodes.OK_200 Then
         Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
         Exit Sub
     End If
@@ -86,12 +89,16 @@ Private Sub ICommand_Exec()
     Dim JSON As Object
     Set JSON = PJSON.Parse(Response.Text)
 
-    Config.ReadScope ConfigScopes.UserScope
-    Config.SetValue "email", Email
-    Config.SetValue "api_key", JSON("api_key")
-    Config.Save ConfigScopes.UserScope
-
-    Immediate.WriteLine PStrings.FString( _
-        CLI.Lang.GetValue("messages/success"), Email, JSON("api_key") _
-    )
+    If IsCreation Then
+        Config.ReadScope ConfigScopes.UserScope
+        Config.SetValue "email", Email
+        Config.SetValue "api_key", JSON("api_key")
+        Config.Save ConfigScopes.UserScope
+    
+        Immediate.WriteLine PStrings.FString( _
+            CLI.Lang.GetValue("messages/success"), Email, JSON("api_key") _
+        )
+    Else
+        Immediate.WriteLine JSON("message")
+    End If
 End Sub

@@ -111,6 +111,12 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
+        Key:="recreate-token", _
+        Default:=False _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
         Key:="registry", _
         Default:="https://registry.ppmvba.com/" _
     )
