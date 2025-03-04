@@ -208,7 +208,7 @@
             </param>
             <usage>
                 <item>
-                    [&lt;some package&gt;@&lt;some version&gt;] [&lt;options&gt;]
+                    [&lt;some package&gt;[@&lt;some version&gt;]] [&lt;options&gt;]
                 </item>
             </usage>
             <messages>
