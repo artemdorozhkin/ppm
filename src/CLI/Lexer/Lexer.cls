@@ -108,9 +108,12 @@ Private Sub ReadIdentifier()
     If CLI.Aliases.Exists(Text) Then
         Text = CLI.Aliases(Text)
     End If
-    If PArray.IncludesAny(CLI.Commands, Text) Then
+
+    If PArray.IncludesAny(CLI.Commands, Text) And _
+    Not this.Tokens.IncludeTokenKind(TokenKind.Command) Then
         this.Kind = TokenKind.Command
-    ElseIf PArray.IncludesAny(CLI.SubCommands, Text) Then
+    ElseIf PArray.IncludesAny(CLI.SubCommands, Text) And _
+    Not this.Tokens.IncludeTokenKind(TokenKind.SubCommand) Then
         this.Kind = TokenKind.SubCommand
     Else
         this.Kind = TokenKind.Identifier

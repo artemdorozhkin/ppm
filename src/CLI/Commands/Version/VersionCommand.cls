@@ -48,7 +48,7 @@ Private Sub ICommand_Exec()
         Dim NewVersToken As SyntaxToken
         Set NewVersToken = this.Tokens.PopFirstTokenKind(TokenKind.Identifier)
         If IsFalse(NewVersToken) Then
-            Immediate.WriteLine PStrings.FString("v{0}", Pack.Version)
+            Immediate.WriteLine Pack.Version
             Exit Sub
         End If
 
@@ -59,7 +59,7 @@ Private Sub ICommand_Exec()
             End
         End If
         Pack.Update Version:=NewVers
-        Immediate.WriteLine PStrings.FString("v{0}", NewVers)
+        Immediate.WriteLine NewVers
         Exit Sub
     End If
 
@@ -90,5 +90,5 @@ Private Sub ICommand_Exec()
 
     NewVers = Strings.Join(CurrentVersParts, ".")
     Pack.Update Version:=NewVers
-    Immediate.WriteLine PStrings.FString("v{0}", NewVers)
+    Immediate.WriteLine NewVers
 End Sub

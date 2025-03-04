@@ -58,11 +58,11 @@ Private Sub ICommand_Exec()
 
     If IsTrue(Pack) And Not AfterDialog Then
         InitPack = InitDialog.SetDefault( _
-            Name:=GetFirstTrue(InitialName, Pack.Name), _
-            Version:=Pack.Version, _
+            Name:=GetFirstTrueOrDefault(Config.GetValue("name"), InitialName, Pack.Name), _
+            Version:=GetFirstTrueOrDefault(Config.GetValue("version"), Pack.Version), _
             Description:=Pack.Description, _
-            Author:=Pack.Author, _
-            GitURL:=Pack.Git _
+            Author:=GetFirstTrueOrDefault(Config.GetValue("author-name"), Pack.Author), _
+            GitURL:=GetFirstTrueOrDefault(Config.GetValue("author-url"), Pack.Git) _
         )
     ElseIf HaveProjectName Then
         InitPack = InitDialog.SetDefault(Name:=InitialName)

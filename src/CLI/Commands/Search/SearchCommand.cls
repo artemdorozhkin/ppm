@@ -39,6 +39,11 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    If this.Tokens.Count = 1 Then
+        ppm "search -h"
+        Exit Sub
+    End If
+
     Dim Registry As String
     Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
 
@@ -73,7 +78,11 @@ Public Sub LookupOnServer(ByVal Registry As String, ByVal PackageName As String)
     If Response.Code = HTTPCodes.OK_200 Then
         Dim JSON As Object: Set JSON = PJSON.Parse(Response.Text)
         If Information.IsObject(JSON("result")) Then
-            PrintResult JSON("result")
+            If JSON("result").Count = 0 Then
+                Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/noMatchesFor"), PackageName)
+            Else
+                PrintResult JSON("result")
+            End If
         ElseIf Information.IsNull(JSON("result")) Then
             Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/noMatchesFor"), PackageName)
         End If
