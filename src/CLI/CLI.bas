@@ -33,6 +33,7 @@ End Property
 
 Public Property Get SubCommands() As Variant
     SubCommands = Array( _
+        "add", _
         "delete", _
         "edit", _
         "generate", _
