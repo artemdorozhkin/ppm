@@ -1,5 +1,5 @@
 Attribute VB_Name = "package"
-'@Folder "PearPMProject"
+'@Folder("PearPMProject")
 '{
 '  "name": "PearPM",
 '  "version": "1.0.0",
@@ -9,12 +9,14 @@ Attribute VB_Name = "package"
 '  "references": {
 '    "VBA": "4.2",
 '    "Excel": "1.9",
-'    "Scripting": "1.0",
-'    "MSXML2": "6.0",
-'    "Rubberduck": "2.5",
-'    "VBIDE": "5.3",
 '    "stdole": "2.0",
+'    "Office": "2.8"
+'  },
+'  "devReferences": {
+'    "Rubberduck": "2.5",
+'    "Scripting": "1.0",
+'    "MSXML2": "3.0",
 '    "Shell32": "1.0",
-'    "Office": "2.6"
+'    "VBIDE": "5.3"
 '  }
 '}

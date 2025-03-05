@@ -101,6 +101,16 @@ End Property
 End Property
 
 #If DEV Then
+  Public Property Get DevReferences() As Dictionary
+#Else
+  Public Property Get DevReferences() As Object
+#End If
+    If this.Pack.Exists("devReferences") Then
+        Set DevReferences = this.Pack("devReferences")
+    End If
+End Property
+
+#If DEV Then
   Public Function Read(ByRef Component As VBComponent) As Pack
 #Else
   Public Function Read(ByRef Component As Object) As Pack
@@ -146,6 +156,12 @@ End Property
             VbCompareMethod.vbTextCompare _
         )
     End If
+    If this.Pack.Exists("devReferences") Then
+        Set this.Pack("devReferences") = Utils.ChangeDictionaryCompareMode( _
+            this.Pack("devReferences"), _
+            VbCompareMethod.vbTextCompare _
+        )
+    End If
 
     Set Read = Me
 End Function
@@ -163,7 +179,8 @@ Public Function Update( _
     Optional ByVal Git As Variant, _
     Optional ByVal Dependencies As Variant, _
     Optional ByVal DevDependencies As Variant, _
-    Optional ByVal References As Variant _
+    Optional ByVal References As Variant, _
+    Optional ByVal DevReferences As Variant _
 ) As Pack
     If Not Information.IsMissing(Name) Then this.Pack("name") = Name
     If Not Information.IsMissing(Version) Then this.Pack("version") = Version
@@ -196,6 +213,12 @@ Public Function Update( _
     If Not Information.IsMissing(References) Then
         If Not References Is Nothing Then
             Set this.Pack("references") = References
+        End If
+    End If
+
+    If Not Information.IsMissing(DevReferences) Then
+        If Not DevReferences Is Nothing Then
+            Set this.Pack("devReferences") = DevReferences
         End If
     End If
 

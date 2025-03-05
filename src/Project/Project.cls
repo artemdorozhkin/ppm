@@ -136,11 +136,16 @@ Public Function IsComponentExists(ByVal NameOrPath As String) As Boolean
 Exit Function
 
 Catch:
-    If Information.Err.Number = 9 Then
-        IsComponentExists = False
-    Else
-        Information.Err.Raise Information.Err.Number, Information.TypeName(Me)
-    End If
+    IsComponentExists = False
+End Function
+
+Public Function IsReferenceExists(ByVal Name As String) As Boolean
+    On Error GoTo Catch
+    IsReferenceExists = this.Project.References(Name).Name <> ""
+Exit Function
+
+Catch:
+    IsReferenceExists = False
 End Function
 
 Private Function IsValidType(ByVal Path As String) As Boolean
