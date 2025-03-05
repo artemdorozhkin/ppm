@@ -120,7 +120,7 @@ Public Sub GenerateDefault(ByVal ForScope As ConfigScopes)
         SkipableKeys = Array( _
             "author-name", _
             "author-url", _
-            "dev-dep", _
+            "save-dev", _
             "help", _
             "location", _
             "name", _
@@ -130,7 +130,7 @@ Public Sub GenerateDefault(ByVal ForScope As ConfigScopes)
         )
     Else
         SkipableKeys = Array( _
-            "dev-dep", _
+            "save-dev", _
             "help", _
             "location", _
             "path", _
