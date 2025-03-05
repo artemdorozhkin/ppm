@@ -32,6 +32,7 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "install"
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("save-dev") = CLI.Lang.GetValue("param", "name=save-dev")
     this.CommandInfo.Params.Item("local") = CLI.Lang.GetValue("param", "name=local")
     this.CommandInfo.Params.Item("registry") = CLI.Lang.GetValue("param", "name=registry")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
@@ -46,9 +47,12 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
-    Set this.Parents = NewDictionary(vbTextCompare)
     this.Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
     this.FromLocal = Utils.GetTokenOrConfigValue("local", this.Tokens, CastTo:=VbVarType.vbBoolean)
+    Dim SaveDev As Boolean
+    SaveDev = this.Tokens.IncludeDefinition(Definitions("save-dev"))
+
+    Set this.Parents = NewDictionary(vbTextCompare)
     With NewFileSystemObject()
         If this.FromLocal And Not .FolderExists(this.Registry) Then
             PFileSystem.CreateFolder this.Registry, Recoursive:=True
@@ -59,21 +63,21 @@ Private Sub ICommand_Exec()
   #If DEV Then
     Dim Libs As Dictionary: Set Libs = Me.GetFlattedLibs()
   #Else
-    Dim Libs As Object: Set Libs = Me.GetFlattedLibs()
+    Dim Libs As Object: Set Libs = Me.GetFlattedLibs(SaveDev)
   #End If
-
-    Dim Paths As Variant
-    If this.FromLocal Then
-        Paths = Me.GetLocalLibs(Libs)
-    Else
-        Paths = Me.DownloadLibs(Libs)
-    End If
-    InstallLibs Paths
-    UpdatePack
 
     If Libs.Count = 0 Then
         Immediate.WriteLine CLI.Lang.GetValue("messages/libsNotFound")
     Else
+        Dim Paths As Variant
+        If this.FromLocal Then
+            Paths = Me.GetLocalLibs(Libs)
+        Else
+            Paths = Me.DownloadLibs(Libs)
+        End If
+        InstallLibs Paths
+        UpdatePack SaveDev
+
         ms = DateTime.Timer - ms
         Immediate.WriteLine PStrings.FString( _
             CLI.Lang.GetValue("messages/installed"), _
@@ -84,14 +88,14 @@ Private Sub ICommand_Exec()
 End Sub
 
 #If DEV Then
-  Public Function GetFlattedLibs() As Dictionary
+  Public Function GetFlattedLibs(ByVal SaveDev As Boolean) As Dictionary
 #Else
-  Public Function GetFlattedLibs() As Object
+  Public Function GetFlattedLibs(ByVal SaveDev As Boolean) As Object
 #End If
     If this.Tokens.IncludeTokenKind(TokenKind.Identifier) Then
         Set GetFlattedLibs = Me.GetLibsFromTokens()
     Else
-        Set GetFlattedLibs = Me.GetLibsFromDependencies()
+        Set GetFlattedLibs = Me.GetLibsFromDependencies(SaveDev)
     End If
 End Function
 
@@ -130,19 +134,23 @@ Continue:
 End Function
 
 #If DEV Then
-  Public Function GetLibsFromDependencies() As Dictionary
+  Public Function GetLibsFromDependencies(ByVal SaveDev As Boolean) As Dictionary
 #Else
-  Public Function GetLibsFromDependencies() As Object
+  Public Function GetLibsFromDependencies(ByVal SaveDev As Boolean) As Object
 #End If
   #If DEV Then
     Dim Libs As Dictionary: Set Libs = NewDictionary(vbTextCompare)
     Dim Dependencies As Dictionary
-    Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
   #Else
     Dim Libs As Object: Set Libs = NewDictionary(vbTextCompare)
     Dim Dependencies As Object
-    Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
   #End If
+    If SaveDev Then
+        Set Dependencies = NewPack(SelectedProject.GetComponent("package")).DevDependencies
+    Else
+        Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
+    End If
+
     If IsFalse(Dependencies) Then
         Set GetLibsFromDependencies = Libs
         Exit Function
@@ -423,9 +431,14 @@ Public Sub ImportComponents(ByVal Path As String)
     Next
 End Sub
 
-Public Sub UpdatePack()
+Public Sub UpdatePack(ByVal SaveDev As Boolean)
     If Not SelectedProject.IsComponentExists("package") Then
         SelectedProject.AddComponent "package"
     End If
-    NewPack(SelectedProject.GetComponent("package")).Update Dependencies:=this.Parents
+
+    If SaveDev Then
+        NewPack(SelectedProject.GetComponent("package")).Update DevDependencies:=this.Parents
+    Else
+        NewPack(SelectedProject.GetComponent("package")).Update Dependencies:=this.Parents
+    End If
 End Sub
