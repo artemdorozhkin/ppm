@@ -34,6 +34,7 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "ref"
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("save-dev") = CLI.Lang.GetValue("param", "name=save-dev")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
@@ -46,6 +47,9 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    Dim SaveDev As Boolean
+    SaveDev = this.Tokens.IncludeDefinition(Definitions("save-dev"))
+
     Dim SubCommand As SyntaxToken
     Set SubCommand = this.Tokens.PopFirstTokenKind(TokenKind.SubCommand)
     Dim SubCommandName As String
@@ -66,36 +70,40 @@ Private Sub ICommand_Exec()
         ElseIf Not PStrings.Contains(this.Name, " ") Then
             this.NameType = NameTypes.TypeName
         Else
-            ' TODO: raise error
+            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/cantFindRef"), this.Name)
+            Exit Sub
         End If
     End If
 
-    If IsFalse(SubCommandName) Or SubCommandName = "add" Then
-        If Strings.Len(this.Name) = 0 Then
-            ppm "ref --help"
-        Else
-            Me.AddReference
-            Me.UpdateReferences
-            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refAdded"), this.Name)
-        End If
+    If IsFalse(SubCommandName) Then
+        ppm "ref --help"
         Exit Sub
     End If
 
-    If Not this.Tokens.IncludeTokenKind(TokenKind.Identifier) And IsTrue(SubCommandName) Then
-        If SubCommandName = "list" Then
-            Me.PrintList
-        ElseIf SubCommandName = "update" Then
-            Me.UpdateReferences
-            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refsUpdated"), this.Name)
-        ElseIf SubCommandName = "delete" Then
-            Me.RmReference
-            Me.UpdateReferences
-            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refDeleted"), this.Name)
-        Else
-            ppm "ref --help"
-        End If
+    If SubCommandName = "list" Then
+        Me.PrintList
+        Exit Sub
+    ElseIf SubCommandName = "update" Then
+        Me.UpdateReferences
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refsUpdated"), this.Name)
+        Exit Sub
+    End If
+
+    If Strings.Len(this.Name) = 0 Then
+        ppm "ref --help"
+        Exit Sub
+    End If
+
+    If SubCommandName = "add" Or SubCommandName = "install" Then
+        Me.AddReference
+        Me.UpdateReferences SaveDev
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refAdded"), this.Name)
+    ElseIf SubCommandName = "delete" Then
+        Me.RmReference
+        Me.UpdateReferences
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refDeleted"), this.Name)
     Else
-        ppm "ref -- help"
+        ppm "ref --help"
     End If
 End Sub
 
@@ -154,22 +162,62 @@ Public Sub RmReference()
     End If
 End Sub
 
-Public Sub UpdateReferences()
-    Dim References As Object
-    Set References = NewDictionary()
-
-    Dim r As Object
-    For Each r In SelectedProject.References
-        References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
-    Next
-
+Public Sub UpdateReferences(Optional ByVal SaveDev As Boolean = False)
     If Not SelectedProject.IsComponentExists("package") Then
         SelectedProject.AddComponent "package"
     End If
     Dim Pack As Pack
     Set Pack = NewPack(SelectedProject.GetComponent("package"))
 
-    Pack.Update References:=References
+    Dim References As Object
+    If IsTrue(Pack.References) Then
+        Set References = Pack.References
+    Else
+        Set References = NewDictionary()
+    End If
+
+    Dim DevReferences As Object
+    If IsTrue(Pack.DevReferences) Then
+        Set DevReferences = Pack.DevReferences
+    Else
+        Set DevReferences = NewDictionary()
+    End If
+
+    Dim Dummy As Variant
+    Dim Name As Variant
+    For Each Name In References
+        If Not SelectedProject.IsReferenceExists(Name) Then
+            References.Remove Name
+        End If
+    Next
+
+    For Each Name In DevReferences
+        If Not SelectedProject.IsReferenceExists(Name) Then
+            DevReferences.Remove Name
+        End If
+    Next
+
+    Dim r As Object
+    For Each r In SelectedProject.References
+        If References.Exists(r.Name) Then GoTo Continue
+        If DevReferences.Exists(r.Name) Then GoTo Continue
+
+        If r.Name = "PearPMProject" Then
+            DevReferences(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+            GoTo Continue
+        End If
+
+        If SaveDev Then
+            DevReferences(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+        Else
+            References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+        End If
+Continue:
+    Next
+
+    If References.Count = 0 Then Set References = Nothing
+    If DevReferences.Count = 0 Then Set DevReferences = Nothing
+    Pack.Update References:=References, DevReferences:=DevReferences
 End Sub
 
 Public Sub PrintList()
