@@ -94,7 +94,7 @@ End Sub
 
 Public Function IsMissing(ByVal ForScope As ConfigScopes) As Boolean
     Dim FSO As Object
-    Set FSO = NewFileSystemObject()
+    Set FSO = GetFileSystemObject()
 
     Select Case ForScope
         Case ConfigScopes.GlobalScode

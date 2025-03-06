@@ -42,7 +42,7 @@ Private Sub ICommand_Exec()
     Dim ProjectConfigPath As String
     ProjectConfigPath = ConfigPaths.GetProjectConfigPath()
     Dim FSO As Object
-    Set FSO = NewFileSystemObject()
+    Set FSO = GetFileSystemObject()
     Dim HasProjectConfig As Boolean
     HasProjectConfig = FSO.FileExists(ProjectConfigPath)
     If HasProjectConfig Then

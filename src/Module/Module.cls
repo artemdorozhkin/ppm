@@ -125,11 +125,14 @@ End Sub
 #Else
   Private Function GetComponentExt() As String
 #End If
+    Dim Ext As String
     Select Case this.Item.Type
-    Case ModuleType.StdModule: GetComponentExt = ".bas"
-    Case ModuleType.ClassModule: GetComponentExt = ".cls"
-    Case ModuleType.FormModule: GetComponentExt = ".frm"
-    Case ModuleType.DocModule: GetComponentExt = ".doccls"
-    Case Else: GetComponentExt = ".txt"
+    Case ModuleType.StdModule: Ext = ".bas"
+    Case ModuleType.ClassModule: Ext = ".cls"
+    Case ModuleType.FormModule: Ext = ".frm"
+    Case ModuleType.DocModule: Ext = ".doccls"
+    Case Else: Ext = ".txt"
     End Select
+
+    GetComponentExt = Ext
 End Function

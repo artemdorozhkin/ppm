@@ -61,7 +61,7 @@ Private Sub ICommand_Exec()
     Dim ZipName As String
     ZipName = Me.GetBuildName(Pack) & ".zip"
     Dim ZipPath As String
-    ZipPath = NewFileSystemObject().BuildPath(Interaction.Environ("TEMP"), ZipName)
+    ZipPath = GetFileSystemObject().BuildPath(Interaction.Environ("TEMP"), ZipName)
     Dim Zip As PZip: Set Zip = NewPZip(ZipPath)
     Zip.AddFolderContent RootFolder
     FileSystem.Kill RootFolder & "\*"
@@ -74,7 +74,7 @@ Private Sub ICommand_Exec()
     Dim Registry As String
     Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
     If ToLocal Then
-        If Not NewFileSystemObject().FolderExists(Registry) Then
+        If Not GetFileSystemObject().FolderExists(Registry) Then
             PFileSystem.CreateFolder Registry, Recoursive:=True
         End If
     End If
@@ -139,7 +139,7 @@ Public Function GetBuildName(ByRef Pack As Pack) As String
 End Function
 
 Public Function CreateExport() As String
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         Dim Folder As String
         Folder = .BuildPath(Interaction.Environ("TEMP"), .GetTempName())
         If Not .FolderExists(Folder) Then PFileSystem.CreateFolder Folder, Recoursive:=True
@@ -156,7 +156,7 @@ Public Function CreateExport() As String
 End Function
 
 Public Function PublishOnLocal(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack) As Boolean
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         Dim PackageFolder As String
         PackageFolder = .BuildPath(Registry, Pack.Name)
         If Not .FolderExists(PackageFolder) Then PFileSystem.CreateFolder PackageFolder, Recoursive:=True
@@ -209,7 +209,7 @@ End Function
 
 Public Sub CreateOrUpdateManifest(ByVal PackageFolder As String, ByRef Pack As Pack)
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         Dim ManifestPath As String
         ManifestPath = .BuildPath(PackageFolder, "manifest.json")
         If .FileExists(ManifestPath) Then
