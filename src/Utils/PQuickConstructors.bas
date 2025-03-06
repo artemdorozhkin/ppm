@@ -24,11 +24,15 @@ End Function
 End Function
 
 #If DEV Then
-  Public Function NewFileSystemObject() As FileSystemObject
+  Public Function GetFileSystemObject() As FileSystemObject
 #Else
-  Public Function NewFileSystemObject() As Object
+  Public Function GetFileSystemObject() As Object
 #End If
-    Set NewFileSystemObject = CreateObject("Scripting.FileSystemObject")
+    Static FSO As Object
+    If FSO Is Nothing Then
+        Set FSO = CreateObject("Scripting.FileSystemObject")
+    End If
+    Set GetFileSystemObject = FSO
 End Function
 
 #If DEV Then
@@ -36,7 +40,7 @@ End Function
 #Else
   Public Function NewFolder(ByVal Path As String) As Object
 #End If
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         If (FileSystem.GetAttr(Path) And vbDirectory) = vbDirectory Then
             Set NewFolder = .GetFolder(Path)
         ElseIf .FileExists(Path) Then

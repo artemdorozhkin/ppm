@@ -96,7 +96,7 @@ Public Sub LookupLocal(ByVal Registry As String, ByVal PackageName As String)
     Dim RegistryFolder As Folder: Set RegistryFolder = NewFolder(Registry)
     Dim PackFolder As Folder
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
     Dim RegistryFolder As Object: Set RegistryFolder = NewFolder(Registry)
     Dim PackFolder As Object
   #End If

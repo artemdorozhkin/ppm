@@ -123,7 +123,7 @@ End Sub
   Public Function ExportComponent(ByVal Folder As String, ByRef Component As Object) As String
 #End If
     Dim Ext As String: Ext = NewModule(Component).Ext
-    Dim Path As String: Path = NewFileSystemObject().BuildPath(Folder, Component.Name & Ext)
+    Dim Path As String: Path = GetFileSystemObject().BuildPath(Folder, Component.Name & Ext)
     TrimCodeEnd Component
     Component.Export Path
     ExportComponent = Path

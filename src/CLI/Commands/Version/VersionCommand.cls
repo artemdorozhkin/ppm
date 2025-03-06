@@ -37,6 +37,7 @@ End Property
 
 Private Sub ICommand_Exec()
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
+
     Dim NewVers As String
 
     Dim SubCommand As SyntaxToken
@@ -44,6 +45,10 @@ Private Sub ICommand_Exec()
     Dim SubCommandName As String
     If IsTrue(SubCommand) Then
         SubCommandName = SubCommand.Text
+        If IsFalse(Pack.Version) Then
+            Immediate.WriteLine "ERR: Version not provided"
+            Exit Sub
+        End If
     Else
         Dim NewVersToken As SyntaxToken
         Set NewVersToken = this.Tokens.PopFirstTokenKind(TokenKind.Identifier)

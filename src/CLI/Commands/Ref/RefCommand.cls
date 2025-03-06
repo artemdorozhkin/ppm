@@ -57,27 +57,13 @@ Private Sub ICommand_Exec()
         SubCommandName = SubCommand.Text
     End If
 
-    If CLI.Aliases.Exists(SubCommandName) Then
-        SubCommandName = CLI.Aliases(SubCommandName)
-    End If
-
-    If this.Tokens.IncludeTokenKind(TokenKind.Identifier) Then
-        this.Name = this.Tokens.PopFirstTokenKind(TokenKind.Identifier).Text
-        If PStrings.StartsWith(this.Name, "{") Then
-            this.NameType = NameTypes.TypeGUID
-        ElseIf NewFileSystemObject().FileExists(this.Name) Then
-            this.NameType = NameTypes.TypePath
-        ElseIf Not PStrings.Contains(this.Name, " ") Then
-            this.NameType = NameTypes.TypeName
-        Else
-            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/cantFindRef"), this.Name)
-            Exit Sub
-        End If
-    End If
-
     If IsFalse(SubCommandName) Then
         ppm "ref --help"
         Exit Sub
+    End If
+
+    If CLI.Aliases.Exists(SubCommandName) Then
+        SubCommandName = CLI.Aliases(SubCommandName)
     End If
 
     If SubCommandName = "list" Then
@@ -89,22 +75,45 @@ Private Sub ICommand_Exec()
         Exit Sub
     End If
 
-    If Strings.Len(this.Name) = 0 Then
+    Dim RefNames As Variant
+    RefNames = this.Tokens.GetTokensKind(TokenKind.Identifier)
+
+    If UBound(RefNames) = -1 Then
         ppm "ref --help"
         Exit Sub
     End If
 
-    If SubCommandName = "add" Or SubCommandName = "install" Then
-        Me.AddReference
-        Me.UpdateReferences SaveDev
-        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refAdded"), this.Name)
-    ElseIf SubCommandName = "delete" Then
-        Me.RmReference
-        Me.UpdateReferences
-        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refDeleted"), this.Name)
-    Else
-        ppm "ref --help"
-    End If
+    Dim Token As Variant
+    For Each Token In RefNames
+        this.Name = Token.Text
+        If PStrings.IsEqual(this.Name, "ppm") Then
+            this.Name = ThisProject.Path
+        End If
+
+        If PStrings.StartsWith(this.Name, "{") Then
+            this.NameType = NameTypes.TypeGUID
+        ElseIf GetFileSystemObject().FileExists(this.Name) Then
+            this.NameType = NameTypes.TypePath
+        ElseIf Not PStrings.Contains(this.Name, " ") Then
+            this.NameType = NameTypes.TypeName
+        Else
+            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/cantFindRef"), this.Name)
+            Exit Sub
+        End If
+
+        If SubCommandName = "add" Or SubCommandName = "install" Then
+            Me.AddReference
+            Me.UpdateReferences SaveDev
+            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refAdded"), this.Name)
+        ElseIf SubCommandName = "delete" Then
+            Me.RmReference
+            Me.UpdateReferences
+            Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/refDeleted"), this.Name)
+        Else
+            ppm "ref --help"
+            Exit Sub
+        End If
+    Next
 End Sub
 
 Public Function ReadReferences() As Collection
@@ -120,6 +129,7 @@ Public Sub AddReference()
     Set Refs = Me.ReadReferences()
 
     Dim Ref As Object
+    On Error Resume Next
     If this.NameType = NameTypes.TypeGUID Then
         Set Ref = SelectedProject.References.AddFromGuid(this.Name, Major:=0, Minor:=0)
     ElseIf this.NameType = NameTypes.TypePath Then
@@ -134,6 +144,22 @@ Public Sub AddReference()
         Next
     End If
 
+    If Information.Err.Number = 32813 Then
+        Immediate.WriteLine "ERR: Reference already exists in the project:", this.Name
+        On Error GoTo 0
+        Exit Sub
+    ElseIf Information.Err.Number <> 0 Then
+        Dim ErrNumber As Long
+        ErrNumber = Information.Err.Number
+        Dim ErrSource As String
+        ErrSource = Information.Err.Source
+        Dim ErrDescription As String
+        ErrDescription = Information.Err.Description
+
+        On Error GoTo 0
+        Information.Err.Raise ErrNumber, ErrSource, ErrDescription
+    End If
+
     If Ref Is Nothing Then
         Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/cantFindRef"), this.Name)
         End
@@ -145,16 +171,16 @@ Public Sub RmReference()
     If this.NameType = NameTypes.TypeName Then
         On Error Resume Next
         Set r = SelectedProject.References(this.Name)
-        SelectedProject.References.Remove r
     ElseIf this.NameType = NameTypes.TypeGUID Then
         For Each r In SelectedProject.References
-            If Strings.LCase(r.Guid) = this.Name Then Exit For
+            If Strings.LCase(r.Guid) = Strings.LCase(this.Name) Then Exit For
         Next
     ElseIf this.NameType = NameTypes.TypePath Then
         For Each r In SelectedProject.References
-            If Strings.LCase(r.FullPath) = this.Name Then Exit For
+            If Strings.LCase(r.FullPath) = Strings.LCase(this.Name) Then Exit For
         Next
     End If
+    SelectedProject.References.Remove r
 
     If r Is Nothing Then
         Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/cantFindRef"), this.Name)
@@ -202,8 +228,9 @@ Public Sub UpdateReferences(Optional ByVal SaveDev As Boolean = False)
         If References.Exists(r.Name) Then GoTo Continue
         If DevReferences.Exists(r.Name) Then GoTo Continue
 
-        If r.Name = "PearPMProject" Then
-            DevReferences(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+        If r.Name = ThisProject.Name Then
+            Dim ThisPack As Pack: Set ThisPack = NewPack(ThisProject.GetComponent("package"))
+            DevReferences("ppm") = ThisPack.Version
             GoTo Continue
         End If
 
@@ -229,8 +256,14 @@ Public Sub PrintList()
     For Each r In SelectedProject.References
         Dim i As Long
         On Error Resume Next
-        Data(i, 0) = r.Name
-        Data(i, 1) = FString("{0}.{1}", r.Major, r.Minor)
+        If r.Name = ThisProject.Name Then
+            Dim ThisPack As Pack: Set ThisPack = NewPack(ThisProject.GetComponent("package"))
+            Data(i, 0) = "ppm"
+            Data(i, 1) = ThisPack.Version
+        Else
+            Data(i, 0) = r.Name
+            Data(i, 1) = FString("{0}.{1}", r.Major, r.Minor)
+        End If
         On Error GoTo 0
 
         i = i + 1
