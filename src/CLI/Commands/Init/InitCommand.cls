@@ -111,6 +111,12 @@ Public Function CreatePackComponent() As Object
         Set PackComponent = SelectedProject.AddComponent("package")
     End If
 
+    Dim Refs As Object
+    Set Refs = NewDictionary()
+    Dim DevRefs As Object
+    Set DevRefs = NewDictionary()
+    Me.FillReferences Refs, DevRefs
+
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     JB.AddObject _
         "name", ResultPack.Name, _
@@ -118,7 +124,8 @@ Public Function CreatePackComponent() As Object
         "description", ResultPack.Description, _
         "author", ResultPack.Author, _
         "git", ResultPack.GitURL, _
-        "references", Me.GetReferences()
+        "references", Refs, _
+        "devReferences", DevRefs
 
     SelectedProject.Rename ResultPack.Name & "Project"
 
@@ -131,14 +138,47 @@ Public Function CreatePackComponent() As Object
     Set CreatePackComponent = PackComponent
 End Function
 
-Public Function GetReferences() As Object
-    Dim References As Object
-    Set References = NewDictionary()
+Public Sub FillReferences(ByRef References As Object, ByRef DevReferences As Object)
+    Dim Pack As Pack
+    Set Pack = NewPack(SelectedProject.GetComponent("package"))
+
+    If IsTrue(Pack.References) Then
+        Set References = Pack.References
+    End If
+
+    If IsTrue(Pack.DevReferences) Then
+        Set DevReferences = Pack.DevReferences
+    End If
+
+    Dim Dummy As Variant
+    Dim Name As Variant
+    For Each Name In References
+        If Not SelectedProject.IsReferenceExists(Name) Then
+            References.Remove Name
+        End If
+    Next
+
+    For Each Name In DevReferences
+        If Not SelectedProject.IsReferenceExists(Name) Then
+            DevReferences.Remove Name
+        End If
+    Next
 
     Dim r As Object
     For Each r In SelectedProject.References
+        If References.Exists(r.Name) Then GoTo Continue
+        If DevReferences.Exists(r.Name) Then GoTo Continue
+
+        If r.Name = ThisProject.Name Then
+            Dim ThisPack As Pack: Set ThisPack = NewPack(ThisProject.GetComponent("package"))
+            DevReferences("ppm") = ThisPack.Version
+            GoTo Continue
+        End If
+
         References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+Continue:
     Next
 
-    Set GetReferences = References
-End Function
+    If References.Count = 0 Then Set References = Nothing
+    If DevReferences.Count = 0 Then Set DevReferences = Nothing
+End Sub
