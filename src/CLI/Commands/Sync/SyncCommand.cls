@@ -55,7 +55,7 @@ Private Sub ICommand_Exec()
   #Else
     Dim SyncPaths As Object: Set SyncPaths = NewDictionary()
     Dim SyncNames As Object: Set SyncNames = NewDictionary()
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Me.CollectPaths SelectedProject.Folder, SyncPaths
 
@@ -151,7 +151,7 @@ End Sub
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
     Dim File As File
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
     Dim File As Object
   #End If
     For Each File In Folder.Files
@@ -167,7 +167,7 @@ Public Function ReadCode(ByVal Path As String) As String
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Dim Ext As String: Ext = Strings.LCase(FSO.GetExtensionName(Path))
     Dim VBAttr As String

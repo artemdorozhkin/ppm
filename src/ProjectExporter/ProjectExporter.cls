@@ -131,7 +131,7 @@ Private Sub DeleteLastExport()
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
 
     Dim Item As Variant
@@ -228,7 +228,7 @@ Private Function SaveComponents(ByVal Encoding As String) As Variant
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Dim FileList As Collection: Set FileList = New Collection
 

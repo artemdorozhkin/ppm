@@ -53,7 +53,7 @@ Private Sub ICommand_Exec()
     SaveDev = this.Tokens.IncludeDefinition(Definitions("save-dev"))
 
     Set this.Parents = NewDictionary(vbTextCompare)
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         If this.FromLocal And Not .FolderExists(this.Registry) Then
             PFileSystem.CreateFolder this.Registry, Recoursive:=True
         End If
@@ -222,7 +222,7 @@ Public Function GetLocalLibPack(ByVal LibName As String, ByVal Version As String
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Dim ManifestPath As String
     ManifestPath = PFileSystem.BuildPath(this.Registry, LibName, "manifest.json")
@@ -370,7 +370,7 @@ End Function
         Dim SavePath As String
         SavePath = PFileSystem.BuildPath(CacheFolder, FileName)
 
-        If Not NewFileSystemObject().FileExists(SavePath) Then
+        If Not GetFileSystemObject().FileExists(SavePath) Then
             Converter.ToFile Response.Body, SavePath
         End If
         Paths.Add SavePath
@@ -383,7 +383,7 @@ Public Sub InstallLibs(ByRef Paths As Variant)
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Dim Zip As PZip: Set Zip = New PZip
     Dim Path As Variant
@@ -408,7 +408,7 @@ Public Sub ImportComponents(ByVal Path As String)
   #Else
     Dim Folder As Object: Set Folder = NewFolder(Path)
     Dim File As Object
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     For Each File In Folder.Files
         On Error Resume Next

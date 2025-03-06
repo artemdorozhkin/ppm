@@ -92,7 +92,7 @@ Private Sub ICommand_Exec()
 
         If PStrings.StartsWith(this.Name, "{") Then
             this.NameType = NameTypes.TypeGUID
-        ElseIf PQuickConstructors.GetFileSystemObject().FileExists(this.Name) Then
+        ElseIf GetFileSystemObject().FileExists(this.Name) Then
             this.NameType = NameTypes.TypePath
         ElseIf Not PStrings.Contains(this.Name, " ") Then
             this.NameType = NameTypes.TypeName

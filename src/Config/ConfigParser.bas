@@ -121,7 +121,7 @@ End Function
 Private Function ReadLines(ByVal Path As String) As Variant
     If Strings.Len(Path) = 0 Then Information.Err.Raise 76, "ConfigParser.ReadLines"
 
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         If Not .FileExists(Path) Then
             .CreateTextFile Path
         End If

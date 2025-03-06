@@ -32,7 +32,7 @@ Public Sub SwitchAddin()
       #If DEV Then
         Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
       #Else
-        Dim FSO As Object: Set FSO = NewFileSystemObject()
+        Dim FSO As Object: Set FSO = GetFileSystemObject()
       #End If
         Dim ppmAddinPath As String
         ppmAddinPath = FSO.BuildPath(Interaction.Environ("APPDATA"), "Microsoft")
