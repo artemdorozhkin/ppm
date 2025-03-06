@@ -52,15 +52,15 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
-        Key:="save-dev", _
-        Default:=False _
+        Key:="encoding", _
+        Short:="e", _
+        Default:="UTF-8" _
     )
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
-        Key:="encoding", _
-        Short:="e", _
-        Default:="UTF-8" _
+        Key:="file-format", _
+        Default:="xlsb" _
     )
     Set Buffer(Definition.Key) = Definition
 
@@ -103,6 +103,13 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
+        Key:="output", _
+        Short:="o", _
+        Default:="" _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
         Key:="path", _
         Short:="p", _
         Default:="" _
@@ -118,6 +125,12 @@ Attribute Items.VB_UserMemId = 0
     Set Definition = NewDefinition( _
         Key:="registry", _
         Default:="https://registry.ppmvba.com/" _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
+        Key:="save-dev", _
+        Default:=False _
     )
     Set Buffer(Definition.Key) = Definition
 
