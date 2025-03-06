@@ -75,7 +75,7 @@ Private Sub ICommand_Exec()
     If CLI.Aliases.Exists(SubCommandName) Then
         SubCommandName = CLI.Aliases(SubCommandName)
     End If
-    If IsFalse(SubCommandName) Or SubCommandName = "add" Then
+    If IsFalse(SubCommandName) Or SubCommandName = "add" Or SubCommandName = "install" Then
         Me.AddClass
         If this.Tokens.IncludeDefinition(Definitions("create-constructor")) Then
             Me.AddConstructor
