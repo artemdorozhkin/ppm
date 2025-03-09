@@ -14,6 +14,8 @@ End Property
 
 Public Property Get Commands() As Variant
     Commands = Array( _
+        "auth", _
+        "build", _
         "class", _
         "config", _
         "export", _
@@ -32,8 +34,10 @@ End Property
 
 Public Property Get SubCommands() As Variant
     SubCommands = Array( _
+        "add", _
         "delete", _
         "edit", _
+        "generate", _
         "get", _
         "list", _
         "major", _
@@ -92,12 +96,13 @@ End Property
 End Property
 
 Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
-    Dim Config As Config: Set Config = NewConfig(ConfigScopes.DefaultScope)
+    Config.ReadScope
+
     If Tokens.Count = 0 Then
         Set ParseCommand = NewHelpCommand()
         Exit Function
     ElseIf Tokens.IncludeDefinition(Definitions("help")) Then
-        Set ParseCommand = NewHelpCommand(Config, Tokens)
+        Set ParseCommand = NewHelpCommand(Tokens)
         Exit Function
     ElseIf Tokens.Count = 1 And Tokens.IncludeDefinition(Definitions("version")) Then
         ShowVersion
@@ -112,7 +117,7 @@ Public Function ParseCommand(ByRef Tokens As Tokens) As ICommand
 
     Dim CommandName As String: CommandName = CLI.FindCommand(CommandToken.Text)
     Dim Command As Variant: Set Command = Application.Run( _
-        PStrings.FString("New{0}Command", CommandName), Config, Tokens _
+        PStrings.FString("New{0}Command", CommandName), Tokens _
     )
     Set ParseCommand = Command
 End Function
@@ -130,13 +135,8 @@ Public Function FindCommand(ByVal Name As String) As String
 End Function
 
 Public Sub InitLang()
-    Dim Config As Config: Set Config = NewConfig(ConfigScopes.UserScope)
     Dim SelectedLang As String
-    SelectedLang = Strings.LCase(GetFirstTrue( _
-        Config.GetValue("language"), _
-        Definitions("language").Default _
-    ))
-
+    SelectedLang = Strings.LCase(Config.GetValue("language"))
     Set this.Lang = NewLang(SelectedLang)
 End Sub
 

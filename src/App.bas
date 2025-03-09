@@ -34,6 +34,16 @@ Public Sub ppm(Optional ByVal StringArgs As String)
         End If
     Next
 
+    If Config.IsMissing(ConfigScopes.GlobalScode) Then
+        Config.GenerateDefault ConfigScopes.GlobalScode
+    End If
+
+    If Config.IsMissing(ConfigScopes.UserScope) Then
+        Config.GenerateDefault ConfigScopes.UserScope
+    End If
+
+    Config.ReadScope
+
     CLI.InitLang
     Dim Command As ICommand: Set Command = CLI.ParseCommand(NewLexer(StringArgs).Lex())
     Command.Exec

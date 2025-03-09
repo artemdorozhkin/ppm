@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TInitCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
@@ -31,10 +30,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
-
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
 End Property
@@ -45,9 +40,9 @@ End Property
 
 Private Sub ICommand_Exec()
     Dim AfterDialog As Boolean
-    AfterDialog = GetFirstValueFrom("_after-dialog", this.Tokens, this.Config)
+    AfterDialog = this.Tokens.IncludeDefinition(Definitions("_after-dialog"))
     Dim SkipByDefault As Boolean
-    SkipByDefault = GetFirstValueFrom("yes", this.Tokens, this.Config)
+    SkipByDefault = this.Tokens.IncludeDefinition(Definitions("yes"))
 
     Dim Pack As Pack
     If SelectedProject.IsComponentExists("package") Then
@@ -58,16 +53,16 @@ Private Sub ICommand_Exec()
     HaveProjectName = this.Tokens.IncludeTokenKind(TokenKind.Identifier)
     Dim InitialName As String
     If HaveProjectName Then
-        InitialName = this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text
+        InitialName = this.Tokens.PopFirstTokenKind(TokenKind.Identifier).Text
     End If
 
     If IsTrue(Pack) And Not AfterDialog Then
         InitPack = InitDialog.SetDefault( _
-            Name:=GetFirstTrue(InitialName, Pack.Name), _
-            Version:=Pack.Version, _
+            Name:=GetFirstTrueOrDefault(Config.GetValue("name"), InitialName, Pack.Name), _
+            Version:=GetFirstTrueOrDefault(Config.GetValue("version"), Pack.Version), _
             Description:=Pack.Description, _
-            Author:=Pack.Author, _
-            GitURL:=Pack.Git _
+            Author:=GetFirstTrueOrDefault(Config.GetValue("author-name"), Pack.Author), _
+            GitURL:=GetFirstTrueOrDefault(Config.GetValue("author-url"), Pack.Git) _
         )
     ElseIf HaveProjectName Then
         InitPack = InitDialog.SetDefault(Name:=InitialName)
@@ -104,7 +99,7 @@ Private Sub ICommand_Exec()
     End If
 End Sub
 
-Public Sub CreatePackComponent()
+Public Function CreatePackComponent() As Object
   #If DEV Then
     Dim PackComponent As VBComponent
   #Else
@@ -116,6 +111,12 @@ Public Sub CreatePackComponent()
         Set PackComponent = SelectedProject.AddComponent("package")
     End If
 
+    Dim Refs As Object
+    Set Refs = NewDictionary()
+    Dim DevRefs As Object
+    Set DevRefs = NewDictionary()
+    Me.FillReferences Refs, DevRefs
+
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
     JB.AddObject _
         "name", ResultPack.Name, _
@@ -123,7 +124,8 @@ Public Sub CreatePackComponent()
         "description", ResultPack.Description, _
         "author", ResultPack.Author, _
         "git", ResultPack.GitURL, _
-        "references", Me.GetReferences()
+        "references", Refs, _
+        "devReferences", DevRefs
 
     SelectedProject.Rename ResultPack.Name & "Project"
 
@@ -132,16 +134,51 @@ Public Sub CreatePackComponent()
         .AddFromString Utils.CommentString(JB.ToString())
         .InsertLines 1, PStrings.FString("'@Folder(""{0}"")", SelectedProject.Name)
     End With
-End Sub
 
-Public Function GetReferences() As Object
-    Dim References As Object
-    Set References = NewDictionary()
+    Set CreatePackComponent = PackComponent
+End Function
 
-    Dim r As Object
-    For Each r In ThisWorkbook.VBProject.References
-        References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+Public Sub FillReferences(ByRef References As Object, ByRef DevReferences As Object)
+    Dim Pack As Pack
+    Set Pack = NewPack(SelectedProject.GetComponent("package"))
+
+    If IsTrue(Pack.References) Then
+        Set References = Pack.References
+    End If
+
+    If IsTrue(Pack.DevReferences) Then
+        Set DevReferences = Pack.DevReferences
+    End If
+
+    Dim Dummy As Variant
+    Dim Name As Variant
+    For Each Name In References
+        If Not SelectedProject.IsReferenceExists(Name) Then
+            References.Remove Name
+        End If
     Next
 
-    Set GetReferences = References
-End Function
+    For Each Name In DevReferences
+        If Not SelectedProject.IsReferenceExists(Name) Then
+            DevReferences.Remove Name
+        End If
+    Next
+
+    Dim r As Object
+    For Each r In SelectedProject.References
+        If References.Exists(r.Name) Then GoTo Continue
+        If DevReferences.Exists(r.Name) Then GoTo Continue
+
+        If r.Name = ThisProject.Name Then
+            Dim ThisPack As Pack: Set ThisPack = NewPack(ThisProject.GetComponent("package"))
+            DevReferences("ppm") = ThisPack.Version
+            GoTo Continue
+        End If
+
+        References(r.Name) = FString("{0}.{1}", r.Major, r.Minor)
+Continue:
+    Next
+
+    If References.Count = 0 Then Set References = Nothing
+    If DevReferences.Count = 0 Then Set DevReferences = Nothing
+End Sub

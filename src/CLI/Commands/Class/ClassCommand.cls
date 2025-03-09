@@ -12,9 +12,8 @@ Option Explicit
 
 Implements ICommand
 
-Private Type TConfigCommand
+Private Type TClassCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 
     Name As String
@@ -24,7 +23,7 @@ Private Type TConfigCommand
     Parts As Variant
 End Type
 
-Private this As TConfigCommand
+Private this As TClassCommand
 
 Private Sub Class_Initialize()
     CLI.Lang.SetBlock "/root/ppmCommands/class"
@@ -35,10 +34,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Params.Item("create-constructor") = CLI.Lang.GetValue("param", "name=create-constructor")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -54,7 +49,7 @@ Private Sub ICommand_Exec()
         Exit Sub
     End If
 
-    this.FullPath = Me.GetFullPath(this.Tokens.GetFirstTokenKind(TokenKind.Identifier).Text)
+    this.FullPath = Me.GetFullPath(this.Tokens.PopFirstTokenKind(TokenKind.Identifier).Text)
     this.Parts = Strings.Split(this.FullPath, ".")
     this.Name = this.Parts(UBound(this.Parts))
     this.CstrName = this.Name & "Cstr"
@@ -71,7 +66,7 @@ Private Sub ICommand_Exec()
     End If
 
     Dim SubCommand As SyntaxToken
-    Set SubCommand = this.Tokens.GetFirstTokenKind(TokenKind.SubCommand)
+    Set SubCommand = this.Tokens.PopFirstTokenKind(TokenKind.SubCommand)
     Dim SubCommandName As String
     If IsTrue(SubCommand) Then
         SubCommandName = SubCommand.Text
@@ -80,7 +75,7 @@ Private Sub ICommand_Exec()
     If CLI.Aliases.Exists(SubCommandName) Then
         SubCommandName = CLI.Aliases(SubCommandName)
     End If
-    If IsFalse(SubCommandName) Or SubCommandName = "add" Then
+    If IsFalse(SubCommandName) Or SubCommandName = "add" Or SubCommandName = "install" Then
         Me.AddClass
         If this.Tokens.IncludeDefinition(Definitions("create-constructor")) Then
             Me.AddConstructor

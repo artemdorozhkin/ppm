@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TSyncCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
@@ -28,10 +27,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -60,7 +55,7 @@ Private Sub ICommand_Exec()
   #Else
     Dim SyncPaths As Object: Set SyncPaths = NewDictionary()
     Dim SyncNames As Object: Set SyncNames = NewDictionary()
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Me.CollectPaths SelectedProject.Folder, SyncPaths
 
@@ -156,7 +151,7 @@ End Sub
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
     Dim File As File
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
     Dim File As Object
   #End If
     For Each File In Folder.Files
@@ -172,7 +167,7 @@ Public Function ReadCode(ByVal Path As String) As String
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Dim Ext As String: Ext = Strings.LCase(FSO.GetExtensionName(Path))
     Dim VBAttr As String

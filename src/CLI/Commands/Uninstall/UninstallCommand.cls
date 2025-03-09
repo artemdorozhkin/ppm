@@ -14,9 +14,10 @@ Implements ICommand
 
 Private Type TUninstallCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
     Pack As Pack
+    HasDeps As Boolean
+    HasDevDeps As Boolean
 End Type
 
 Private this As TUninstallCommand
@@ -29,10 +30,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -47,6 +44,8 @@ Private Sub ICommand_Exec()
     Immediate.WriteLine CLI.Lang.GetValue("messages/uninstalling")
 
     Set this.Pack = NewPack(SelectedProject.GetComponent("package"))
+    this.HasDeps = IsTrue(this.Pack.Dependencies)
+    this.HasDevDeps = IsTrue(this.Pack.DevDependencies)
 
   #If DEV Then
     Dim Libs As Dictionary: Set Libs = GetAllInstalledLibs()
@@ -55,6 +54,18 @@ Private Sub ICommand_Exec()
     Dim Libs As Object: Set Libs = GetAllInstalledLibs()
     Dim RmDepenpencies As Object: Set RmDepenpencies = GetRmDependencies()
   #End If
+    If Libs.Count = 0 Then
+        Immediate.WriteLine CLI.Lang.GetValue("messages/noInstalledLibs")
+        Exit Sub
+    End If
+
+    If RmDepenpencies.Count = 0 And this.Tokens.Count = 1 Then
+        Set RmDepenpencies = Libs
+    ElseIf RmDepenpencies.Count = 0 Then
+        Immediate.WriteLine CLI.Lang.GetValue("messages/nothingToRemove")
+        Exit Sub
+    End If
+
     Dim NotUsed As Collection: Set NotUsed = New Collection
 
     If IsTrue(Libs) And IsTrue(RmDepenpencies) Then
@@ -72,10 +83,21 @@ Continue:
         End
     End If
 
+    Dim Has
     Dim Dep As Variant
     For Each Dep In NotUsed
         RemoveDependency Dep
-        this.Pack.Dependencies.Remove Dep
+        If this.HasDeps Then
+            If this.Pack.Dependencies.Exists(Dep) Then
+                this.Pack.Dependencies.Remove Dep
+            End If
+        End If
+
+        If this.HasDevDeps Then
+            If this.Pack.DevDependencies.Exists(Dep) Then
+                this.Pack.DevDependencies.Remove Dep
+            End If
+        End If
     Next
     this.Pack.Update
 
@@ -107,13 +129,24 @@ End Function
   Public Sub CollectAndCountDependencies(ByVal PackName As String, ByRef Output As Object)
 #End If
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent(PackName))
-    If IsFalse(Pack.Dependencies) Then Exit Sub
-
-    Dim Name As Variant
-    For Each Name In Pack.Dependencies
-        Output(Name) = Output(Name) + 1
-        CollectAndCountDependencies Name & "Package", Output
-    Next
+    Dim HasDeps As Boolean
+    HasDeps = IsTrue(Pack.Dependencies)
+    Dim HasDevDeps As Boolean
+    HasDevDeps = IsTrue(Pack.DevDependencies)
+    If HasDeps Then
+        Dim Name As Variant
+        For Each Name In Pack.Dependencies
+            Output(Name) = Output(Name) + 1
+            CollectAndCountDependencies Name & "Package", Output
+        Next
+    End If
+    
+    If HasDevDeps Then
+        For Each Name In Pack.DevDependencies
+            Output(Name) = Output(Name) + 1
+            CollectAndCountDependencies Name & "Package", Output
+        Next
+    End If
 End Sub
 
 #If DEV Then
@@ -121,7 +154,10 @@ End Sub
 #Else
   Public Function GetRmDependencies() As Object
 #End If
-    If IsFalse(this.Pack.Dependencies) Then Exit Function
+    If Not this.HasDeps And Not this.HasDevDeps Then
+        Set GetRmDependencies = NewDictionary()
+        Exit Function
+    End If
 
   #If DEV Then
     Dim RmLibs As Dictionary: Set RmLibs = NewDictionary(VbCompareMethod.vbTextCompare)
@@ -131,10 +167,24 @@ End Sub
 
     Dim LibName As Variant
     For Each LibName In this.Tokens.GetTokensKind(TokenKind.Identifier)
-        If this.Pack.Dependencies.Exists(LibName.Text) Then
-            RmLibs(LibName.Text) = RmLibs(LibName.Text) + 1
-            CollectAndCountDependencies LibName.Text & "Package", RmLibs
+        If this.HasDeps Then
+            If this.Pack.Dependencies.Exists(LibName.Text) Then
+                RmLibs(LibName.Text) = RmLibs(LibName.Text) + 1
+                CollectAndCountDependencies LibName.Text & "Package", RmLibs
+                GoTo Continue
+            End If
         End If
+
+        If this.HasDevDeps Then
+            If this.Pack.DevDependencies.Exists(LibName.Text) Then
+                RmLibs(LibName.Text) = RmLibs(LibName.Text) + 1
+                CollectAndCountDependencies LibName.Text & "Package", RmLibs
+                GoTo Continue
+            End If
+        End If
+
+        Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/cantFindDep"), LibName.Text)
+Continue:
     Next
 
     Set GetRmDependencies = RmLibs

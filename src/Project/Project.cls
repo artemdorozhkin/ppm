@@ -29,6 +29,14 @@ Private this As TProject
     Set Components = this.Project.VBComponents
 End Property
 
+#If DEV Then
+  Public Property Get References() As References
+#Else
+  Public Property Get References() As Object
+#End If
+    Set References = this.Project.References
+End Property
+
 Public Property Get IsSaved() As Boolean
     On Error Resume Next
     IsSaved = this.FileName <> ""
@@ -115,7 +123,7 @@ End Sub
   Public Function ExportComponent(ByVal Folder As String, ByRef Component As Object) As String
 #End If
     Dim Ext As String: Ext = NewModule(Component).Ext
-    Dim Path As String: Path = NewFileSystemObject().BuildPath(Folder, Component.Name & Ext)
+    Dim Path As String: Path = GetFileSystemObject().BuildPath(Folder, Component.Name & Ext)
     TrimCodeEnd Component
     Component.Export Path
     ExportComponent = Path
@@ -128,11 +136,16 @@ Public Function IsComponentExists(ByVal NameOrPath As String) As Boolean
 Exit Function
 
 Catch:
-    If Information.Err.Number = 9 Then
-        IsComponentExists = False
-    Else
-        Information.Err.Raise Information.Err.Number, Information.TypeName(Me)
-    End If
+    IsComponentExists = False
+End Function
+
+Public Function IsReferenceExists(ByVal Name As String) As Boolean
+    On Error GoTo Catch
+    IsReferenceExists = this.Project.References(Name).Name <> ""
+Exit Function
+
+Catch:
+    IsReferenceExists = False
 End Function
 
 Private Function IsValidType(ByVal Path As String) As Boolean

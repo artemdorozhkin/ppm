@@ -52,7 +52,7 @@ Public Function Lex() As Tokens
         Dim Length As Long: Length = this.Position - this.Start
         Dim Text As String
         Text = Strings.Mid(this.Text, this.Start, Length)
-        this.Tokens.Add NewSyntaxToken(this.Kind, Text)
+        this.Tokens.Push NewSyntaxToken(this.Kind, Text)
         If Current = """" Or Current = "'" Then this.Position = this.Position + 1
 Continue:
     Loop
@@ -98,7 +98,6 @@ End Sub
 
 Private Sub ReadIdentifier()
     Do While Not PStrings.IsWhiteSpace(Current) And _
-             Not Current = "-" And _
              Not Current = "="
         this.Position = this.Position + 1
         If Information.IsNull(Current) Then Exit Do
@@ -106,12 +105,21 @@ Private Sub ReadIdentifier()
 
     Dim Length As Long: Length = this.Position - this.Start
     Dim Text As String: Text = Strings.Mid(this.Text, this.Start, Length)
+    Dim Alias As String: Alias = ""
+
     If CLI.Aliases.Exists(Text) Then
-        Text = CLI.Aliases(Text)
+        Alias = CLI.Aliases(Text)
     End If
-    If PArray.IncludesAny(CLI.Commands, Text) Then
+
+    If ( _
+        PArray.IncludesAny(CLI.Commands, Text) Or _
+        PArray.IncludesAny(CLI.Commands, Alias) _
+    ) And Not this.Tokens.IncludeTokenKind(TokenKind.Command) Then
         this.Kind = TokenKind.Command
-    ElseIf PArray.IncludesAny(CLI.SubCommands, Text) Then
+    ElseIf ( _
+        PArray.IncludesAny(CLI.SubCommands, Text) Or _
+        PArray.IncludesAny(CLI.SubCommands, Alias) _
+    ) And Not this.Tokens.IncludeTokenKind(TokenKind.SubCommand) Then
         this.Kind = TokenKind.SubCommand
     Else
         this.Kind = TokenKind.Identifier

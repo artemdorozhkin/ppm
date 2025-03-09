@@ -14,7 +14,6 @@ Option Explicit
 #If DEV Then
   '@DefaultMember
   Public Property Get Items() As Dictionary
-Attribute Items.VB_UserMemId = 0
 #Else
   '@DefaultMember
   Public Property Get Items() As Object
@@ -53,13 +52,6 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
-        Key:="dev-dep", _
-        Short:="d", _
-        Default:=False _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    Set Definition = NewDefinition( _
         Key:="encoding", _
         Short:="e", _
         Default:="UTF-8" _
@@ -67,9 +59,8 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
-        Key:="global", _
-        Short:="g", _
-        Default:=False _
+        Key:="file-format", _
+        Default:="xlsb" _
     )
     Set Buffer(Definition.Key) = Definition
 
@@ -77,25 +68,6 @@ Attribute Items.VB_UserMemId = 0
         Key:="help", _
         Short:="h", _
         Default:=False _
-    )
-    Set Buffer(Definition.Key) = Definition
-
-    With NewFileSystemObject()
-        Dim PpmFolder As String
-        PpmFolder = .BuildPath(Interaction.Environ("APPDATA"), "ppm")
-        Dim RegistryPath As String
-        RegistryPath = .BuildPath(PpmFolder, "registry")
-        If Not .FolderExists(PpmFolder) Then
-            .CreateFolder PpmFolder
-        End If
-        If Not .FolderExists(RegistryPath) Then
-            .CreateFolder RegistryPath
-        End If
-    End With
-
-    Set Definition = NewDefinition( _
-        Key:="registry", _
-        Default:=RegistryPath _
     )
     Set Buffer(Definition.Key) = Definition
 
@@ -131,9 +103,34 @@ Attribute Items.VB_UserMemId = 0
     Set Buffer(Definition.Key) = Definition
 
     Set Definition = NewDefinition( _
+        Key:="output", _
+        Short:="o", _
+        Default:="" _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
         Key:="path", _
         Short:="p", _
         Default:="" _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
+        Key:="recreate-token", _
+        Default:=False _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
+        Key:="registry", _
+        Default:="https://registry.ppmvba.com/" _
+    )
+    Set Buffer(Definition.Key) = Definition
+
+    Set Definition = NewDefinition( _
+        Key:="save-dev", _
+        Default:=False _
     )
     Set Buffer(Definition.Key) = Definition
 

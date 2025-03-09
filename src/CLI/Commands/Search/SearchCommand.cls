@@ -7,18 +7,17 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder("PearPMProject.src.CLI.Commands.Search")
+'@Folder "PearPMProject.src.CLI.Commands.Search"
 Option Explicit
 
 Implements ICommand
 
-Private Type TExportCommand
+Private Type TSearchCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
-Private this As TExportCommand
+Private this As TSearchCommand
 
 Private Sub Class_Initialize()
     CLI.Lang.SetBlock "/root/ppmCommands/search"
@@ -31,10 +30,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
 
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
-
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
 End Property
@@ -44,8 +39,19 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    If this.Tokens.Count = 1 Then
+        ppm "search -h"
+        Exit Sub
+    End If
+
+    Dim Registry As String
+    Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
+
+    Dim IsLocal As Boolean
+    IsLocal = Utils.GetTokenOrConfigValue("local", this.Tokens, CastTo:=VbVarType.vbBoolean)
+
     Dim PackageToken As SyntaxToken
-    Set PackageToken = this.Tokens.GetFirstTokenKind(TokenKind.Identifier)
+    Set PackageToken = this.Tokens.PopFirstTokenKind(TokenKind.Identifier)
     If IsFalse(PackageToken) Then
         Immediate.WriteLine CLI.Lang.GetValue("messages/nameMissing")
         Exit Sub
@@ -54,10 +60,7 @@ Private Sub ICommand_Exec()
     Dim PackageName As String
     PackageName = PackageToken.Text
 
-    Dim Registry As String
-    Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
-
-    If GetFirstValueFrom("local", this.Tokens, this.Config) Then
+    If IsLocal Then
         LookupLocal Registry, PackageName
     Else
         LookupOnServer Registry, PackageName
@@ -66,11 +69,7 @@ End Sub
 
 Public Sub LookupOnServer(ByVal Registry As String, ByVal PackageName As String)
     Dim URL As String
-    If Strings.Right(Registry, 1) <> "/" Then
-        URL = Registry & PStrings.FString("/search/{0}", PackageName)
-    Else
-        URL = Registry & PStrings.FString("search/{0}", PackageName)
-    End If
+    URL = Utils.ResolveUrl(Registry, PStrings.FString("/-/search/{0}", PackageName))
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Response As TResponse
@@ -78,11 +77,14 @@ Public Sub LookupOnServer(ByVal Registry As String, ByVal PackageName As String)
 
     If Response.Code = HTTPCodes.OK_200 Then
         Dim JSON As Object: Set JSON = PJSON.Parse(Response.Text)
-        Dim Result As Collection: Set Result = JSON("result")
-        If Result.Count = 0 Then
+        If Information.IsObject(JSON("result")) Then
+            If JSON("result").Count = 0 Then
+                Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/noMatchesFor"), PackageName)
+            Else
+                PrintResult JSON("result")
+            End If
+        ElseIf Information.IsNull(JSON("result")) Then
             Immediate.WriteLine PStrings.FString(CLI.Lang.GetValue("messages/noMatchesFor"), PackageName)
-        Else
-            PrintResult Result
         End If
     End If
 End Sub
@@ -94,7 +96,7 @@ Public Sub LookupLocal(ByVal Registry As String, ByVal PackageName As String)
     Dim RegistryFolder As Folder: Set RegistryFolder = NewFolder(Registry)
     Dim PackFolder As Folder
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
     Dim RegistryFolder As Object: Set RegistryFolder = NewFolder(Registry)
     Dim PackFolder As Object
   #End If

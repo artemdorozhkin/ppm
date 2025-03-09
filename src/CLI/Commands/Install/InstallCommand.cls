@@ -14,7 +14,6 @@ Implements ICommand
 
 Private Type TInstallCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
     Registry As String
     FromLocal As Boolean
@@ -33,14 +32,11 @@ Private Sub Class_Initialize()
     Set this.CommandInfo = New CommandInfo
     this.CommandInfo.Name = "install"
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
+    this.CommandInfo.Params.Item("save-dev") = CLI.Lang.GetValue("param", "name=save-dev")
     this.CommandInfo.Params.Item("local") = CLI.Lang.GetValue("param", "name=local")
     this.CommandInfo.Params.Item("registry") = CLI.Lang.GetValue("param", "name=registry")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -51,10 +47,13 @@ Private Property Get ICommand_CommandInfo() As CommandInfo
 End Property
 
 Private Sub ICommand_Exec()
+    this.Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
+    this.FromLocal = Utils.GetTokenOrConfigValue("local", this.Tokens, CastTo:=VbVarType.vbBoolean)
+    Dim SaveDev As Boolean
+    SaveDev = this.Tokens.IncludeDefinition(Definitions("save-dev"))
+
     Set this.Parents = NewDictionary(vbTextCompare)
-    this.Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
-    this.FromLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         If this.FromLocal And Not .FolderExists(this.Registry) Then
             PFileSystem.CreateFolder this.Registry, Recoursive:=True
         End If
@@ -64,21 +63,21 @@ Private Sub ICommand_Exec()
   #If DEV Then
     Dim Libs As Dictionary: Set Libs = Me.GetFlattedLibs()
   #Else
-    Dim Libs As Object: Set Libs = Me.GetFlattedLibs()
+    Dim Libs As Object: Set Libs = Me.GetFlattedLibs(SaveDev)
   #End If
-
-    Dim Paths As Variant
-    If this.FromLocal Then
-        Paths = Me.GetLocalLibs(Libs)
-    Else
-        Paths = Me.DownloadLibs(Libs)
-    End If
-    InstallLibs Paths
-    UpdatePack
 
     If Libs.Count = 0 Then
         Immediate.WriteLine CLI.Lang.GetValue("messages/libsNotFound")
     Else
+        Dim Paths As Variant
+        If this.FromLocal Then
+            Paths = Me.GetLocalLibs(Libs)
+        Else
+            Paths = Me.DownloadLibs(Libs)
+        End If
+        InstallLibs Paths
+        UpdatePack SaveDev
+
         ms = DateTime.Timer - ms
         Immediate.WriteLine PStrings.FString( _
             CLI.Lang.GetValue("messages/installed"), _
@@ -89,14 +88,14 @@ Private Sub ICommand_Exec()
 End Sub
 
 #If DEV Then
-  Public Function GetFlattedLibs() As Dictionary
+  Public Function GetFlattedLibs(ByVal SaveDev As Boolean) As Dictionary
 #Else
-  Public Function GetFlattedLibs() As Object
+  Public Function GetFlattedLibs(ByVal SaveDev As Boolean) As Object
 #End If
     If this.Tokens.IncludeTokenKind(TokenKind.Identifier) Then
         Set GetFlattedLibs = Me.GetLibsFromTokens()
     Else
-        Set GetFlattedLibs = Me.GetLibsFromDependencies()
+        Set GetFlattedLibs = Me.GetLibsFromDependencies(SaveDev)
     End If
 End Function
 
@@ -135,19 +134,23 @@ Continue:
 End Function
 
 #If DEV Then
-  Public Function GetLibsFromDependencies() As Dictionary
+  Public Function GetLibsFromDependencies(ByVal SaveDev As Boolean) As Dictionary
 #Else
-  Public Function GetLibsFromDependencies() As Object
+  Public Function GetLibsFromDependencies(ByVal SaveDev As Boolean) As Object
 #End If
   #If DEV Then
     Dim Libs As Dictionary: Set Libs = NewDictionary(vbTextCompare)
     Dim Dependencies As Dictionary
-    Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
   #Else
     Dim Libs As Object: Set Libs = NewDictionary(vbTextCompare)
     Dim Dependencies As Object
-    Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
   #End If
+    If SaveDev Then
+        Set Dependencies = NewPack(SelectedProject.GetComponent("package")).DevDependencies
+    Else
+        Set Dependencies = NewPack(SelectedProject.GetComponent("package")).Dependencies
+    End If
+
     If IsFalse(Dependencies) Then
         Set GetLibsFromDependencies = Libs
         Exit Function
@@ -219,11 +222,10 @@ Public Function GetLocalLibPack(ByVal LibName As String, ByVal Version As String
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Dim ManifestPath As String
-    ManifestPath = FSO.BuildPath(this.Registry, LibName)
-    ManifestPath = FSO.BuildPath(ManifestPath, "manifest.json")
+    ManifestPath = PFileSystem.BuildPath(this.Registry, LibName, "manifest.json")
     If Not FSO.FileExists(ManifestPath) Then
         Information.Err.Raise _
             76, _
@@ -242,11 +244,7 @@ End Function
 
 Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As String) As Pack
     Dim URL As String
-    If Strings.Right(this.Registry, 1) <> "/" Then
-        URL = this.Registry & PStrings.FString("/{0}/{1}", LibName, Version)
-    Else
-        URL = this.Registry & PStrings.FString("{0}/{1}", LibName, Version)
-    End If
+    URL = Utils.ResolveUrl(this.Registry, PStrings.FString("/{0}/{1}", LibName, Version))
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Response As TResponse
@@ -254,8 +252,13 @@ Public Function GetLibPackFromServer(ByVal LibName As String, ByVal Version As S
     Response = HTTP.GetRequest(URL)
     On Error GoTo 0
     If Response.Code <> HTTPCodes.OK_200 Then
-        Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
-        Immediate.WriteLine Response.Text
+        Dim JSONResponse As Object
+        Set JSONResponse = PJSON.Parse(Response.Text)
+        If Err.Number = 0 Then
+            Immediate.WriteLine "ERR:", JSONResponse("error")
+        Else
+            Immediate.WriteLine CLI.Lang.GetValue("messages/somethingWentWrong")
+        End If
         End
     End If
 
@@ -310,11 +313,6 @@ End Function
 #Else
   Public Function DownloadLibs(ByRef Libs As Object) As Variant
 #End If
-    Dim Registry As String
-    If Strings.Right(this.Registry, 1) <> "/" Then
-        Registry = this.Registry & "/"
-    End If
-
     Dim HTTP As HTTP: Set HTTP = New HTTP
     Dim Converter As BinaryConverter: Set Converter = New BinaryConverter
     Dim Paths As Collection: Set Paths = New Collection
@@ -326,7 +324,7 @@ End Function
     For Each Name In Libs
         Dim Version As String: Version = Libs(Name)
         Dim URL As String
-        URL = PStrings.FString("{0}{1}/{2}", Registry, Name, Version)
+        URL = Utils.ResolveUrl(this.Registry, PStrings.FString("/{0}/{1}", Name, Version))
         Dim Response As TResponse
         Response = HTTP.GetRequest(URL)
         If Response.Code <> HTTPCodes.OK_200 Then
@@ -372,7 +370,7 @@ End Function
         Dim SavePath As String
         SavePath = PFileSystem.BuildPath(CacheFolder, FileName)
 
-        If Not NewFileSystemObject().FileExists(SavePath) Then
+        If Not GetFileSystemObject().FileExists(SavePath) Then
             Converter.ToFile Response.Body, SavePath
         End If
         Paths.Add SavePath
@@ -385,7 +383,7 @@ Public Sub InstallLibs(ByRef Paths As Variant)
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Dim Zip As PZip: Set Zip = New PZip
     Dim Path As Variant
@@ -410,7 +408,7 @@ Public Sub ImportComponents(ByVal Path As String)
   #Else
     Dim Folder As Object: Set Folder = NewFolder(Path)
     Dim File As Object
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     For Each File In Folder.Files
         On Error Resume Next
@@ -433,6 +431,14 @@ Public Sub ImportComponents(ByVal Path As String)
     Next
 End Sub
 
-Public Sub UpdatePack()
-    NewPack(SelectedProject.GetComponent("package")).Update Dependencies:=this.Parents
+Public Sub UpdatePack(ByVal SaveDev As Boolean)
+    If Not SelectedProject.IsComponentExists("package") Then
+        SelectedProject.AddComponent "package"
+    End If
+
+    If SaveDev Then
+        NewPack(SelectedProject.GetComponent("package")).Update DevDependencies:=this.Parents
+    Else
+        NewPack(SelectedProject.GetComponent("package")).Update Dependencies:=this.Parents
+    End If
 End Sub

@@ -12,13 +12,12 @@ Option Explicit
 
 Implements ICommand
 
-Private Type TExportCommand
+Private Type TPublishCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
-Private this As TExportCommand
+Private this As TPublishCommand
 
 Private Sub Class_Initialize()
     CLI.Lang.SetBlock "/root/ppmCommands/publish"
@@ -30,10 +29,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Params.Item("registry") = CLI.Lang.GetValue("param", "name=registry")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -66,7 +61,7 @@ Private Sub ICommand_Exec()
     Dim ZipName As String
     ZipName = Me.GetBuildName(Pack) & ".zip"
     Dim ZipPath As String
-    ZipPath = NewFileSystemObject().BuildPath(Interaction.Environ("TEMP"), ZipName)
+    ZipPath = GetFileSystemObject().BuildPath(Interaction.Environ("TEMP"), ZipName)
     Dim Zip As PZip: Set Zip = NewPZip(ZipPath)
     Zip.AddFolderContent RootFolder
     FileSystem.Kill RootFolder & "\*"
@@ -75,11 +70,11 @@ Private Sub ICommand_Exec()
     PrintDetails Zip, Pack
 
     Dim ToLocal As Boolean
-    ToLocal = GetFirstValueFrom("local", this.Tokens, this.Config)
+    ToLocal = Utils.GetTokenOrConfigValue("local", this.Tokens, CastTo:=VbVarType.vbBoolean)
     Dim Registry As String
-    Registry = GetFirstValueFrom("registry", this.Tokens, this.Config)
+    Registry = Utils.GetTokenOrConfigValue("registry", this.Tokens)
     If ToLocal Then
-        If Not NewFileSystemObject().FolderExists(Registry) Then
+        If Not GetFileSystemObject().FolderExists(Registry) Then
             PFileSystem.CreateFolder Registry, Recoursive:=True
         End If
     End If
@@ -88,6 +83,7 @@ Private Sub ICommand_Exec()
     If ToLocal Then
         Success = PublishOnLocal(Registry, ZipPath, Pack)
     Else
+        Registry = Utils.ResolveUrl(Registry)
         Dim Response As TResponse
         Response = PublishOnServer(Registry, ZipPath, Pack)
         Success = Response.Code = HTTPCodes.OK_200 Or _
@@ -143,7 +139,7 @@ Public Function GetBuildName(ByRef Pack As Pack) As String
 End Function
 
 Public Function CreateExport() As String
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         Dim Folder As String
         Folder = .BuildPath(Interaction.Environ("TEMP"), .GetTempName())
         If Not .FolderExists(Folder) Then PFileSystem.CreateFolder Folder, Recoursive:=True
@@ -160,7 +156,7 @@ Public Function CreateExport() As String
 End Function
 
 Public Function PublishOnLocal(ByVal Registry As String, ByVal ZipPath As String, ByRef Pack As Pack) As Boolean
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         Dim PackageFolder As String
         PackageFolder = .BuildPath(Registry, Pack.Name)
         If Not .FolderExists(PackageFolder) Then PFileSystem.CreateFolder PackageFolder, Recoursive:=True
@@ -198,7 +194,10 @@ Public Function PublishOnServer(ByVal Registry As String, ByVal ZipPath As Strin
   #Else
     Dim Headers As Object: Set Headers = NewDictionary()
   #End If
+    Config.ReadScope ConfigScopes.UserScope
     Headers("Content-Type") = "multipart/form-data; boundary=" & FormData.Boundary
+    Headers("email") = Config.GetValue("email")
+    Headers("api-key") = Config.GetValue("api_key")
 
     Dim HTTP As HTTP: Set HTTP = New HTTP
     PublishOnServer = HTTP.PostRequest( _
@@ -210,7 +209,7 @@ End Function
 
 Public Sub CreateOrUpdateManifest(ByVal PackageFolder As String, ByRef Pack As Pack)
     Dim JB As PJSONBuilder: Set JB = New PJSONBuilder
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         Dim ManifestPath As String
         ManifestPath = .BuildPath(PackageFolder, "manifest.json")
         If .FileExists(ManifestPath) Then

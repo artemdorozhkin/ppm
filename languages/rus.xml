@@ -1,5 +1,36 @@
 <root>
     <ppmCommands>
+        <auth>
+            <description>
+                Регистрирует email в реестре и возвращает токен для\\nвозможности публикации пакетов.
+            </description>
+            <param name="email">
+                \\tEmail пользователя.
+            </param>
+            <param name="registry">
+                \\tИспользовать указанный url реестра.
+            </param>
+            <usage>
+                <item>
+                    &lt;email&gt; [--registry URL]
+                </item>
+            </usage>
+            <messages>
+                <waitingAnswer>
+                    Жду ответ от сервера...
+                </waitingAnswer>
+                <errorOccurred>
+                    ERR: {0}
+                </errorOccurred>
+                <somethingWentWrong>
+                    ERR: что-то пошло не так
+                </somethingWentWrong>
+                <success>
+                    Ваш api-key для email '{0}': {1}
+                    Api-key записан в конфиг файл.
+                </success>
+            </messages>
+        </auth>
         <class>
             <description>
                 Управляет классами проекта (.cls).
@@ -55,9 +86,6 @@
             <description>
                 Управляет конфигурационным файлом ppm.
             </description>
-            <param name="global">
-                \\tИспользовать глобальный конфиг.
-            </param>
             <param name="location">
                 \\tИспользовать указанный конфиг &lt;global|user|project&gt;.
             </param>
@@ -74,6 +102,9 @@
                 <item>
                     edit
                 </item>
+                <item>
+                    list
+                </item>
             </usage>
             <messages>
                 <unknownConfigType>
@@ -85,6 +116,15 @@
                 <deleted>
                     ключ '{0}' удален
                 </deleted>
+                <needSaveProject>
+                    Необходимо сохранить проект перед созданием файла конфигурации.
+                </needSaveProject>
+                <fileGenerated>
+                    Создан файл конфигурации: {0}
+                </fileGenerated>
+                <unknownKey>
+                    Неизвестный ключ '{0}'
+                </unknownKey>
             </messages>
         </config>
         <export>
@@ -168,7 +208,7 @@
             </param>
             <usage>
                 <item>
-                    [&lt;пакет&gt;@&lt;версия&gt;] [&lt;опции&gt;]
+                    [&lt;пакет&gt;[@&lt;версия&gt;]] [&lt;опции&gt;]
                 </item>
             </usage>
             <messages>
@@ -379,6 +419,15 @@
                 <cantRemoveUsingDependencies>
                     ERR: невозможно удалить зависимости, которые используются другими пакетами
                 </cantRemoveUsingDependencies>
+                <noInstalledLibs>
+                    ERR: в проекте нет установленных пакетов 
+                </noInstalledLibs>
+                <nothingToRemove>
+                   нечего удалять 
+                </nothingToRemove>
+                <cantFindDep>
+                    ERR: не удалось найти пакет '{0}' 
+                </cantFindDep>
                 <uninstalled>
                     успешно удалено пакетов: {0}, за {1}
                 </uninstalled>

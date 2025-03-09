@@ -7,17 +7,16 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder("PearPMProject.src.CLI.Commands.Version")
+'@Folder "PearPMProject.src.CLI.Commands.Version"
 
 Implements ICommand
 
-Private Type TExportCommand
+Private Type TVersionCommand
     CommandInfo As CommandInfo
-    Config As Config
     Tokens As Tokens
 End Type
 
-Private this As TExportCommand
+Private this As TVersionCommand
 
 Private Sub Class_Initialize()
     CLI.Lang.SetBlock "/root/ppmCommands/version"
@@ -27,10 +26,6 @@ Private Sub Class_Initialize()
     this.CommandInfo.Description = CLI.Lang.GetValue("description")
     this.CommandInfo.Usage = CLI.Lang.GetValues("usage")
 End Sub
-
-Public Property Set Config(ByVal RHS As Config)
-    Set this.Config = RHS
-End Property
 
 Public Property Set Tokens(ByVal RHS As Tokens)
     Set this.Tokens = RHS
@@ -42,18 +37,23 @@ End Property
 
 Private Sub ICommand_Exec()
     Dim Pack As Pack: Set Pack = NewPack(SelectedProject.GetComponent("package"))
+
     Dim NewVers As String
 
     Dim SubCommand As SyntaxToken
-    Set SubCommand = this.Tokens.GetFirstTokenKind(TokenKind.SubCommand)
+    Set SubCommand = this.Tokens.PopFirstTokenKind(TokenKind.SubCommand)
     Dim SubCommandName As String
     If IsTrue(SubCommand) Then
         SubCommandName = SubCommand.Text
+        If IsFalse(Pack.Version) Then
+            Immediate.WriteLine "ERR: Version not provided"
+            Exit Sub
+        End If
     Else
         Dim NewVersToken As SyntaxToken
-        Set NewVersToken = this.Tokens.GetFirstTokenKind(TokenKind.Identifier)
+        Set NewVersToken = this.Tokens.PopFirstTokenKind(TokenKind.Identifier)
         If IsFalse(NewVersToken) Then
-            Immediate.WriteLine PStrings.FString("v{0}", Pack.Version)
+            Immediate.WriteLine Pack.Version
             Exit Sub
         End If
 
@@ -64,7 +64,7 @@ Private Sub ICommand_Exec()
             End
         End If
         Pack.Update Version:=NewVers
-        Immediate.WriteLine PStrings.FString("v{0}", NewVers)
+        Immediate.WriteLine NewVers
         Exit Sub
     End If
 
@@ -95,5 +95,5 @@ Private Sub ICommand_Exec()
 
     NewVers = Strings.Join(CurrentVersParts, ".")
     Pack.Update Version:=NewVers
-    Immediate.WriteLine PStrings.FString("v{0}", NewVers)
+    Immediate.WriteLine NewVers
 End Sub

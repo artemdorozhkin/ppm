@@ -8,7 +8,7 @@ Public Sub ChangeFileEncoding(ByVal Path As String, ByVal Encoding As String)
   #Else
     Dim SourceStream As Object
   #End If
-    Set SourceStream = NewFileSystemObject().OpenTextFile(Path)
+    Set SourceStream = GetFileSystemObject().OpenTextFile(Path)
     Dim Content As String
     If Not SourceStream.AtEndOfStream Then
         Content = SourceStream.ReadAll()
@@ -55,7 +55,7 @@ Public Sub SaveToFile(ByVal Path As String, ByVal Content As String, Optional By
     EncodingStream.CopyTo BinaryStream
     EncodingStream.Close
 
-    With NewFileSystemObject()
+    With GetFileSystemObject()
         If Not .FileExists(Path) Then
             PFileSystem.CreateFolder .GetParentFolderName(Path), Recoursive:=True
             BinaryStream.SaveToFile Path, 1 'adSaveCreateNotExist
@@ -75,7 +75,7 @@ Public Sub CreateFolder(ByVal Path As String, Optional ByVal Recoursive As Boole
   #If DEV Then
     Dim FSO As FileSystemObject: Set FSO = NewFileSystemObject()
   #Else
-    Dim FSO As Object: Set FSO = NewFileSystemObject()
+    Dim FSO As Object: Set FSO = GetFileSystemObject()
   #End If
     Dim Parts As Variant: Parts = Strings.Split(Path, Application.PathSeparator)
     Dim Part As Variant
@@ -116,7 +116,7 @@ Public Function BuildPath(ParamArray Parts() As Variant)
   #Else
     Dim FSO As Object
   #End If
-    Set FSO = NewFileSystemObject()
+    Set FSO = GetFileSystemObject()
 
     Dim FullPath As String
     Dim Part As Variant

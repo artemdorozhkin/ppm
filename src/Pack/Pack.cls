@@ -85,7 +85,9 @@ End Property
 #Else
   Public Property Get DevDependencies() As Object
 #End If
-    Set DevDependencies = this.Pack("devDependencies")
+    If this.Pack.Exists("devDependencies") Then
+        Set DevDependencies = this.Pack("devDependencies")
+    End If
 End Property
 
 #If DEV Then
@@ -95,6 +97,16 @@ End Property
 #End If
     If this.Pack.Exists("references") Then
         Set References = this.Pack("references")
+    End If
+End Property
+
+#If DEV Then
+  Public Property Get DevReferences() As Dictionary
+#Else
+  Public Property Get DevReferences() As Object
+#End If
+    If this.Pack.Exists("devReferences") Then
+        Set DevReferences = this.Pack("devReferences")
     End If
 End Property
 
@@ -119,6 +131,12 @@ End Property
         End If
     Next
     Code = Strings.Join(PCollection.ToArray(Lines), vbNewLine)
+    If Code = "" Then
+        Set this.Pack = NewDictionary()
+        Set Read = Me
+        Exit Function
+    End If
+
     Set this.Pack = PJSON.Parse(Utils.UncommentString(Code))
     If this.Pack.Exists("dependencies") Then
         Set this.Pack("dependencies") = Utils.ChangeDictionaryCompareMode( _
@@ -135,6 +153,12 @@ End Property
     If this.Pack.Exists("references") Then
         Set this.Pack("references") = Utils.ChangeDictionaryCompareMode( _
             this.Pack("references"), _
+            VbCompareMethod.vbTextCompare _
+        )
+    End If
+    If this.Pack.Exists("devReferences") Then
+        Set this.Pack("devReferences") = Utils.ChangeDictionaryCompareMode( _
+            this.Pack("devReferences"), _
             VbCompareMethod.vbTextCompare _
         )
     End If
@@ -155,7 +179,8 @@ Public Function Update( _
     Optional ByVal Git As Variant, _
     Optional ByVal Dependencies As Variant, _
     Optional ByVal DevDependencies As Variant, _
-    Optional ByVal References As Variant _
+    Optional ByVal References As Variant, _
+    Optional ByVal DevReferences As Variant _
 ) As Pack
     If Not Information.IsMissing(Name) Then this.Pack("name") = Name
     If Not Information.IsMissing(Version) Then this.Pack("version") = Version
@@ -188,6 +213,12 @@ Public Function Update( _
     If Not Information.IsMissing(References) Then
         If Not References Is Nothing Then
             Set this.Pack("references") = References
+        End If
+    End If
+
+    If Not Information.IsMissing(DevReferences) Then
+        If Not DevReferences Is Nothing Then
+            Set this.Pack("devReferences") = DevReferences
         End If
     End If
 
