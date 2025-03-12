@@ -159,6 +159,7 @@ Catch:
             Information.Err.Description _
         )
     End If
+    Resume
 End Sub
 
 #If DEV Then
